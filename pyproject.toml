@@ -1,0 +1,10 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "alpha-labs"
+version = "0.1.0"
+requires-python = ">=3.12"
+description = "Alpha Labs offline, cost-aware quantitative research foundation (no execution)"
+[tool.setuptools.packages.find]
+where = ["packages/alpha_lab/src"]

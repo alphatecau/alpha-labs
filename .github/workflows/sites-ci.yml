@@ -1,0 +1,14 @@
+name: Sites v0.3 existing tests
+on:
+  push:
+  pull_request:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run existing offline site tests
+        run: node --test apps/sites/tests/*.test.cjs

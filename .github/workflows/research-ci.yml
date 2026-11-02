@@ -1,0 +1,17 @@
+name: Alpha Labs offline research tests
+on:
+  push:
+  pull_request:
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run independent research tests
+        run: PYTHONPATH=packages/alpha_lab/src python -m unittest discover -s tests/unit -p test_*.py -v
+      - name: Run synthetic research fixture
+        run: |
+          PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.cli examples/SYNTHETIC_SOLUSDC_1h.csv --quote USDC --provenance synthetic --output /tmp/research-check.json

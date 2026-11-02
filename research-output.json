@@ -1,0 +1,303 @@
+{
+  "assumptions": {
+    "adverse_slippage_bps_each_side": "10",
+    "fast": 12,
+    "fee_bps_each_side": "10",
+    "latency_funding_MEV_and_adverse_selection": "not_modelled",
+    "max_capital_allocation": "0.20",
+    "operating_costs": "not_included",
+    "order_fills": "next_candle_open_modelled",
+    "position_mark": "liquidation_estimate_at_last_close",
+    "slow": 48,
+    "starting_balance_quote_units": "10000",
+    "strategy": "EMA_TREND_LONG_ONLY",
+    "trade_entry_decision": "prior_candle_close"
+  },
+  "configuration": {
+    "fast": 12,
+    "fee_bps": "10",
+    "max_allocation": "0.20",
+    "model_version": "0.1.0-offline-ema",
+    "slippage_bps": "10",
+    "slow": 48,
+    "starting_balance": "10000"
+  },
+  "configuration_sha256": "31290eb42b15aee77fcafcda9832b79fca6f5cc27584e3ebce8365c7e4f904c1",
+  "dataset": {
+    "bars": 360,
+    "interval_minutes": 60,
+    "provenance": "synthetic",
+    "quote_currency": "USDC",
+    "sha256": "f4f23e3d5c7f191624c88bb05b5f92bdf1cf62c8d6369e8ca07e252ee5ee485f",
+    "split_index": 252
+  },
+  "limitations": [
+    "Historical CSV is not independently verified or executable pricing",
+    "Holdout is descriptive until strategy design and preprocessing are frozen externally",
+    "Candle prices do not model spread/depth/intra-bar execution failures",
+    "No statistical confidence bound or multiple-testing adjustment",
+    "Funding, tax, and operating expenses are excluded; value is in quote units, not AUD FX unless quote is AUD",
+    "No live market data, orders, custody, autonomous agents, or AI calls"
+  ],
+  "periods": {
+    "holdout": {
+      "double_cost_strategy": {
+        "closed_trades": 1,
+        "estimated_unexecuted_exit_fee_in_nav": "4.163303383542031985337382136",
+        "executed_orders": 3,
+        "final_liquidatable_value": "10039.37183212699670928726023",
+        "max_drawdown_pct": 0.7712010004337893,
+        "open_position": true,
+        "orders": [
+          {
+            "fee": "3.992015968063872255489021956",
+            "kind": "BUY",
+            "price": "171.9287712",
+            "quantity": "11.60950532072398204719159290",
+            "quote_outlay": "2000.000000000000000000000000",
+            "source": "modelled_next_open",
+            "time": "2025-01-11T12:00:00+00:00"
+          },
+          {
+            "fee": "3.931630147774594686580975038",
+            "kind": "SELL",
+            "modelled_trade_pnl": "-38.116556260477251396093456",
+            "price": "169.3280652",
+            "quantity": "11.60950532072398204719159290",
+            "quote_received": "1961.883443739522748603906544",
+            "source": "modelled_next_open",
+            "time": "2025-01-13T05:00:00+00:00"
+          },
+          {
+            "fee": "3.992015968063872255489021956",
+            "kind": "BUY",
+            "price": "172.3983084",
+            "quantity": "11.57788613215845294073959126",
+            "quote_outlay": "2000.000000000000000000000000",
+            "source": "modelled_next_open",
+            "time": "2025-01-14T10:00:00+00:00"
+          }
+        ],
+        "pnl": "39.37183212699670928726023",
+        "return_pct": 0.3937183212699671,
+        "starting_balance": "10000",
+        "total_modelled_fees": "11.91566208390233919755901895"
+      },
+      "equal_allocation_buy_hold": {
+        "closed_trades": 0,
+        "estimated_unexecuted_exit_fee_in_nav": "2.093604965912393846867407548",
+        "executed_orders": 1,
+        "final_liquidatable_value": "10091.51136094648145302054014",
+        "max_drawdown_pct": 0.9084797903455947,
+        "open_position": true,
+        "orders": [
+          {
+            "fee": "1.998001998001998001998001999",
+            "kind": "BUY",
+            "price": "171.7571856",
+            "quantity": "11.63271272187169560839614735",
+            "quote_outlay": "2000.000000000000000000000001",
+            "source": "modelled_next_open",
+            "time": "2025-01-11T12:00:00+00:00"
+          }
+        ],
+        "pnl": "91.51136094648145302054014",
+        "return_pct": 0.9151136094648146,
+        "starting_balance": "10000",
+        "total_modelled_fees": "1.998001998001998001998001999"
+      },
+      "excess_vs_buy_hold_pct_points": -0.35949645534555996,
+      "strategy": {
+        "closed_trades": 1,
+        "estimated_unexecuted_exit_fee_in_nav": "2.087902906404247299113025107",
+        "executed_orders": 3,
+        "final_liquidatable_value": "10055.56171541192545872069606",
+        "max_drawdown_pct": 0.6938116471424961,
+        "open_position": true,
+        "orders": [
+          {
+            "fee": "1.998001998001998001998001999",
+            "kind": "BUY",
+            "price": "171.7571856",
+            "quantity": "11.63271272187169560839614735",
+            "quote_outlay": "2000.000000000000000000000001",
+            "source": "modelled_next_open",
+            "time": "2025-01-11T12:00:00+00:00"
+          },
+          {
+            "fee": "1.971718430344426833740524498",
+            "kind": "SELL",
+            "modelled_trade_pnl": "-30.253288085917593093216027",
+            "price": "169.4977326",
+            "quantity": "11.63271272187169560839614735",
+            "quote_received": "1969.746711914082406906783974",
+            "source": "modelled_next_open",
+            "time": "2025-01-13T05:00:00+00:00"
+          },
+          {
+            "fee": "1.998001998001998001998001998",
+            "kind": "BUY",
+            "price": "172.2262542",
+            "quantity": "11.60103032654819245321542851",
+            "quote_outlay": "2000.000000000000000000000000",
+            "source": "modelled_next_open",
+            "time": "2025-01-14T10:00:00+00:00"
+          }
+        ],
+        "pnl": "55.56171541192545872069606",
+        "return_pct": 0.5556171541192546,
+        "starting_balance": "10000",
+        "total_modelled_fees": "5.967722426348422837736528495"
+      }
+    },
+    "training": {
+      "double_cost_strategy": {
+        "closed_trades": 2,
+        "estimated_unexecuted_exit_fee_in_nav": "4.138698949255038611127636692",
+        "executed_orders": 5,
+        "final_liquidatable_value": "10135.86775207918266245086931",
+        "max_drawdown_pct": 0.8546307858732529,
+        "open_position": true,
+        "orders": [
+          {
+            "fee": "3.992015968063872255489021956",
+            "kind": "BUY",
+            "price": "154.0107066",
+            "quantity": "12.96018976924774480415578444",
+            "quote_outlay": "2000.000000000000000000000000",
+            "source": "modelled_next_open",
+            "time": "2025-01-04T05:00:00+00:00"
+          },
+          {
+            "fee": "4.067527648013717654841082716",
+            "kind": "SELL",
+            "modelled_trade_pnl": "29.696296358845109765700275",
+            "price": "156.9239232",
+            "quantity": "12.96018976924774480415578444",
+            "quote_received": "2029.696296358845109765700275",
+            "source": "modelled_next_open",
+            "time": "2025-01-06T08:00:00+00:00"
+          },
+          {
+            "fee": "3.992015968063872255489021958",
+            "kind": "BUY",
+            "price": "159.9283182",
+            "quantity": "12.48064136793965315233653835",
+            "quote_outlay": "2000.000000000000000000000001",
+            "source": "modelled_next_open",
+            "time": "2025-01-07T13:00:00+00:00"
+          },
+          {
+            "fee": "4.090101563210567706878714076",
+            "kind": "SELL",
+            "modelled_trade_pnl": "40.960680042073285732478323",
+            "price": "163.8578276",
+            "quantity": "12.48064136793965315233653835",
+            "quote_received": "2040.960680042073285732478324",
+            "source": "modelled_next_open",
+            "time": "2025-01-09T18:00:00+00:00"
+          },
+          {
+            "fee": "3.992015968063872255489021954",
+            "kind": "BUY",
+            "price": "165.1732872",
+            "quantity": "12.08432681741733918669937918",
+            "quote_outlay": "1999.999999999999999999999999",
+            "source": "modelled_next_open",
+            "time": "2025-01-10T23:00:00+00:00"
+          }
+        ],
+        "pnl": "135.86775207918266245086931",
+        "return_pct": 1.3586775207918267,
+        "starting_balance": "10000",
+        "total_modelled_fees": "20.13367711541590212818686266"
+      },
+      "equal_allocation_buy_hold": {
+        "closed_trades": 0,
+        "estimated_unexecuted_exit_fee_in_nav": "2.268692957380282913245496075",
+        "executed_orders": 1,
+        "final_liquidatable_value": "10266.42426442290263033225058",
+        "max_drawdown_pct": 1.014406202303796,
+        "open_position": true,
+        "orders": [
+          {
+            "fee": "1.998001998001998001998001998",
+            "kind": "BUY",
+            "price": "150.9616108",
+            "quantity": "13.23516612875197276311788002",
+            "quote_outlay": "2000.000000000000000000000000",
+            "source": "modelled_next_open",
+            "time": "2025-01-03T01:00:00+00:00"
+          }
+        ],
+        "pnl": "266.42426442290263033225058",
+        "return_pct": 2.6642426442290263,
+        "starting_balance": "10000",
+        "total_modelled_fees": "1.998001998001998001998001998"
+      },
+      "excess_vs_buy_hold_pct_points": -1.059638313808457,
+      "strategy": {
+        "closed_trades": 2,
+        "estimated_unexecuted_exit_fee_in_nav": "2.075563745616368305308085114",
+        "executed_orders": 5,
+        "final_liquidatable_value": "10160.46043304205691902778653",
+        "max_drawdown_pct": 0.7780743077679662,
+        "open_position": true,
+        "orders": [
+          {
+            "fee": "1.998001998001998001998001997",
+            "kind": "BUY",
+            "price": "153.8570033",
+            "quantity": "12.98609718860940535423779437",
+            "quote_outlay": "1999.999999999999999999999999",
+            "source": "modelled_next_open",
+            "time": "2025-01-04T05:00:00+00:00"
+          },
+          {
+            "fee": "2.039871231037259681728932222",
+            "kind": "SELL",
+            "modelled_trade_pnl": "37.831359806222422047203291",
+            "price": "157.0811616",
+            "quantity": "12.98609718860940535423779437",
+            "quote_received": "2037.831359806222422047203290",
+            "source": "modelled_next_open",
+            "time": "2025-01-06T08:00:00+00:00"
+          },
+          {
+            "fee": "1.998001998001998001998001999",
+            "kind": "BUY",
+            "price": "159.7687091",
+            "quantity": "12.50559017004662023646532673",
+            "quote_outlay": "2000.000000000000000000000001",
+            "source": "modelled_next_open",
+            "time": "2025-01-07T13:00:00+00:00"
+          },
+          {
+            "fee": "2.051192083448531091068875084",
+            "kind": "SELL",
+            "modelled_trade_pnl": "49.140891365082559977806208",
+            "price": "164.0220138",
+            "quantity": "12.50559017004662023646532673",
+            "quote_received": "2049.140891365082559977806209",
+            "source": "modelled_next_open",
+            "time": "2025-01-09T18:00:00+00:00"
+          },
+          {
+            "fee": "1.998001998001998001998001998",
+            "kind": "BUY",
+            "price": "165.0084436",
+            "quantity": "12.10848338673741664210207724",
+            "quote_outlay": "2000.000000000000000000000000",
+            "source": "modelled_next_open",
+            "time": "2025-01-10T23:00:00+00:00"
+          }
+        ],
+        "pnl": "160.46043304205691902778653",
+        "return_pct": 1.6046043304205693,
+        "starting_balance": "10000",
+        "total_modelled_fees": "10.08506930849178477879181330"
+      }
+    }
+  },
+  "status": "HYPOTHESIS_SCREEN_ONLY_NOT_VALIDATED_ALPHA"
+}

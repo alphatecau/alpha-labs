@@ -1,3 +1,3 @@
 # Import status
 
-Partial import in progress.
+This repository is partially imported; remaining source is not yet committed.

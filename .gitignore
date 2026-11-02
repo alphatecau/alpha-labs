@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+node_modules/
+dist/
+build/
+.coverage
+*.sqlite3
+*.db
+datasets/raw/**
+datasets/curated/**
+datasets/replay/**
+!datasets/**/.gitkeep

@@ -20,7 +20,7 @@ def parse_ohlc_payload(payload, *, pair, minutes):
     if len(candle_keys)!=1: raise ValueError('Expected exactly one market data series')
     series=result[candle_keys[0]]
     if len(series)<81: raise ValueError('Insufficient completed candles for research: require >= 80')
-    if len(series)>720: raise ValueError('Unexpected series length exceeds documented limit')
+    if len(series)>721: raise ValueError('Unexpected series length exceeds documented limit')
     # Last entry is explicitly described by Kraken as the currently-forming candle.
     complete=series[:-1]
     rows=[]

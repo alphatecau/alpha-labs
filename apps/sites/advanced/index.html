@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090e0c" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="Alpha Labs is a multi-market, evidence-first quantitative research workspace for transparent strategy evaluation, risk control, and paper-trading research." />
+  <title>Alpha Labs — Evidence-First Trading Research</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<div id="app" class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <a href="#overview" class="brand" data-page="overview" aria-label="Alpha Labs home">
+      <div class="brand-glyph">α<span>·</span></div>
+      <div><div class="brand-name">alpha<span>labs</span></div><div class="brand-desc">MULTI-MARKET RESEARCH</div></div>
+    </a>
+    <div class="sidebar-section">WORKSPACE</div>
+    <nav id="main-nav">
+      <button class="nav-item active" data-page="overview"><span class="nav-icon">▦</span>Overview<span class="nav-kbd">01</span></button>
+      <button class="nav-item" data-page="research"><span class="nav-icon">⌘</span>Alpha research<span class="nav-kbd">02</span></button>
+      <button class="nav-item" data-page="backtest"><span class="nav-icon">⌁</span>Backtest studio<span class="nav-kbd">03</span></button>
+      <button class="nav-item" data-page="evidence"><span class="nav-icon">◈</span>Evidence audit<span class="nav-kbd">04</span></button>
+      <button class="nav-item" data-page="risk"><span class="nav-icon">◇</span>Risk laboratory<span class="nav-kbd">05</span></button>
+      <button class="nav-item" data-page="roadmap"><span class="nav-icon">≡</span>Development plan<span class="nav-kbd">06</span></button>
+      <button class="nav-item" data-page="architecture"><span class="nav-icon">⎔</span>Architecture<span class="nav-kbd">07</span></button>
+    </nav>
+    <a href="../index.html#settings" class="nav-item" style="display:flex;align-items:center;text-decoration:none;color:#b7f486">← Return to Alpha Labs</a><div class="sidebar-spacer"></div>
+    <div class="sidebar-report"><div class="dot amber"></div><div><strong>Research environment</strong><p>No live feed connected<br/>No capital at risk</p></div></div>
+    <div class="sidebar-footer">BUILD v0.3.0 <span>•</span> NOV 2026</div>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+  <div class="workspace">
+    <header class="topbar">
+      <div class="top-left"><button class="mobile-menu" id="menu-button" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">☰</button><span class="crumb">WORKSPACE</span><span class="slash">/</span><strong id="crumb-page">Overview</strong></div>
+      <div class="top-right"><span class="clock" id="clock">UTC+10</span><span class="environment"><span class="dot amber"></span> RESEARCH MODE</span><span class="profile">AL</span></div>
+    </header>
+    <main>
+      <section id="page-overview" class="page active" aria-labelledby="overview-title">
+        <div class="page-hero"><div class="hero-copy"><div class="eyebrow"><span class="eyebrow-mark">✳</span> QUANTITATIVE INTELLIGENCE / V3.1</div><h1 id="overview-title">Research before <em>risk.</em></h1><p>Design. Challenge. Validate. Deploy only when evidence earns the right. One disciplined workspace for Solana trading research.</p><div class="hero-actions"><button class="button lime" data-page="research">Explore the alpha lab <span>↗</span></button><button class="button subtle" data-page="backtest">Open backtest studio <span>→</span></button><button class="button subtle" data-page="evidence">Review evidence gates <span>→</span></button></div></div><div class="hero-art" aria-hidden="true"><div class="orbit o1"></div><div class="orbit o2"></div><div class="orbit o3"></div><div class="orbit-core">α</div><div class="orbit-point one"></div><div class="orbit-point two"></div><div class="orbit-point three"></div></div></div>
+        <div class="notice"><span class="notice-icon">!</span><div><strong>Research workspace prototype.</strong> All strategy entries are proposed hypotheses. An offline research simulator is available with synthetic data or a user-imported CSV. No live market feed, exchange, wallet or AI backend is connected. No returns are claimed.</div><span class="notice-label">TRANSPARENT BY DESIGN</span></div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">REGISTERED HYPOTHESES <span>↗</span></div><strong id="metric-hypotheses">04</strong><span class="metric-foot">Research candidates</span></div>
+          <div class="metric"><div class="metric-label">VERIFIED STRATEGIES <span>◇</span></div><strong>00</strong><span class="metric-foot">Awaiting independent tests</span></div>
+          <div class="metric"><div class="metric-label">CONNECTED DATA FEEDS <span>⌁</span></div><strong>00</strong><span class="metric-foot">Data integration pending</span></div>
+          <div class="metric"><div class="metric-label">CAPITAL AT RISK <span>◎</span></div><strong>A$0</strong><span class="metric-foot positive">Paper research only</span></div>
+        </div>
+        <div class="offline-status card">
+          <div class="offline-status-copy"><span class="section-kicker">NEW IN V0.2 / OFFLINE RESEARCH</span><h3>Backtest with your own OHLCV data.</h3><p>Import timestamped candles, test transparent long/flat rules, inspect trades and compare the same-size passive benchmark. Sample data is synthetic, never a claim of actual returns.</p></div>
+          <button class="button lime" data-page="backtest">Open the studio ↗</button>
+        </div>
+        <div class="content-grid">
+          <div class="card main-card"><div class="card-head"><div><span class="section-kicker">01 / RESEARCH PIPELINE</span><h2>Evidence, not speculation.</h2><p>Strategies must progress through independent gates.</p></div><span class="outline-badge">PROCESS STANDARD</span></div><div class="pipeline">
+            <div class="pipe-step"><span class="step-no">01</span><div><strong>Register hypothesis</strong><p>Economic mechanism, inputs, costs and failure conditions.</p></div><span class="pipe-state planned">DESIGNED</span></div>
+            <div class="pipe-step"><span class="step-no">02</span><div><strong>Historical verification</strong><p>Point-in-time datasets, executable assumptions, benchmarks.</p></div><span class="pipe-state">NOT STARTED</span></div>
+            <div class="pipe-step"><span class="step-no">03</span><div><strong>Independent evaluation</strong><p>Sealed holdouts, parameter sensitivity, confidence bounds.</p></div><span class="pipe-state">NOT STARTED</span></div>
+            <div class="pipe-step"><span class="step-no">04</span><div><strong>Forward paper testing</strong><p>Frozen rules, live quotes and full decision audit.</p></div><span class="pipe-state">NOT STARTED</span></div>
+            <div class="pipe-step"><span class="step-no">05</span><div><strong>Controlled live approval</strong><p>Separate risk, security and capital authorisation.</p></div><span class="pipe-state blocked">LOCKED</span></div>
+          </div><div class="card right-card"><div class="card-head"><div><span class="section-kicker">02 / DESIGN PRINCIPLES</span><h2>Non-negotiable.</h2></div></div><div class="principle"><span class="principle-icon">◈</span><div><strong>Evidence first</strong><p>No performance claim without independently reproducible results.</p></div></div><div class="principle"><span class="principle-icon">⬡</span><div><strong>Independent risk controls</strong><p>Neither strategies nor AI can override safety limits.</p></div></div><div class="principle"><span class="principle-icon">≋</span><div><strong>Real costs count</strong><p>Fees, slippage, failed orders and operational expenditure.</p></div></div><div class="principle"><span class="principle-icon">⌁</span><div><strong>Fail closed</strong><p>Uncertain critical inputs prevent new orders.</p></div></div></div>
+        </div>
+        <div class="callout"><div><span class="section-kicker">OUR INVESTMENT IN DISCIPLINE</span><h2>The most profitable trade may be the one we never take.</h2><p>The goal is credible positive net expectancy—not high activity, predictive-sounding AI or cosmetic dashboards.</p></div><button class="button lime" data-page="risk">Explore risk modelling ↗</button></div>
+      </section>
+      <section id="page-research" class="page" aria-labelledby="research-title">
+        <div class="page-title"><div><span class="section-kicker">ALPHA DISCOVERY / EXPERIMENT REGISTRY</span><h1 id="research-title">Strategy laboratory<span class="title-dot">.</span></h1><p>Register falsifiable trading hypotheses. Tests and results remain unavailable until real datasets and an independent research engine are connected.</p></div><button class="button lime" id="open-register">+ Register hypothesis</button></div>
+        <div class="notice"><span class="notice-icon">i</span><div><strong>Unverified research ideas.</strong> These are not live signals, investment recommendations or profitable strategies.</div></div>
+        <div class="stats-three"><div class="stat"><span>Hypotheses</span><strong id="research-total">4</strong><small>Registered locally</small></div><div class="stat"><span>Independently tested</span><strong>0</strong><small>Research engine pending</small></div><div class="stat"><span>Production approved</span><strong>0</strong><small>Execution disabled</small></div></div>
+        <div class="card"><div class="card-head"><div><span class="section-kicker">EXPERIMENT REGISTRY</span><h2>Research candidates</h2></div><div class="controls"><label for="filter-market" class="sr-only">Filter by market</label><select id="filter-market"><option value="all">All markets</option><option value="SOL/USDC">SOL/USDC</option><option value="Other">Other</option></select><button class="button subtle small" id="export-registry">Export JSON ↗</button></div></div><div class="table-scroll"><table><thead><tr><th>ID / HYPOTHESIS</th><th>MARKET</th><th>MECHANISM</th><th>STATUS</th><th>REVIEW</th></tr></thead><tbody id="hypothesis-body"></tbody></table></div><p class="footnote">Saved to this browser only. Export the registry to preserve it or move it to a future database-backed version.</p></div>
+        <div class="cards-two"><div class="card"><span class="section-kicker">RESEARCH RULE 01</span><h3>Every idea needs a reason.</h3><p>Define who is on the other side of the trade, why the price inefficiency might exist, when it should disappear and what would disprove the thesis.</p></div><div class="card"><span class="section-kicker">RESEARCH RULE 02</span><h3>The holdout stays sealed.</h3><p>Keep evaluation periods independent of strategy selection. Record every tested configuration—including failures—to reduce selection bias.</p></div></div>
+      </section>
+
+      <section id="page-backtest" class="page" aria-labelledby="backtest-title">
+        <div class="page-title"><div><span class="section-kicker">RESEARCH ENGINE / OFFLINE EXPLORATORY REPLAY</span><h1 id="backtest-title">Backtest studio<span class="title-dot">.</span></h1><p>Import genuine, timestamped OHLCV candles or use a clearly identified synthetic demonstration. Simulate simple long/flat strategies using only completed bars, with configurable friction.</p></div><button class="button subtle" id="export-backtest" disabled>Export research report ↗</button></div>
+        <div class="notice"><span class="notice-icon">!</span><div><strong>Research simulation, not real execution.</strong> The model assumes fills at the next candle open, with user-defined fees and slippage. It does not verify executable quotes, order book depth, failed fills or market impact. No financial performance is verified.</div><span class="notice-label">NO LIVE TRADES</span></div>
+        <div class="bt-layout">
+          <div class="card">
+            <div class="card-head"><div><span class="section-kicker">01 / DATASET</span><h2>Data integrity checkpoint</h2><p>Timestamp, open, high, low, close and optional volume.</p></div><span class="outline-badge" id="bt-source-tag">SYNTHETIC DEMO</span></div>
+            <div class="bt-actions"><label for="bt-file" class="button subtle upload-control">↑ Import CSV <input id="bt-file" type="file" accept=".csv,text/csv" /></label><button class="button subtle" id="bt-demo">Restore demo dataset</button><button class="button subtle" id="bt-template">CSV template ↓</button></div>
+            <div class="dataset-box"><strong id="bt-dataset-name">Synthetic hourly demonstration · fixed seed</strong><span id="bt-dataset-range">Loading offline observations…</span><span id="bt-dataset-rows"></span><span id="bt-dataset-quality"></span><span id="bt-dataset-fingerprint"></span></div>
+            <p class="footnote">CSV must contain strictly increasing ISO-8601 timestamps with timezone, and valid positive OHLC values. Imported prices must share the selected quote currency; no FX conversion is performed. Data remains in this browser session; uploads are not sent to a server.</p>
+            <div class="bt-error" id="bt-error" role="alert" hidden></div>
+          </div>
+          <form class="card" id="bt-form">
+            <div class="card-head"><div><span class="section-kicker">02 / MODEL CONFIGURATION</span><h2>Reproducible assumptions</h2><p>Trade at bar <em>i</em> open using information through bar <em>i−1</em>.</p></div></div>
+            <div class="bt-form-grid">
+              <label>Trading rule<select id="bt-strategy" name="strategy"><option value="ema">Fast/slow EMA regime</option><option value="sma">Close above slow SMA</option></select></label>
+              <label>Initial paper capital (quote units)<input id="bt-capital" type="number" min="100" max="100000000" step="100" value="10000" required /></label>
+              <label>Quote currency (must match CSV prices)<select id="bt-currency"><option value="USDC">USDC</option><option value="AUD">AUD</option><option value="USD">USD</option><option value="QUOTE">Other quote units</option></select></label>
+              <label>Fast lookback (bars)<input id="bt-fast" type="number" min="2" max="500" step="1" value="10" required /></label>
+              <label>Slow lookback (bars)<input id="bt-slow" type="number" min="5" max="1000" step="1" value="30" required /></label>
+              <label>Fee per side (bps)<input id="bt-fee" type="number" min="0" max="200" step="1" value="8" required /></label>
+              <label>Slippage per side (bps)<input id="bt-slip" type="number" min="0" max="500" step="1" value="12" required /></label>
+              <label>Allocation per position (%)<input id="bt-exposure" type="number" min="1" max="100" step="1" value="25" required /></label>
+            </div>
+            <div class="bt-run"><button type="submit" class="button lime">Run offline simulation ↗</button><span>One position · long/flat · no leverage · no wallet</span></div>
+          </form>
+        </div>
+        <div class="card space-top" id="bt-results" aria-live="polite">
+          <div class="card-head"><div><span class="section-kicker">03 / SIMULATION RESULTS</span><h2>Performance under assumptions</h2><p id="bt-result-status">Run the model to produce exploratory results.</p></div><span class="outline-badge" id="bt-result-badge">NOT VERIFIED</span></div>
+          <div class="bt-metrics">
+            <div><span>Simulated net return</span><strong id="bt-return">—</strong><small>After assumed execution friction</small></div>
+            <div><span>Simulated net P&amp;L</span><strong id="bt-pnl">—</strong><small>In the selected CSV quote currency</small></div>
+            <div><span>Passive benchmark</span><strong id="bt-benchmark">—</strong><small>Same allocation, buy at first eligible open</small></div>
+            <div><span>Maximum drawdown</span><strong id="bt-drawdown">—</strong><small>Exploratory marked equity series</small></div>
+            <div><span>Closed trades</span><strong id="bt-trades">—</strong><small>Open positions shown separately</small></div>
+            <div><span>Observed trade win rate</span><strong id="bt-winrate">—</strong><small>Completed simulated trades only</small></div>
+          </div>
+          <div class="bt-chart-head"><div><strong>Portfolio trajectory</strong><p id="bt-chart-currency">Modelled net liquidation value · USDC</p></div><div class="bt-legend"><span><i class="line-key active-key"></i>Strategy</span><span><i class="line-key benchmark-key"></i>Passive benchmark</span></div></div>
+          <div class="bt-chart" id="bt-chart" aria-label="Simulated strategy and benchmark equity curves"></div>
+          <p class="footnote" id="bt-open-note">Results will show after a local simulation. This graph is not a market feed.</p>
+        </div>
+        <div class="bt-results-grid space-top">
+          <div class="card"><div class="card-head"><div><span class="section-kicker">04 / COST STRESS</span><h2>Does the result survive friction?</h2><p>Fees and assumed slippage both increase.</p></div></div><div class="table-scroll"><table class="bt-small-table"><thead><tr><th>COST MULTIPLIER</th><th>NET RETURN</th><th>MAX DRAWDOWN</th><th>TRADE COUNT</th></tr></thead><tbody id="bt-stress-rows"><tr><td colspan="4">Run a simulation to compare assumptions.</td></tr></tbody></table></div></div>
+          <div class="card"><div class="card-head"><div><span class="section-kicker">05 / ACCOUNTING</span><h2>Audit snapshot</h2><p>Inspect modelled fills and outstanding inventory.</p></div></div><div class="bt-audit" id="bt-audit"><p>No run yet. Every completed simulation will display its versioned assumptions and fill activity.</p></div></div>
+        </div>
+        <div class="card space-top"><div class="card-head"><div><span class="section-kicker">06 / MODELLED TRANSACTIONS</span><h2>Completed simulated positions</h2></div></div><div class="table-scroll"><table class="bt-small-table"><thead><tr><th>ENTRY TIME (UTC)</th><th>EXIT TIME (UTC)</th><th id="bt-trade-currency">NET P&amp;L (USDC)</th><th>TRADE RETURN</th></tr></thead><tbody id="bt-trade-rows"><tr><td colspan="4">No replay completed.</td></tr></tbody></table></div><p class="footnote">No execution records are from an exchange. All fills are modelled at candle open plus user-assumed friction; incomplete final positions remain open and are marked at estimated net liquidation value.</p></div>
+      </section>
+      <section id="page-evidence" class="page" aria-labelledby="evidence-title">
+        <div class="page-title"><div><span class="section-kicker">PROFITABILITY RESEARCH / V0.3</span><h1 id="evidence-title">Evidence before exposure<span class="title-dot">.</span></h1><p>Run a transparent chronological experiment on the dataset currently loaded in Backtest Studio. Separate model selection from the final test period and assess AI operating costs.</p></div><button id="ev-export" class="button subtle" disabled>Export audit JSON ↗</button></div>
+        <div class="notice"><span class="notice-icon">!</span><div><strong>Not proof of profitability.</strong> Browser-only experiments cannot enforce a sealed holdout; repeated runs contaminate the test set. Candle-open execution is assumed. Use an externally controlled evaluation for real-capital decisions.</div></div>
+        <div class="cards-two">
+          <div class="card"><div class="card-head"><div><span class="section-kicker">01 / PREDEFINED EXPERIMENT</span><h2>Chronological evidence check</h2><p>Four fixed parameter sets. Selection uses validation only; test results cannot influence the selected candidate within a single run.</p></div></div>
+          <div class="ev-split"><div><strong>60%</strong><span>Research/training</span></div><div><strong>20%</strong><span>Validation/selection</span></div><div><strong>20%</strong><span>Final test</span></div></div>
+          <p class="footnote">One-bar embargo between windows. Indicator warm-up uses preceding historical observations, but portfolio value resets at each evaluation boundary. This avoids carrying gains from training into testing.</p>
+          <button id="ev-run" class="button lime">Run evidence audit ↗</button><span id="ev-data-source" class="ev-source">Dataset: synthetic demo</span>
+          <div class="bt-error" id="ev-error" role="alert" hidden></div>
+          <div id="ev-verdict" class="ev-verdict" aria-live="polite">No evidence audit run. Import your own historical CSV in Backtest Studio to explore how results change.</div></div>
+          <div class="card"><div class="card-head"><div><span class="section-kicker">02 / SYSTEMATIC COST CONTROL</span><h2>AI token budget</h2><p>Deterministic calculations are free of model inference; estimate optional AI calls only when a research exception needs analysis.</p></div></div>
+          <div class="ev-fields">
+            <label>AI reviews per day<input id="ev-calls" type="number" min="0" max="100000" value="3" step="1"/></label>
+            <label>Input tokens / call<input id="ev-input" type="number" min="0" max="100000" value="600" step="100"/></label>
+            <label>Output tokens / call<input id="ev-output" type="number" min="0" max="100000" value="150" step="50"/></label>
+            <label>Input USD / 1M tokens<input id="ev-input-price" type="number" min="0" step="0.01" value="0.50"/></label>
+            <label>Output USD / 1M tokens<input id="ev-output-price" type="number" min="0" step="0.01" value="2.50"/></label>
+          </div>
+          <div class="ev-cost"><span>Estimated monthly AI cost <small>30-day usage, example prices editable</small></span><strong id="ev-monthly">US$0.00</strong></div>
+          <div class="ev-cost"><span>Total model tokens / month</span><strong id="ev-tokens">0</strong></div>
+          <p class="footnote">Zero AI calls is the default production design. Prices are editable examples, not live quotes; the estimate excludes hosting, market-data and trading costs. Do not send raw histories to a model.</p>
+          </div>
+        </div>
+        <div class="card space-top"><div class="card-head"><div><span class="section-kicker">03 / FIXED STRATEGY COMPARISON</span><h2>Selection and final test</h2><p>Four candidate rules, ranked only on validation outcomes, then one unmodified candidate evaluated on a later period.</p></div><span id="ev-badge" class="outline-badge">NOT RUN</span></div>
+          <div class="table-scroll"><table class="bt-small-table ev-table"><thead><tr><th>CANDIDATE</th><th>TRAIN NET</th><th>VALIDATION NET</th><th>VALIDATION TRADES</th><th>SELECTED</th></tr></thead><tbody id="ev-candidates"><tr><td colspan="5">No experiment run.</td></tr></tbody></table></div>
+        </div>
+        <div class="bt-metrics space-top"><div><span>Final test net return</span><strong id="ev-return">—</strong><small>Assumed transaction costs</small></div><div><span>Vs passive benchmark</span><strong id="ev-excess">—</strong><small>Percentage-point difference</small></div><div><span>2× cost stress return</span><strong id="ev-stress">—</strong><small>Higher fees and slippage</small></div><div><span>Final-test closed trades</span><strong id="ev-trades">—</strong><small>Statistical adequacy not implied</small></div><div><span>Final-test drawdown</span><strong id="ev-drawdown">—</strong><small>Marked portfolio equity</small></div><div><span>Independent quote verification</span><strong>None</strong><small>Required before capital use</small></div></div>
+        <div class="card space-top"><span class="section-kicker">04 / APPROVAL BOUNDARY</span><h2>Real-money deployment remains blocked</h2><p class="footnote">A positive result here never unlocks real trading. Dedicated point-in-time data, multiple-testing adjustment, independent holdout control, executable-quote validation, capital and wallet security review and a separately approved limited-capital pilot are still required.</p><div id="ev-warnings" class="ev-warnings"><p class="footnote">Run the experiment to view limitations and data-quality warnings.</p></div></div>
+      </section>
+      <section id="page-risk" class="page" aria-labelledby="risk-title">
+        <div class="page-title"><div><span class="section-kicker">CAPITAL PROTECTION / MODEL ONLY</span><h1 id="risk-title">Risk laboratory<span class="title-dot">.</span></h1><p>Explore how risk budgets, stop distances and position limits affect hypothetical exposure. No orders can be placed.</p></div><span class="pill"><span class="dot mint"></span> SIMULATION ONLY</span></div>
+        <div class="notice"><span class="notice-icon">i</span><div><strong>Illustrative calculation, not financial advice.</strong> Slippage, gaps, liquidity failure and volatile market conditions can cause losses beyond any planned stop.</div></div>
+        <div class="content-grid risk-grid"><div class="card"><div class="card-head"><div><span class="section-kicker">INTERACTIVE RISK BUDGET</span><h2>Position-sizing sandbox</h2><p>Editable assumptions, calculated immediately.</p></div></div><div class="field-grid"><label>Portfolio equity (AUD)<input type="number" id="equity" value="10000" min="1" step="100" /></label><label>Reference price (AUD)<input type="number" id="price" value="200" min="0.01" step="0.01" /></label><label>Risk per trade <output id="risk-pct-label">0.25%</output><input type="range" id="risk-pct" min="0.05" max="1" value="0.25" step="0.05" /></label><label>Stop distance <output id="stop-pct-label">4.0%</output><input type="range" id="stop-pct" min="1" max="20" value="4" step="0.5" /></label><label>Estimated round-trip costs <output id="cost-pct-label">0.40%</output><input type="range" id="cost-pct" min="0.05" max="3" value="0.4" step="0.05" /></label><label>Max nominal exposure <output id="cap-pct-label">10%</output><input type="range" id="cap-pct" min="1" max="25" value="10" step="1" /></label></div><button class="button subtle" id="reset-risk">↺ Reset assumptions</button></div><div class="card results-card"><span class="section-kicker">CALCULATED EXPOSURE</span><div class="result-big" id="position-aud">A$568.18</div><span class="sub-result">Maximum illustrative position notional</span><div class="result-divider"></div><div class="result-line"><span>Risk budget</span><strong id="risk-budget">A$25.00</strong></div><div class="result-line"><span>Estimated position quantity</span><strong id="position-qty">2.84 units</strong></div><div class="result-line"><span>Estimated round-trip costs</span><strong id="position-fees">A$2.27</strong></div><div class="result-line"><span>Illustrative stop + cost loss</span><strong id="potential-loss">A$25.00</strong></div><div class="result-line"><span>Nominal portfolio exposure</span><strong id="exposure-ratio">5.68%</strong></div><div class="result-divider"></div><div class="warning-text">⚠ Actual losses may exceed this estimate. No real-time liquidity, gap risk, failed exit probability or portfolio correlation is modelled here.</div></div></div>
+        <div class="card space-top"><div class="card-head"><div><span class="section-kicker">INDEPENDENT CONTROLS</span><h2>Research release guardrails</h2></div><span class="outline-badge">PROPOSED / NOT ENFORCED</span></div><div class="guardrails"><div><span>LEVERAGE</span><strong>Disabled</strong></div><div><span>DAILY LOSS TRIGGER</span><strong>2% equity</strong></div><div><span>DRAWDOWN TRIGGER</span><strong>5% high-water mark</strong></div><div><span>LIVE EXECUTION</span><strong class="red">Not implemented</strong></div></div></div>
+      </section>
+      <section id="page-roadmap" class="page" aria-labelledby="roadmap-title"><div class="page-title"><div><span class="section-kicker">DELIVERY ROADMAP / 16-WEEK BASELINE</span><h1 id="roadmap-title">Build with purpose<span class="title-dot">.</span></h1><p>Evidence-gated milestones from foundation through independent forward testing. Dates are proposed targets, not guaranteed progress.</p></div><button class="button subtle" id="reset-roadmap">Reset progress ↺</button></div><div class="card roadmap-summary"><div><span class="section-kicker">TRACKED IMPLEMENTATION</span><h2 id="roadmap-progress-label">0 / 8 milestones completed</h2><p>Checklist progress is saved only in this browser; ticking a milestone does not verify engineering completion.</p></div><div class="progress"><div class="progress-fill" id="roadmap-progress"></div></div></div><div class="timeline" id="timeline"></div></section>
+      <section id="page-architecture" class="page" aria-labelledby="architecture-title"><div class="page-title"><div><span class="section-kicker">SYSTEM DESIGN / V3.0</span><h1 id="architecture-title">Engineered for evidence<span class="title-dot">.</span></h1><p>Research, risk and execution remain separate. Every decision needs provenance, reproducibility and independent oversight.</p></div></div><div class="architecture-flow"><div class="arch-node"><span class="node-num">LAYER 01</span><h3>Market observation</h3><p>Historical markets • DEX feeds • Solana RPC • executable quotations</p></div><span class="flow-arrow">↓</span><div class="arch-node"><span class="node-num">LAYER 02</span><h3>Point-in-time data store</h3><p>Source provenance • event time • receipt time • immutable archives</p></div><span class="flow-arrow">↓</span><div class="arch-split"><div class="arch-node"><span class="node-num">LAYER 03A</span><h3>Alpha research</h3><p>Registered hypotheses • statistical tests • backtests</p></div><div class="arch-node"><span class="node-num">LAYER 03B</span><h3>AI research assistant</h3><p>Research support • diagnostics • code review • no trading authority</p></div></div><span class="flow-arrow">↓</span><div class="arch-node"><span class="node-num">LAYER 04</span><h3>Independent validation</h3><p>Sealed holdouts • walk-forward tests • confidence bounds • strategy registry</p></div><span class="flow-arrow">↓</span><div class="arch-node accent-node"><span class="node-num">LAYER 05</span><h3>Risk veto and execution simulator</h3><p>Capital controls • slippage and fees • simulated fill ledger • no signing code</p></div><span class="flow-arrow">↓</span><div class="arch-node"><span class="node-num">LAYER 06</span><h3>Audit and monitoring</h3><p>Reconciled results • incident records • health checks • independent review</p></div></div><div class="cards-two space-top"><div class="card"><span class="section-kicker">TECHNICAL BOUNDARY</span><h3>No autonomous real-money trading</h3><p>This demonstration website has no trade execution, no wallet connection and no market API integration. A future production backend must enforce those boundaries outside the browser.</p></div><div class="card"><span class="section-kicker">NEXT ENGINEERING STEP</span><h3>Build the Alpha Research Engine</h3><p>Start with timestamped market data, deterministic replay, accounting invariants, cost models, immutable experiments and independent validation before automating decisions.</p></div></div></section>
+    </main>
+    <footer><span>© 2026 ALPHA LABS · INDEPENDENT RESEARCH PROJECT</span><span>RESEARCH ENVIRONMENT <i>●</i> NO LIVE TRADING</span></footer>
+  </div>
+</div>
+<div class="modal-backdrop" id="register-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-head"><div><span class="section-kicker">EXPERIMENT REGISTRY</span><h2 id="modal-title">Register a hypothesis</h2></div><button id="close-modal" class="icon-button" aria-label="Close">✕</button></div><form id="register-form"><label>Strategy name <input name="name" maxlength="80" required placeholder="e.g. Session momentum filter" /></label><label>Market <select name="market"><option value="SOL/USDC">SOL/USDC</option><option value="Other">Other / to be defined</option></select></label><label>Economic hypothesis <textarea name="thesis" maxlength="600" required placeholder="Why might an exploitable advantage exist? Who or what provides it?"></textarea></label><label>What would falsify it? <textarea name="falsifier" maxlength="500" required placeholder="What measured outcome would cause this hypothesis to be rejected?"></textarea></label><label>Required data and execution assumptions <textarea name="evidence" maxlength="500" placeholder="e.g. point-in-time SOL/USDC OHLCV, route quotes, fees and order latency"></textarea></label><div class="modal-actions"><button type="button" class="button subtle" id="cancel-modal">Cancel</button><button type="submit" class="button lime">Save hypothesis ↗</button></div></form></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="../research-engine.js" defer></script>
+<script src="../evidence-engine.js" defer></script>
+<script src="../app.js" defer></script>
+</body>
+</html>

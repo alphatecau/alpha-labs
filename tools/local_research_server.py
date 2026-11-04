@@ -16,7 +16,12 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-ENDPOINT = "/api/v1/research/solusd"
+ENDPOINT = "/api/v1/research/solusd"  # retained for backwards compatibility
+MARKET_CONFIG = {
+    "xbtusd": ("XBTUSD", "BTC/USD"),
+    "ethusd": ("ETHUSD", "ETH/USD"),
+    "solusd": ("SOLUSD", "SOL/USD"),
+}
 SCHEMA = "alpha-labs.historical-research.v1"
 MAX_JSON_BYTES = 2_000_000
 
@@ -44,16 +49,19 @@ def _metric(record: dict, name: str) -> float:
     return round(value, 5)
 
 
-def load_snapshot(root: Path = ROOT, *, now: datetime | None = None) -> dict:
+def load_snapshot(root: Path = ROOT, *, market: str = "solusd", now: datetime | None = None) -> dict:
+    if market not in MARKET_CONFIG:
+        raise ValueError("Unsupported market")
+    expected_pair, market_label = MARKET_CONFIG[market]
     root = Path(root)
-    csv_path = root / "solusd-recent.csv"
-    manifest = _json_file(root / "solusd-recent.csv.manifest.json")
-    report = _json_file(root / "solusd-research.json")
+    csv_path = root / f"{market}-recent.csv"
+    manifest = _json_file(root / f"{market}-recent.csv.manifest.json")
+    report = _json_file(root / f"{market}-research.json")
     csv_hash = hashlib.sha256(csv_path.read_bytes()).hexdigest()
     dataset = report["dataset"]
     if not (csv_hash == manifest["written_csv_sha256"] == dataset["sha256"]):
         raise ValueError("CSV and research hashes do not match")
-    if (manifest["requested_pair"] != "SOLUSD" or manifest["interval_minutes"] != 60
+    if (manifest["requested_pair"] != expected_pair or manifest["interval_minutes"] != 60
             or dataset["interval_minutes"] != 60 or dataset["quote_currency"] != "USD"
             or dataset["bars"] != manifest["record_count"] or dataset["bars"] < 80
             or not dataset["provenance"].startswith("kraken-public-ohlc")
@@ -79,7 +87,7 @@ def load_snapshot(root: Path = ROOT, *, now: datetime | None = None) -> dict:
         "schema": SCHEMA,
         "status": "stale" if age_hours > 3 else "historical",
         "source": "Kraken public OHLC (imported, not independently authenticated)",
-        "market": "SOL/USD",
+        "market": market_label,
         "interval_minutes": 60,
         "complete_candles": dataset["bars"],
         "last_candle_utc": candle.isoformat(),
@@ -115,12 +123,12 @@ class ResearchHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         url = urlsplit(self.path)
-        if url.path == ENDPOINT:
+        if url.path in {f"/api/v1/research/{slug}" for slug in MARKET_CONFIG}:
             if url.query:
                 self._send_json(400, {"status": "invalid_request"})
                 return
             try:
-                self._send_json(200, load_snapshot(self.research_root))
+                self._send_json(200, load_snapshot(self.research_root, market=url.path.rsplit("/", 1)[-1]))
             except (FileNotFoundError, KeyError, TypeError, ValueError, OSError, json.JSONDecodeError) as exc:
                 # Do not expose local paths or potentially untrusted file contents.
                 print("Read-only research unavailable:", type(exc).__name__)

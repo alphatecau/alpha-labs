@@ -72,3 +72,86 @@
       foot.textContent = 'No market feed, trading account or portfolio ledger connected.';
     });
 })();
+
+
+/* Alpha Labs three-market historical research bridge: read only. */
+(() => {
+  'use strict';
+  const watchlist = document.querySelector('#view-markets .market-panel');
+  if (!watchlist) return;
+  const panel = document.createElement('section');
+  panel.className = 'panel';
+  panel.style.marginTop = '18px';
+  panel.setAttribute('aria-label', 'Three-market historical research');
+  const title = document.createElement('h2');
+  title.textContent = 'BTC · ETH · SOL — Historical research';
+  const warning = document.createElement('p');
+  warning.className = 'fine-note';
+  warning.textContent = 'Read-only historical EMA hypothesis screening. These are not live prices, verified alpha, investment recommendations or actionable signals. No trading permissions.';
+  const grid = document.createElement('div');
+  grid.className = 'detail-grid';
+  panel.append(title, warning, grid);
+  watchlist.insertAdjacentElement('afterend', panel);
+  // Never mix historical imported results with the fictional demo screen.
+  const demoToggle = document.getElementById('demo-toggle');
+  const syncDemoVisibility = () => {panel.hidden = Boolean(demoToggle && demoToggle.checked);};
+  if (demoToggle) demoToggle.addEventListener('change', syncDemoVisibility);
+  syncDemoVisibility();
+
+  const sources = [
+    ['xbtusd', 'Bitcoin · BTC/USD', 'BTC/USD'],
+    ['ethusd', 'Ethereum · ETH/USD', 'ETH/USD'],
+    ['solusd', 'Solana · SOL/USD', 'SOL/USD']
+  ];
+  const add = (tag, contents, cls) => {
+    const element = document.createElement(tag);
+    if (cls) element.className = cls;
+    element.textContent = contents;
+    return element;
+  };
+  const fmt = number => {
+    if (typeof number !== 'number' || !Number.isFinite(number)) throw Error('Invalid metric');
+    return `${number.toFixed(3)}%`;
+  };
+  const validate = (data, market) => {
+    if (!data || data.schema !== 'alpha-labs.historical-research.v1' ||
+        data.trading_enabled !== false || data.market !== market ||
+        !['historical', 'stale'].includes(data.status) ||
+        !Number.isSafeInteger(data.complete_candles) || data.complete_candles < 80 ||
+        data.complete_candles > 720 || data.interval_minutes !== 60 ||
+        !Number.isFinite(Date.parse(data.last_candle_utc)) ||
+        !Number.isFinite(Date.parse(data.fetched_at_utc))) throw Error('Invalid research contract');
+    for (const period of ['training', 'holdout']) {
+      if (!data.periods || !data.periods[period]) throw Error('Invalid periods');
+      for (const k of ['strategy_pct', 'passive_pct', 'double_cost_pct']) fmt(data.periods[period][k]);
+    }
+    return data;
+  };
+  for (const [slug, name, market] of sources) {
+    const card = document.createElement('div');
+    card.append(add('strong', name), add('p', 'Loading local historical research…', 'fine-note'));
+    grid.append(card);
+    fetch(`/api/v1/research/${slug}`, {cache: 'no-store', credentials: 'omit'})
+      .then(response => {if (!response.ok) throw Error('Unavailable'); return response.json();})
+      .then(data => {
+        const result = validate(data, market);
+        const h = result.periods.holdout;
+        const t = result.periods.training;
+        const stamp = new Date(result.last_candle_utc).toLocaleString('en-AU', {
+          timeZone: 'Australia/Brisbane', dateStyle: 'medium', timeStyle: 'short'
+        });
+        card.replaceChildren(
+          add('strong', name),
+          add('p', `${result.status === 'stale' ? 'STALE' : 'HISTORICAL'} · ${result.complete_candles} completed hourly candles`, 'fine-note'),
+          add('p', `Training strategy: ${fmt(t.strategy_pct)} · passive: ${fmt(t.passive_pct)}`, 'fine-note'),
+          add('p', `Holdout strategy: ${fmt(h.strategy_pct)} · passive: ${fmt(h.passive_pct)}`, 'fine-note'),
+          add('p', `Holdout ×2 costs: ${fmt(h.double_cost_pct)}`, 'fine-note'),
+          add('p', `Last candle: ${stamp} AEST. Imported Kraken public data; not executable pricing.`, 'fine-note')
+        );
+      })
+      .catch(() => card.replaceChildren(
+        add('strong', name),
+        add('p', 'Historical research unavailable or invalid. No market assessment.', 'fine-note')
+      ));
+  }
+})();

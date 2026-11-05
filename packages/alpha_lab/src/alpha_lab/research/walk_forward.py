@@ -51,6 +51,12 @@ def evaluate_windows(dataset, initial=720, window=168):
                 bars[end - 1].time + timedelta(hours=1)
             ).isoformat(),
             "strategy_pct": strategy.return_pct,
+            "executed_orders": strategy.executed_orders,
+            "open_position": strategy.open_position,
+            "total_modelled_fees": strategy.total_modelled_fees,
+            "executed_orders": strategy.executed_orders,
+            "open_position": strategy.open_position,
+            "total_modelled_fees": strategy.total_modelled_fees,
             "passive_pct": benchmark.return_pct,
             "double_cost_pct": stress.return_pct,
             "max_drawdown_pct": strategy.max_drawdown_pct,

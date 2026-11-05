@@ -1,8 +1,8 @@
 # Multi-year research evidence review — 5 November 2026
 
-Status: research infrastructure review in progress. No merge or trading approval.
+Status: the subsequent complete upload passed independent engineering review. The EMA baseline failed the economic promotion screen. See [the completed audit](25_MULTYEAR_EVIDENCE_REVIEW_20261105.md) for current findings. Trading remains disabled.
 
-## Verified in this review
+## Initial review before the complete evidence upload
 
 - PR #8 initially contained nine files at `bd10dacaa56949ff5f08d719aa73783f5c4f37e2`. Both PR workflows passed, and 93 Python plus 36 website tests passed independently before the additional changes below.
 - Available Termux screenshots show completed reports for **April 2023–December 2025**, not January 2023–December 2025. The repeated SOL evaluation stops at the intentional no-overwrite guard. That exception does not mean the prior report failed.
@@ -36,10 +36,10 @@ The new bundle contains the selected CSVs, manifests, original ZIP/checksum pair
 
 Upload the resulting `AlphaLabs_Research_Evidence_COMPLETE_20261105.tar.gz` for independent inspection. The phone's Downloads directory is outside this review environment, so its files cannot be retrieved automatically.
 
-## Remaining gate
+## Evidence gate and outcome
 
-Independently verify the uploaded file inventory and the source-to-CSV linkage, reproduce the BTC/ETH/SOL reports from the captured source, and inspect any real anomaly rows. Review why the April starting window was selected and retain that choice in the experiment history; it does not restore holdout independence.
+The complete `AlphaLabs_Evidence.zip` upload contained the expected inner archive, all source datasets and original archives. Its inventory, source linkage, real anomaly rows and all three reports have now been inspected and reproduced. The earlier January attribution is corrected by the actual March archive record in the completed audit. The April start remains a selection made after inspecting data quality; it does not restore holdout independence.
 
-Until that evidence arrives, real multi-year results and exact archive anomalies remain **unverified**, PR #8 remains a draft, and Strategy Research v0.8 has not begun. Preserve EMA(12,48) as a frozen comparator. No paper/live execution, broker integration or profitability approval is introduced.
+The engineering evidence gate is complete for the reviewed infrastructure. Preserve EMA(12,48) as a frozen comparator and reject it for promotion: all three unsealed test returns are negative and below allocation-matched passive hold. Strategy Research v0.8 still requires its own registered hypothesis and future evidence. No paper/live execution, broker integration or profitability approval is introduced.
 
 Provider documentation: [Binance public-data format, checksums and correction policy](https://github.com/binance/binance-public-data). The provider documents microsecond Spot timestamps from 1 January 2025 and notes that archives can later be corrected. A current REST response or download must not be assumed identical to the original cached source.

@@ -1,0 +1,432 @@
+{
+  "baseline_promotion": "REJECT_EMA_12_48_FOR_FORWARD_TRADING_PROMOTION",
+  "engineering_evidence_gate": "PASS_FOR_REVIEWED_RESEARCH_INFRASTRUCTURE",
+  "forensic_archives": [
+    {
+      "archive": "BTCUSDT-1h-2023-01.zip",
+      "early_close_rows": [],
+      "missing_hours": [],
+      "row_565_raw": [
+        "1674561600000",
+        "22917.11000000",
+        "23035.31000000",
+        "22882.09000000",
+        "22964.13000000",
+        "9509.92112000",
+        "1674565199999",
+        "218300102.68118210",
+        "269949",
+        "4804.27272000",
+        "110281743.51373780",
+        "0"
+      ],
+      "rows": 744,
+      "sha256": "ea8caf7fd56c7f7143723f56f8d12a2fc0b643badbcdae5c660db2d11454a11d",
+      "zero_volume_hours": 0
+    },
+    {
+      "archive": "BTCUSDT-1h-2023-03.zip",
+      "early_close_rows": [
+        {
+          "canonical_close": 1679662799999,
+          "earliness_ms": "1218353",
+          "observed_close": 1679661581646,
+          "open_utc": "2023-03-24T12:00:00+00:00",
+          "row": 565
+        }
+      ],
+      "missing_hours": [
+        "2023-03-24T13:00:00+00:00"
+      ],
+      "row_565_raw": [
+        "1679659200000",
+        "28080.00000000",
+        "28080.00000000",
+        "28080.00000000",
+        "28080.00000000",
+        "0.00000000",
+        "1679661581646",
+        "0.00000000",
+        "0",
+        "0.00000000",
+        "0.00000000",
+        "0"
+      ],
+      "rows": 743,
+      "sha256": "7f2afb8e0179a57ac31eab5205660298ba5eb77039ac2e21aef9b715ff3d06ce",
+      "zero_volume_hours": 1
+    }
+  ],
+  "holdout_independently_sealed": false,
+  "independent_venue_price_authentication": false,
+  "inner_bundle_sha256": "bb949f86418f007c766a882e15e25c38ad517d8343b18c380d1d464f79316ce9",
+  "inventory_files_verified": 324,
+  "markets": [
+    {
+      "candles": 24144,
+      "canonical_source_csv_byte_match": true,
+      "configuration": {
+        "capital_usdt": "10000",
+        "embargo_candles": 48,
+        "fast": 12,
+        "fee_bps_each_side": "10",
+        "max_allocation": "0.20",
+        "operating_cost_usdt_per_year": "0",
+        "slippage_bps_each_side": "10",
+        "slow": 48,
+        "strategy": "EMA_12_48_FROZEN_LONG_FLAT",
+        "training_fraction": "0.60",
+        "validation_fraction": "0.20"
+      },
+      "data_sha256": "64b0a9e8f264965249d4c2afaa58946d4eb7fa6e5b285355818e911f5b6daa09",
+      "early_close_anomalies": 0,
+      "full_report_reproduced": true,
+      "operating_expense_usdt_per_year": "0",
+      "periods": {
+        "test_unsealed": {
+          "bars": 4781,
+          "double_cost_return_pct": -16.157605229846126,
+          "end_exclusive_utc": "2026-01-01T00:00:00+00:00",
+          "excess_vs_passive_pp": -7.563692930393306,
+          "max_drawdown_pct": 12.546315694160057,
+          "modelled_orders": 130,
+          "passive_return_pct": -3.44824624260274,
+          "start_utc": "2025-06-15T19:00:00+00:00",
+          "strategy_return_pct": -11.011939172996046
+        },
+        "training": {
+          "bars": 14437,
+          "double_cost_return_pct": -9.928217141765746,
+          "end_exclusive_utc": "2024-11-24T14:00:00+00:00",
+          "excess_vs_passive_pp": -44.419180937091085,
+          "max_drawdown_pct": 10.500745104679396,
+          "modelled_orders": 360,
+          "passive_return_pct": 48.88004347516886,
+          "start_utc": "2023-04-03T01:00:00+00:00",
+          "strategy_return_pct": 4.460862538077779
+        },
+        "validation": {
+          "bars": 4781,
+          "double_cost_return_pct": -13.498900984458434,
+          "end_exclusive_utc": "2025-06-13T19:00:00+00:00",
+          "excess_vs_passive_pp": -11.237938486423364,
+          "max_drawdown_pct": 11.291895167449335,
+          "modelled_orders": 126,
+          "passive_return_pct": 2.7350388968081853,
+          "start_utc": "2024-11-26T14:00:00+00:00",
+          "strategy_return_pct": -8.502899589615177
+        }
+      },
+      "separate_ledger_comparisons_passed": 9,
+      "source_months_verified": 33,
+      "symbol": "BTCUSDT",
+      "zero_volume_hours": 0
+    },
+    {
+      "candles": 24144,
+      "canonical_source_csv_byte_match": true,
+      "configuration": {
+        "capital_usdt": "10000",
+        "embargo_candles": 48,
+        "fast": 12,
+        "fee_bps_each_side": "10",
+        "max_allocation": "0.20",
+        "operating_cost_usdt_per_year": "0",
+        "slippage_bps_each_side": "10",
+        "slow": 48,
+        "strategy": "EMA_12_48_FROZEN_LONG_FLAT",
+        "training_fraction": "0.60",
+        "validation_fraction": "0.20"
+      },
+      "data_sha256": "abe096f50f67ead3cb75114ba0592593c9754f771b14e803a1653264f774269f",
+      "early_close_anomalies": 0,
+      "full_report_reproduced": true,
+      "operating_expense_usdt_per_year": "0",
+      "periods": {
+        "test_unsealed": {
+          "bars": 4781,
+          "double_cost_return_pct": -5.496907082625984,
+          "end_exclusive_utc": "2026-01-01T00:00:00+00:00",
+          "excess_vs_passive_pp": -3.935549627806015,
+          "max_drawdown_pct": 10.002542168772226,
+          "modelled_orders": 119,
+          "passive_return_pct": 3.2262348891201764,
+          "start_utc": "2025-06-15T19:00:00+00:00",
+          "strategy_return_pct": -0.7093147386858387
+        },
+        "training": {
+          "bars": 14437,
+          "double_cost_return_pct": -16.61518382924899,
+          "end_exclusive_utc": "2024-11-24T14:00:00+00:00",
+          "excess_vs_passive_pp": -18.67200214994499,
+          "max_drawdown_pct": 10.332277534098333,
+          "modelled_orders": 373,
+          "passive_return_pct": 16.980219310730213,
+          "start_utc": "2023-04-03T01:00:00+00:00",
+          "strategy_return_pct": -1.6917828392147771
+        },
+        "validation": {
+          "bars": 4781,
+          "double_cost_return_pct": -12.575616344999725,
+          "end_exclusive_utc": "2025-06-13T19:00:00+00:00",
+          "excess_vs_passive_pp": -2.6328292906257564,
+          "max_drawdown_pct": 16.856828554515292,
+          "modelled_orders": 130,
+          "passive_return_pct": -4.782764314261321,
+          "start_utc": "2024-11-26T14:00:00+00:00",
+          "strategy_return_pct": -7.415593604887078
+        }
+      },
+      "separate_ledger_comparisons_passed": 9,
+      "source_months_verified": 33,
+      "symbol": "ETHUSDT",
+      "zero_volume_hours": 0
+    },
+    {
+      "candles": 24144,
+      "canonical_source_csv_byte_match": true,
+      "configuration": {
+        "capital_usdt": "10000",
+        "embargo_candles": 48,
+        "fast": 12,
+        "fee_bps_each_side": "10",
+        "max_allocation": "0.20",
+        "operating_cost_usdt_per_year": "0",
+        "slippage_bps_each_side": "10",
+        "slow": 48,
+        "strategy": "EMA_12_48_FROZEN_LONG_FLAT",
+        "training_fraction": "0.60",
+        "validation_fraction": "0.20"
+      },
+      "data_sha256": "de365e95e1624d0768b0bd7c37544956ad864b5aa367ef84a5adb1a3d11fb563",
+      "early_close_anomalies": 0,
+      "full_report_reproduced": true,
+      "operating_expense_usdt_per_year": "0",
+      "periods": {
+        "test_unsealed": {
+          "bars": 4781,
+          "double_cost_return_pct": -12.02746974633184,
+          "end_exclusive_utc": "2026-01-01T00:00:00+00:00",
+          "excess_vs_passive_pp": -3.6071679901678246,
+          "max_drawdown_pct": 13.65454737076382,
+          "modelled_orders": 118,
+          "passive_return_pct": -3.7390444392675954,
+          "start_utc": "2025-06-15T19:00:00+00:00",
+          "strategy_return_pct": -7.34621242943542
+        },
+        "training": {
+          "bars": 14437,
+          "double_cost_return_pct": 31.420751948072738,
+          "end_exclusive_utc": "2024-11-24T14:00:00+00:00",
+          "excess_vs_passive_pp": -176.38633404864655,
+          "max_drawdown_pct": 8.119412331298506,
+          "modelled_orders": 314,
+          "passive_return_pct": 220.5182039515137,
+          "start_utc": "2023-04-03T01:00:00+00:00",
+          "strategy_return_pct": 44.13186990286715
+        },
+        "validation": {
+          "bars": 4781,
+          "double_cost_return_pct": -17.80941652776864,
+          "end_exclusive_utc": "2025-06-13T19:00:00+00:00",
+          "excess_vs_passive_pp": -5.390220245973843,
+          "max_drawdown_pct": 20.682226355237606,
+          "modelled_orders": 130,
+          "passive_return_pct": -7.28015071774248,
+          "start_utc": "2024-11-26T14:00:00+00:00",
+          "strategy_return_pct": -12.670370963716323
+        }
+      },
+      "separate_ledger_comparisons_passed": 9,
+      "source_months_verified": 33,
+      "symbol": "SOLUSDT",
+      "zero_volume_hours": 0
+    }
+  ],
+  "notes": [
+    "All returns are historical modelled outcomes, not observed financial execution.",
+    "The April start follows source-data inspection and is not an untouched holdout.",
+    "Current provider REST samples corroborate only sampled OHLCV; no independent venue validation."
+  ],
+  "outer_bundle_sha256": "80065224b4240412ba61129c4581a16e4ea2944c22509357156bf414d4440485",
+  "reason": "All three unsealed test periods lose after modelled execution costs and underperform allocation-matched passive hold.",
+  "reviewed_at_utc": "2026-11-05T06:25:55.637196+00:00",
+  "same_provider_rest_samples": [
+    {
+      "ohlcv_matches_current_provider_rest": true,
+      "rest_observation": [
+        1680307200000,
+        "28465.36000000",
+        "28547.20000000",
+        "28408.57000000",
+        "28438.27000000",
+        "1524.81719000",
+        1680310799999,
+        "43415784.73435520",
+        46983,
+        "738.40413000",
+        "21027000.66934780",
+        "0"
+      ],
+      "symbol": "BTCUSDT",
+      "timestamp_utc": "2023-04-01T00:00:00+00:00"
+    },
+    {
+      "ohlcv_matches_current_provider_rest": true,
+      "rest_observation": [
+        1735689600000,
+        "93576.00000000",
+        "94509.42000000",
+        "93489.03000000",
+        "94401.14000000",
+        "755.99010000",
+        1735693199999,
+        "71068810.55946380",
+        93525,
+        "421.08319000",
+        "39596777.77992590",
+        "0"
+      ],
+      "symbol": "BTCUSDT",
+      "timestamp_utc": "2025-01-01T00:00:00+00:00"
+    },
+    {
+      "ohlcv_matches_current_provider_rest": true,
+      "rest_observation": [
+        1767222000000,
+        "87728.30000000",
+        "87728.30000000",
+        "87619.67000000",
+        "87648.22000000",
+        "191.19123000",
+        1767225599999,
+        "16762379.76738430",
+        38240,
+        "86.88848000",
+        "7617579.67502890",
+        "0"
+      ],
+      "symbol": "BTCUSDT",
+      "timestamp_utc": "2025-12-31T23:00:00+00:00"
+    },
+    {
+      "ohlcv_matches_current_provider_rest": true,
+      "rest_observation": [
+        1680307200000,
+        "1821.52000000",
+        "1827.73000000",
+        "1819.61000000",
+        "1822.85000000",
+        "11574.67720000",
+        1680310799999,
+        "21106163.09557000",
+        24597,
+        "6450.19120000",
+        "11761323.05475100",
+        "0"
+      ],
+      "symbol": "ETHUSDT",
+      "timestamp_utc": "2023-04-01T00:00:00+00:00"
+    },
+    {
+      "ohlcv_matches_current_provider_rest": true,
+      "rest_observation": [
+        1735689600000,
+        "3337.78000000",
+        "3365.71000000",
+        "3335.84000000",
+        "3363.70000000",
+        "8894.44440000",
+        1735693199999,
+        "29821272.00821100",
+        54290,
+        "5447.53240000",
+        "18265028.78115900",
+        "0"
+      ],
+      "symbol": "ETHUSDT",
+      "timestamp_utc": "2025-01-01T00:00:00+00:00"
+    },
+    {
+      "ohlcv_matches_current_provider_rest": true,
+      "rest_observation": [
+        1767222000000,
+        "2977.14000000",
+        "2977.14000000",
+        "2970.19000000",
+        "2971.64000000",
+        "4215.85090000",
+        1767225599999,
+        "12537215.66611200",
+        50482,
+        "2399.68100000",
+        "7136321.90485400",
+        "0"
+      ],
+      "symbol": "ETHUSDT",
+      "timestamp_utc": "2025-12-31T23:00:00+00:00"
+    },
+    {
+      "ohlcv_matches_current_provider_rest": true,
+      "rest_observation": [
+        1680307200000,
+        "21.15000000",
+        "21.31000000",
+        "21.10000000",
+        "21.16000000",
+        "101750.15000000",
+        1680310799999,
+        "2157642.66250000",
+        4345,
+        "48933.21000000",
+        "1037433.64020000",
+        "0"
+      ],
+      "symbol": "SOLUSDT",
+      "timestamp_utc": "2023-04-01T00:00:00+00:00"
+    },
+    {
+      "ohlcv_matches_current_provider_rest": true,
+      "rest_observation": [
+        1735689600000,
+        "189.31000000",
+        "192.66000000",
+        "189.08000000",
+        "192.54000000",
+        "109512.36400000",
+        1735693199999,
+        "20911201.78025000",
+        46813,
+        "62624.92700000",
+        "11958559.88245000",
+        "0"
+      ],
+      "symbol": "SOLUSDT",
+      "timestamp_utc": "2025-01-01T00:00:00+00:00"
+    },
+    {
+      "ohlcv_matches_current_provider_rest": true,
+      "rest_observation": [
+        1767222000000,
+        "124.86000000",
+        "125.05000000",
+        "124.60000000",
+        "124.65000000",
+        "51558.22900000",
+        1767225599999,
+        "6438098.16525000",
+        18928,
+        "20519.06500000",
+        "2561702.24573000",
+        "0"
+      ],
+      "symbol": "SOLUSDT",
+      "timestamp_utc": "2025-12-31T23:00:00+00:00"
+    }
+  ],
+  "same_provider_rest_samples_matched": 9,
+  "source_commit": "6c95ddebbba1ea858372261da8ac87575133a8b8",
+  "source_files_matched_to_github": 110,
+  "total_archive_members": 325,
+  "trading_enabled": false
+}

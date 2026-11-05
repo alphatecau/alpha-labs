@@ -4,7 +4,9 @@ Status: research-only ingestion repair, **not** profitability verification. Live
 
 ## Problem
 
-The previous Binance monthly 1h archive parser rejected a row whenever `close_time` did not equal `open_time + 3,600 seconds - one source timestamp unit`. Exchange-published and SHA-256-valid historical data may contain an earlier `close_time` within the matching candle interval. These rows require explicit provenance and human review; they are not automatically evidence of locally corrupted downloads. The January 2023 BTC/USDT failure was observed at input row 565, but the exact real row values have not been independently inspected in this development environment.
+The previous Binance monthly 1h archive parser rejected a row whenever `close_time` did not equal `open_time + 3,600 seconds - one source timestamp unit`. Exchange-published and SHA-256-valid historical data may contain an earlier `close_time` within the matching candle interval. These rows require explicit provenance and human review; they are not automatically evidence of locally corrupted downloads.
+
+Independent inspection of the uploaded originals corrected the initial January attribution: **January 2023 has 744 complete hourly BTC candles and no early-close anomaly**. The actual early-close record is **March 2023 row 565**, opening 24 March at 12:00 UTC. Its close timestamp is `1679661581646`, versus canonical `1679662799999`; the 13:00 UTC candle is then missing. The March archive has 743 rows and remains rejected. See the [reproduction audit](25_MULTYEAR_EVIDENCE_REVIEW_20261105.md).
 
 ## Fixed contract
 
@@ -18,7 +20,7 @@ The previous Binance monthly 1h archive parser rejected a row whenever `close_ti
 
 ## Known remaining limitation
 
-There are public reports of missing Binance BTC/USDT 1-hour klines in March 2023 (including 24 March 13:00 UTC). This patch **does not fabricate missing observations**, override the continuous-time requirement or guarantee that the full 2023-01 through 2025-12 download succeeds. If the March archive contains a gap, stop and perform independent cross-source reconciliation or choose a separate explicitly defined uninterrupted evaluation window. Do not interpolate prices and then report the series as native exchange history.
+The received BTC March 2023 archive and a separate provider REST query both omit 24 March 13:00 UTC. This patch **does not fabricate missing observations**, override the continuous-time requirement or allow the full 2023-01 through 2025-12 BTC range to pass. Stop at that gap and perform independent cross-source reconciliation or choose a separate explicitly defined uninterrupted evaluation window. The reproduced research explicitly uses April 2023–December 2025; selecting this window after inspection does not create an independent holdout.
 
 ## Safe staged validation on Termux
 
@@ -49,4 +51,4 @@ If errors remain, they now contain observed and expected timestamps. Do not cont
 
 ## Verification boundary
 
-Synthetic fixture tests reproduce early-close metadata on row 565, check the 2025 microsecond change and reject timestamps outside the interval, missing candles and manifest tampering. They do not prove that the exact real Binance January 2023 row has the same anomaly or that any resulting strategy is profitable.
+Synthetic fixture tests reproduce early-close metadata on row 565, check the 2025 microsecond change and reject timestamps outside the interval, missing candles and manifest tampering. Separate inspection of the actual cached archives now confirms the complete January month and the March early-close/missing-hour defect described above. These checks do not establish strategy profitability or independently authenticated market prices.

@@ -5,7 +5,7 @@
 ## Data source and boundaries
 
 - Venue/data: Binance Vision public monthly **spot** BTCUSDT, ETHUSDT, SOLUSDT hourly klines. This is *not* an Australian broker, Solana DEX, or a derivatives/short-selling data set.
-- Time: complete UTC calendar months only; default January 2023–December 2025 inclusive. Starting with Binance's January 2025 **spot** archive, open/close timestamps switch from milliseconds to microseconds.
+- Time: complete UTC calendar months only. The CLI retains its original January 2023–December 2025 default, which fails BTC completeness checks at the confirmed March 2023 gap. The independently reproduced window is **April 2023–December 2025**, explicitly selected below. Starting with Binance's January 2025 **spot** archive, open/close timestamps switch from milliseconds to microseconds.
 - Each monthly ZIP is checked against its colocated published `.CHECKSUM` file, parsed with a bounded ZIP reader, and validated for every expected hourly candle, complete OHLCV, chronological order and exact timestamps. Any missing or inconsistent month fails; **no interpolation**.
 - A CSV and manifest record dataset SHA-256, archive hashes and provenance. The checksum proves bytes correspond to those published by the archive provider, **not** independent market-price authentication.
 - Raw, curated and experiment outputs are ignored by Git and remain on-device. The program requires network access to fetch archives. Source jurisdiction/terms/availability must be checked before using the data commercially.
@@ -18,14 +18,16 @@ Run in a clean clone of the current repository, Python >=3.12 (stdlib only):
 
 ```sh
 export PYTHONPATH=packages/alpha_lab/src
-python scripts/multi_year_research.py fetch --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-01 --through-month 2025-12
-python scripts/multi_year_research.py freeze --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-01 --through-month 2025-12
-python scripts/multi_year_research.py evaluate --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-01 --through-month 2025-12
+python scripts/multi_year_research.py fetch --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-04 --through-month 2025-12
+python scripts/multi_year_research.py freeze --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-04 --through-month 2025-12
+python scripts/multi_year_research.py evaluate --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-04 --through-month 2025-12
 ```
 
 `run` combines fetch, freeze and evaluate for an initial engineering test, but sequential operations make it easy to stop if a download or checksum fails. Do not call a freeze generated *after looking at the data* an independent preregistration. Reports are written under `datasets/replay/reports/` with the first run refusing to overwrite a previous result. Raw archives can be reused for retries; if a run stops halfway, rerun `fetch`. Already completed CSV output is deliberately not overwritten.
 
 Use `verify` to re-check the dataset/manifest hash. Use `--annual-overhead-usdt` to add an explicit per-market operating-cost assumption; 0 is the default **assumption**, not a real expense estimate.
+
+The April window was selected after inspecting source-data problems. It is development evidence, not a restored untouched holdout. The [independent reproduction audit](25_MULTYEAR_EVIDENCE_REVIEW_20261105.md) reproduced all three reports and rejected the EMA baseline for promotion.
 
 ## Method (all modelled; no broker execution)
 

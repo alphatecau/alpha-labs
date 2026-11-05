@@ -2,11 +2,13 @@
 
 This programme serves one objective: **credible positive expected net economic value**, never guaranteed profitability.
 
+**Current evidence (5 November 2026):** the selected Binance monthly spot datasets and three modelled reports have been independently reproduced; see [the audit](25_MULTYEAR_EVIDENCE_REVIEW_20261105.md). The reviewed infrastructure is suitable for research integration. Gate 1 remains partly open because venue/account eligibility, permissible dataset usage, independent venue checks, publication-time reconstruction and executable quote/cost calibration are not established. EMA(12,48) failed its economic screen and cannot be promoted.
+
 ## Gate 0 — implemented now
 - Locally deterministic, cost-aware strategy baseline and passive comparison.
 - Strict timestamp/quote unit/data validation and source checksums.
 - No exchange login, no signing, no API or AI costs.
-- This is NOT a research result on real prices.
+- Synthetic checks do not establish a result on real prices. The separate historical modelled results are documented in the audit and do not establish profitable alpha.
 
 ## Gate 1 — source-quality evidence
 - Select one permitted venue and identify exact BTC/ETH/SOL spot pairs.
@@ -30,7 +32,7 @@ This programme serves one objective: **credible positive expected net economic v
 - Start with independently capped exposure, evaluate real fills and losses before scaling.
 
 ## Trading economics
-Always report **modelled gross P&L**, **after-cost trade P&L**, and **after-operating-expenses P&L** separately. The current v0.5 CLI only computes the middle value under a simplified fee/slippage model and is **not** a sufficient basis for trading decisions.
+Always report **modelled gross P&L**, **after-cost trade P&L**, and **after-operating-expenses P&L** separately. The legacy v0.5 CLI computes only the middle value under a simplified fee/slippage model. The multi-year pipeline adds an optional operating-expense adjustment, defaulting to a zero assumption. Full gross/net economics and real execution-cost calibration remain requirements; neither CLI is a sufficient basis for trading decisions.
 
 ## Agent token budget
 Zero LLM tokens for ingest, indicators, backtest, risk, accounting, monitoring. Only introduce Condor/specialist LLMs for bounded research interpretation or anomaly review if no-AI ablation shows incremental value greater than cost.

@@ -277,6 +277,12 @@ def verify_dataset(path: Path, manifest_path: Path) -> dict:
     from alpha_lab.data.manifests import verify_manifest
     original = doc["dataset_manifest"]
     verify_manifest(path, original)
+    expected_provenance = {
+        "source_class": "exchange-public", "source_id": "binance-vision-spot-monthly-1h",
+        "venue": "binance-spot", "quote_currency": "USDT", "interval_minutes": 60,
+    }
+    if any(original.get(key) != value for key, value in expected_provenance.items()):
+        raise ValueError("Incorrect Binance archive provenance metadata")
     if doc["csv_sha256"] != original["csv_sha256"] or doc["candle_count"] != original["candle_count"]:
         raise ValueError("Dataset metadata mismatch")
     if doc["symbol"] != original["instrument"] or doc["symbol"] not in SYMBOLS:
@@ -292,6 +298,15 @@ def verify_dataset(path: Path, manifest_path: Path) -> dict:
     raw_dir = Path(path).resolve().parents[2] / "raw" / "binance-vision" / "spot-monthly-1h" / doc["symbol"]
     if sum(entry.get("bars", 0) for entry in doc["source_archives"]) != doc["candle_count"]:
         raise ValueError("Inconsistent archived candle counts")
+    canonical_digest = hashlib.sha256()
+
+    class DigestWriter:
+        def write(self, value: str) -> int:
+            canonical_digest.update(value.encode("utf-8"))
+            return len(value)
+
+    canonical_csv = csv.writer(DigestWriter(), lineterminator="\n")
+    canonical_csv.writerow(("timestamp", "open", "high", "low", "close", "volume"))
     for (year, month), entry in zip(required, doc["source_archives"]):
         if entry["month"] != f"{year:04d}-{month:02d}" or entry["official_checksum_matched"] is not True:
             raise ValueError("Invalid archive provenance")
@@ -306,8 +321,11 @@ def verify_dataset(path: Path, manifest_path: Path) -> dict:
         if verify_checksum(zipped, checks, filename) != entry["archive_sha256"]:
             raise ValueError("Cached archive no longer matches recorded checksum")
         actual_anomalies: list[dict] = []
-        parse_archive(zipped, doc["symbol"], year, month, anomalies=actual_anomalies)
+        source_rows = parse_archive(zipped, doc["symbol"], year, month, anomalies=actual_anomalies)
+        canonical_csv.writerows(source_rows)
         if (entry.get("close_timestamp_anomalies") != actual_anomalies
                 or entry.get("close_timestamp_anomaly_count") != len(actual_anomalies)):
             raise ValueError("Reported close timestamp anomalies do not match the source archive")
+    if canonical_digest.hexdigest() != doc["csv_sha256"]:
+        raise ValueError("Curated CSV does not match its checksum-verified source archives")
     return doc

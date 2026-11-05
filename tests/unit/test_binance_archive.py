@@ -6,6 +6,7 @@ import tempfile
 import unittest
 
 from archive_fixture import make_archive, two_month_transport
+from alpha_lab.data.manifests import build_manifest
 from alpha_lab.data.adapters.binance_archive import (BASE, archive_name, month_range,
     parse_archive, verify_checksum, build_dataset, verify_dataset)
 
@@ -93,5 +94,39 @@ class ArchiveResearchTests(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 build_dataset("BTCUSDT","2024-12","2025-01",Path(temp),transport=no_checksum)
             self.assertFalse(list((Path(temp)/"curated").rglob('*.csv')))
+
+    def test_rehashed_csv_must_still_match_source_candles(self):
+        with tempfile.TemporaryDirectory() as temp:
+            transport, _ = two_month_transport()
+            result = build_dataset("BTCUSDT", "2024-12", "2025-01", Path(temp), transport=transport)
+            path, manifest_path = Path(result["csv"]), Path(result["manifest"])
+            path.write_text(path.read_text().replace(",5.0\n", ",6.0\n", 1), encoding="utf-8")
+            doc = json.loads(manifest_path.read_text())
+            old = doc["dataset_manifest"]
+            doc["dataset_manifest"] = build_manifest(
+                path, quote_currency="USDT", interval_minutes=60,
+                source_class=old["source_class"], source_id=old["source_id"],
+                venue=old["venue"], instrument=old["instrument"],
+                retrieved_at_utc=old["retrieved_at_utc"])
+            doc["csv_sha256"] = doc["dataset_manifest"]["csv_sha256"]
+            manifest_path.write_text(json.dumps(doc), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Curated CSV.*source archives"):
+                verify_dataset(path, manifest_path)
+
+    def test_rehashed_source_metadata_cannot_relabel_archive(self):
+        with tempfile.TemporaryDirectory() as temp:
+            transport, _ = two_month_transport()
+            result = build_dataset("BTCUSDT", "2024-12", "2025-01", Path(temp), transport=transport)
+            path, manifest_path = Path(result["csv"]), Path(result["manifest"])
+            doc = json.loads(manifest_path.read_text())
+            old = doc["dataset_manifest"]
+            doc["dataset_manifest"] = build_manifest(
+                path, quote_currency="USDT", interval_minutes=60,
+                source_class="user-supplied", source_id=old["source_id"],
+                venue=old["venue"], instrument=old["instrument"],
+                retrieved_at_utc=old["retrieved_at_utc"])
+            manifest_path.write_text(json.dumps(doc), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "provenance metadata"):
+                verify_dataset(path, manifest_path)
 
 if __name__=='__main__':unittest.main()

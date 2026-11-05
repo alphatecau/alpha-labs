@@ -83,8 +83,15 @@ def verify_checksum(zip_bytes: bytes, checksum_bytes: bytes, expected_filename: 
     return digest
 
 
-def parse_archive(data: bytes, symbol: str, year: int, month: int) -> list[tuple[str, ...]]:
-    """Require all hourly candles for a calendar month, in order, with valid OHLCV."""
+def parse_archive(data: bytes, symbol: str, year: int, month: int, *,
+                  anomalies: list[dict] | None = None) -> list[tuple[str, ...]]:
+    """Require a complete hourly open-time grid; flag early close metadata.
+
+    Some checksum-valid Binance archives contain an early in-bar close_time.
+    Never silently accept such rows: a caller must supply an anomaly ledger.
+    No missing/open-time gaps, mixed timestamp units, late closes, or malformed
+    OHLCV are accepted. This does NOT establish candle completeness.
+    """
     expected = archive_name(symbol, year, month).removesuffix(".zip") + ".csv"
     if len(data) > MAX_ARCHIVE_BYTES:
         raise ValueError("Oversized compressed archive")
@@ -124,9 +131,27 @@ def parse_archive(data: bytes, symbol: str, year: int, month: int) -> list[tuple
                 raise ValueError("Non-hourly timestamp alignment")
             observed = datetime.fromtimestamp(stamp / factor, tz=UTC)
             if observed != expected_stamp or observed >= end:
-                raise ValueError("Missing, duplicated, reordered or out-of-month candle")
-            if close_stamp != stamp + factor * 3600 - 1:
-                raise ValueError("Incorrect close timestamp or timestamp units")
+                raise ValueError(f"Missing, duplicated, reordered or out-of-month candle: expected {expected_stamp.isoformat()}, observed {observed.isoformat()}")
+            expected_close = stamp + factor * 3600 - 1
+            if close_stamp != expected_close:
+                if not (stamp <= close_stamp < expected_close):
+                    raise ValueError(
+                        "Incorrect close timestamp or timestamp units: "
+                        f"open={stamp}, observed_close={close_stamp}, "
+                        f"expected_close={expected_close}, unit={'us' if year >= 2025 else 'ms'}"
+                    )
+                if anomalies is None:
+                    raise ValueError("Early close timestamp requires an explicit anomaly ledger")
+                anomalies.append({
+                    "row": idx,
+                    "open_time_utc": observed.isoformat(),
+                    "recorded_close_timestamp": close_stamp,
+                    "expected_close_timestamp": expected_close,
+                    "earliness_in_source_units": expected_close - close_stamp,
+                    "timestamp_unit": "us" if year >= 2025 else "ms",
+                    "classification": "exchange_archive_early_close_metadata",
+                    "requires_independent_review": True,
+                })
             o, h, l, c, v = (Decimal(values[j]) for j in (1, 2, 3, 4, 5))
             if not all(x.is_finite() for x in (o, h, l, c, v)):
                 raise ValueError("Nonfinite OHLCV")
@@ -158,16 +183,21 @@ def fetch_month(symbol: str, year: int, month: int, raw_dir: Path,
         zipped = transport(url)
         checked = transport(url + ".CHECKSUM")
     digest = verify_checksum(zipped, checked, filename)
-    candles = parse_archive(zipped, symbol, year, month)
+    # Retain the checksum-verified original for forensics even if parsing fails.
+    # A cached archive is NOT an accepted/research-ready dataset.
     if not zippath.exists() or not checkpath.exists():
         zippath.write_bytes(zipped)
         checkpath.write_bytes(checked)
+    anomalies: list[dict] = []
+    candles = parse_archive(zipped, symbol, year, month, anomalies=anomalies)
     return candles, {
         "month": f"{year:04d}-{month:02d}",
         "archive_url": url,
         "archive_sha256": digest,
         "official_checksum_matched": True,
         "bars": len(candles),
+        "close_timestamp_anomalies": anomalies,
+        "close_timestamp_anomaly_count": len(anomalies),
     }
 
 
@@ -220,6 +250,8 @@ def build_dataset(symbol: str, start: str, end: str, root: Path,
             "csv_sha256": dataset.sha256,
             "candle_count": len(dataset.bars),
             "source_archives": provenance,
+            "source_close_timestamp_anomaly_count": sum(entry["close_timestamp_anomaly_count"] for entry in provenance),
+            "source_close_timestamp_anomalies_require_review": any(entry["close_timestamp_anomaly_count"] for entry in provenance),
             "dataset_manifest": base,
             "source_archive_checksums_verified": True,
             "independent_price_crosscheck_performed": False,
@@ -252,6 +284,11 @@ def verify_dataset(path: Path, manifest_path: Path) -> dict:
     required = month_range(doc["first_month"], doc["last_month"])
     if len(required) != len(doc["source_archives"]):
         raise ValueError("Missing archive entries")
+    reported_anomalies = sum(entry.get("close_timestamp_anomaly_count", -1)
+                             for entry in doc["source_archives"])
+    if (doc.get("source_close_timestamp_anomaly_count") != reported_anomalies
+            or doc.get("source_close_timestamp_anomalies_require_review") is not bool(reported_anomalies)):
+        raise ValueError("Invalid source close timestamp anomaly declaration")
     raw_dir = Path(path).resolve().parents[2] / "raw" / "binance-vision" / "spot-monthly-1h" / doc["symbol"]
     if sum(entry.get("bars", 0) for entry in doc["source_archives"]) != doc["candle_count"]:
         raise ValueError("Inconsistent archived candle counts")
@@ -268,4 +305,9 @@ def verify_dataset(path: Path, manifest_path: Path) -> dict:
         checks = (raw_dir / (filename + ".CHECKSUM")).read_bytes()
         if verify_checksum(zipped, checks, filename) != entry["archive_sha256"]:
             raise ValueError("Cached archive no longer matches recorded checksum")
+        actual_anomalies: list[dict] = []
+        parse_archive(zipped, doc["symbol"], year, month, anomalies=actual_anomalies)
+        if (entry.get("close_timestamp_anomalies") != actual_anomalies
+                or entry.get("close_timestamp_anomaly_count") != len(actual_anomalies)):
+            raise ValueError("Reported close timestamp anomalies do not match the source archive")
     return doc

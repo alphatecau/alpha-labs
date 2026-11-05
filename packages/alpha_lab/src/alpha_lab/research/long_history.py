@@ -301,6 +301,12 @@ def evaluate_spec(data_csv: Path, manifest_json: Path, spec_file: Path,
     result["source_archive_months"] = len(manifest["source_archives"])
     result["instrument"] = manifest["symbol"]
     result["archive_sha256_verified"] = True
+    result["source_close_timestamp_anomaly_count"] = manifest["source_close_timestamp_anomaly_count"]
+    result["source_close_timestamp_anomalies_require_review"] = manifest["source_close_timestamp_anomalies_require_review"]
+    if result["source_close_timestamp_anomalies_require_review"]:
+        result["limitations"].append(
+            "The source contains kline close-time metadata anomalies; review the exact rows and independent evidence before interpreting this backtest"
+        )
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("x", encoding="utf-8") as fp:
         json.dump(result, fp, indent=2, sort_keys=True, allow_nan=False)

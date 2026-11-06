@@ -1,4 +1,4 @@
-# Alpha Labs — project status (5 November 2026)
+# Alpha Labs — project status (6 November 2026)
 
 **Scope:** deterministic research infrastructure and a standalone mobile operator UI. Financial release and execution remain disabled.
 
@@ -7,6 +7,7 @@
 - Offline long/flat EMA(12,48) baseline, passive comparison, modelled fees/slippage, strict CSV/UTC/quote validation and historical walk-forward diagnostics.
 - Binance monthly spot BTCUSDT/ETHUSDT/SOLUSDT ingestion with archive checksums, exact hourly-grid checks, explicit early-close anomaly records, source-to-curated CSV binding, frozen local experiment records and a complete evidence exporter.
 - Multi-year research with unsealed chronological partitions, 48-hour embargoes, doubled-cost stress, descriptive risk metrics, replay parity and optional operating-expense assumptions.
+- Strategy Research v0.8 offline runner with a single registered LONG/FLAT regime-filtered momentum candidate, stop-risk sizing, UTC loss suspensions, cost sensitivity and an independent reference replay.
 - Standalone mobile operator/advanced research UI and a fixture-tested read-only local research bridge. Integrated production backend/deployment is not verified.
 
 ## Evidence accepted
@@ -17,16 +18,22 @@ The frozen EMA baseline **fails the economic promotion screen**: BTC −11.012%,
 
 See [the completed evidence audit](docs/25_MULTYEAR_EVIDENCE_REVIEW_20261105.md) and [machine-readable findings](docs/evidence/2026-11-05_REPRODUCTION_AUDIT.json).
 
+## Strategy Research v0.8 decision
+
+**FAIL. Reject the registered candidate for promotion.** The previously examined April 2023–December 2025 dataset was reverified. After base friction and a scenario overhead of 120 USDT per market/year, the final unsealed partition returned −2.463% BTC, −1.008% ETH and −3.808% SOL. All three lost money even at zero overhead. A second run reproduced all reports byte for byte. A separate implementation reproduced 72,432 target decisions and 291 ledgers. See the [v0.8 implementation and verification report](docs/26_STRATEGY_RESEARCH_V08.md).
+
 ## Verification
 
 102 Python unit tests and 36 website tests passed for the reviewed implementation; both PR workflows passed at that source commit. CI must pass again on each integration commit. The separate received-data audit reproduced three full reports and passed 27 NAV/fee/order-count comparisons plus nine sampled same-provider REST OHLCV comparisons.
 
+The v0.8 review branch passed 117 Python tests and 36 website tests locally, plus the existing three-width browser smoke test and synthetic baseline CLI.
+
 ## Outstanding
 
 - Gate 1 is **partially evidenced**, not fully cleared: venue/account eligibility, permissible dataset usage, independent venue price checks, historical publication-time reconstruction and executable bid/ask/cost calibration remain unverified.
-- Untouched prospective evaluation, statistical uncertainty, selection/multiple-testing adjustment, capacity analysis and a profitable candidate have not been established.
+- Prospective evaluation, capacity analysis and a profitable candidate are outstanding. The v0.8 block-bootstrap bounds are descriptive for previously examined data, with a fixed nine-comparison adjustment.
 - Most API, worker, accounting, independent risk and execution services remain planned scaffolds. Operational paper trading, 24/7 supervision, broker/wallet signing, actual trading and production backend deployment are not implemented or verified. Backend/security workflows and the release verification script remain disabled/stubbed.
 
 ## Next stage
 
-Integrate the reviewed research infrastructure after current CI passes. Register the Strategy Research v0.8 regime-filtered momentum hypothesis and its falsification/candidate budget before evaluation; preserve EMA(12,48) as the frozen comparator. Complete the remaining source/cost prerequisites before promoting any candidate. No paper/live bot, broker connection or capital release is approved by this engineering review.
+Review the v0.8 results and close the experiment. Any successor requires a separate registration and a genuinely unseen evaluation window. Complete the source and cost prerequisites before any future promotion review. Paper/live execution, broker connection and capital release remain outside this research stage.

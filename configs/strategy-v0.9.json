@@ -1,0 +1,87 @@
+{
+  "schema": "alpha-labs.strategy-research.v0.9",
+  "v08_dependency_commit": "6f7b893ee4c319573bc23cc633f2fae6e90f7381",
+  "data": {
+    "source": "Binance Vision spot hourly, April 2023 through December 2025; match the v0.8 raw and curated data audit",
+    "evidence_class": "previously_examined_historical_research",
+    "sha256_by_symbol": {
+      "BTCUSDT": "64b0a9e8f264965249d4c2afaa58946d4eb7fa6e5b285355818e911f5b6daa09",
+      "ETHUSDT": "abe096f50f67ead3cb75114ba0592593c9754f771b14e803a1653264f774269f",
+      "SOLUSDT": "de365e95e1624d0768b0bd7c37544956ad864b5aa367ef84a5adb1a3d11fb563"
+    },
+    "bars_per_market": 24144
+  },
+  "candidate_budget": 6,
+  "candidates": [
+    {"id": "A_4h", "role": "primary", "family": "breakout", "signal_hours": 4, "entry_bars": 20, "exit_bars": 10, "confirmation_hours": 24, "confirmation_bars": 30, "atr_multiple": "2.5"},
+    {"id": "A_4h_neighbor", "role": "sensitivity_only", "family": "breakout", "signal_hours": 4, "entry_bars": 24, "exit_bars": 12, "confirmation_hours": 24, "confirmation_bars": 30, "atr_multiple": "2.5"},
+    {"id": "A_1d", "role": "primary", "family": "breakout", "signal_hours": 24, "entry_bars": 20, "exit_bars": 10, "confirmation_hours": 168, "confirmation_bars": 10, "atr_multiple": "2.5"},
+    {"id": "A_1d_neighbor", "role": "sensitivity_only", "family": "breakout", "signal_hours": 24, "entry_bars": 24, "exit_bars": 12, "confirmation_hours": 168, "confirmation_bars": 10, "atr_multiple": "2.5"},
+    {"id": "B_4h", "role": "primary", "family": "mean_reversion", "signal_hours": 4, "mean_bars": 24, "range_days": 10, "max_range_return_fraction": "0.05", "entry_atr": "1.5", "atr_multiple": "2", "maximum_holding_hours": 24},
+    {"id": "B_4h_neighbor", "role": "sensitivity_only", "family": "mean_reversion", "signal_hours": 4, "mean_bars": 24, "range_days": 10, "max_range_return_fraction": "0.05", "entry_atr": "1.75", "atr_multiple": "2", "maximum_holding_hours": 24}
+  ],
+  "signals": {
+    "hypothesis_A": "Persistent price breakouts with higher-timeframe confirmation, ATR sizing and a slower rolling-channel exit can reduce churn and earn positive net expectancy.",
+    "hypothesis_B": "Temporary four-hour downside deviations in ten-day ranges can recover enough to cover entry and exit friction.",
+    "rule_A": "Enter when the completed close is strictly above the highest high of the preceding entry_bars and the latest completed confirmation close is strictly above its SMA of confirmation_bars, including that confirmation close. Exit on a close strictly below the lowest low of the preceding exit_bars. Losing the entry filter alone does not cause an exit.",
+    "rule_B": "Enter when (prior mean_bars close average minus the current close) is at least entry_atr times ATR and the absolute ten-day return of completed UTC daily closes is at most max_range_return_fraction. Exit on a close at or above that rolling prior average, loss of the daily range condition, or maximum_holding_hours from the entry open.",
+    "atr_bars": 14,
+    "stop_floor_fraction": "0.01",
+    "stop_ceiling_fraction": "0.15",
+    "timing": "Only complete UTC-aligned four-hour, daily and Monday-start weekly bars. ATR is the simple average of the latest 14 true ranges with a preceding close, including the current completed signal bar. Fix stop distance as ATR times atr_multiple divided by signal close, clipped to the configured bounds. Measure the resulting distance from the entry open. Scheduled decisions apply once at the next hourly open; the stress delays only discretionary candidate decisions by one more hour. After exit, wait at least one full signal interval to enter again."
+  },
+  "protocol": {
+    "first_open_utc": "2023-04-01T00:00:00+00:00",
+    "development_start_utc": "2023-06-19T00:00:00+00:00",
+    "development_end_utc": "2024-11-24T14:00:00+00:00",
+    "validation_end_utc": "2025-06-13T19:00:00+00:00",
+    "end_exclusive_utc": "2026-01-01T00:00:00+00:00",
+    "embargo_hours": 48,
+    "forward_step_hours": 720,
+    "minimum_forward_hours": 168,
+    "notes": "Partitions and forward folds reset capital, position and suspension state; only causal feature history can cross boundaries. No trained labels or parameter fitting. Skip 48 hours after the start of each forward block and before validation and test. Forward results overlap the named validation/test partitions and are descriptive. Score all configurations independently. No grid, winner reselection, or adaptive tuning."
+  },
+  "costs": {
+    "capital_usdt_per_scope": "10000",
+    "fee_bps_each_side": "10",
+    "price_concession_bps_each_side": "10",
+    "friction_stress_multiplier": 2,
+    "extra_signal_latency_hours": 1,
+    "annual_candidate_overhead_usdt": ["0", "120", "360"],
+    "primary_annual_overhead_usdt": "120",
+    "notes": "Apply one annual overhead scenario per 10,000 USDT account, including the single shared-capital portfolio. Prorate by hours using 8,760 hours/year and debit after each replay. v0.8 pays the same overhead for comparison; passive, EMA and FLAT pay zero. Full friction includes exit estimates on terminal marks."
+  },
+  "risk": {
+    "max_new_position_fraction": "0.20",
+    "max_position_stop_risk_fraction": "0.0025",
+    "max_aggregate_stop_risk_fraction": "0.01",
+    "daily_loss_suspension_fraction": "0.02",
+    "drawdown_suspension_fraction": "0.05",
+    "notes": "Cash-only LONG/FLAT; one open position per market. Cap each new entry by available cash, 20% of starting and current equity, its friction-inclusive stop risk and remaining aggregate initial planned risk on positions still open. Admit in BTC, ETH, SOL order on ties. Estimate exit costs in opening and closing marks. New UTC days use the prior close as the reference. Flatten at a breached opening mark or next open after a closing breach. A daily breach suspends through the UTC day, and portfolio drawdown through the scored window. Model a stop touched after the open at its trigger less concession and fees, or at the opening gap if worse. No intrahour proceeds finance same-hour entries. Observed losses can exceed planned amounts."
+  },
+  "benchmarks": {
+    "initial_risky_allocation": "0.20",
+    "notes": "FLAT, frozen hourly EMA(12,48), passive buy-and-hold and v0.8 are scored on the same dates. EMA/passive use 20% of initial cash in total, divided equally across markets for portfolio reports. Shared v0.8 reuses original signals and close-triggered 4% stop with shared admission and mark-to-market controls. Match retrospective passive to candidate average hourly notional and hourly P&L standard deviation separately, as fractions of initial capital. Report cash-unmatchable comparisons as unavailable."
+  },
+  "rejection": {
+    "minimum_closed_trades_single": 20,
+    "minimum_closed_trades_portfolio": 40,
+    "minimum_profit_factor_exclusive": "1.2",
+    "minimum_positive_fold_fraction_exclusive": "0.50",
+    "rules": "FAIL a scope if base or doubled net return after primary overhead is non-positive, base net closed expectancy is non-positive when defined, base profit factor is at most 1.2 when defined, base or doubled open/close drawdown reaches 5%, at most half the base forward folds are positive, or base net return does not beat FLAT, both available matched passives and v0.8. Report minimum trades and missing comparisons separately. Historical data can only give FAIL or INSUFFICIENT EVIDENCE, never PASS. Any primary candidate failing a scope is rejected; sensitivity neighbours cannot be selected."
+  },
+  "uncertainty": {
+    "block_days": 14,
+    "minimum_blocks": 6,
+    "replicates": 16384,
+    "seed": 909,
+    "family_alpha": "0.05",
+    "comparisons": 48,
+    "notes": "Bonferroni over 6 variants × 4 scopes × 2 paired comparisons (FLAT and exposure-matched passive). Use complete UTC days from final base test, daily changes in NAV over initial capital less prorated overhead. One-sided moving-block percentile bounds are descriptive and do not undo prior inspection."
+  },
+  "prospective": {
+    "start_utc": "2027-01-01T00:00:00+00:00",
+    "end_exclusive_utc": "2028-01-01T00:00:00+00:00",
+    "rules": "Leave the window untouched. Only an eligible primary candidate frozen with immutable code, rules, scoring and data collection before the window can enter. Independent custody, post-window one-time release, independent reproduction, matched benchmark and corrected uncertainty gates, and verified execution cost and data prerequisites are required. Any change after inspection requires a fresh window. This runner does not admit candidates or evaluate prospective data."
+  }
+}

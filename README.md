@@ -4,6 +4,8 @@
 
 Strategy Research v0.8 rejected its registered momentum candidate after testing BTC, ETH and SOL. See the [results and Termux reproduction commands](docs/26_STRATEGY_RESEARCH_V08.md).
 
+Strategy Research v0.9 added shared-capital historical testing and rejected every registered variant. See the [portfolio results, audit and reproduction commands](docs/29_STRATEGY_RESEARCH_V09.md).
+
 ## Run the first research pipeline (Android Codespaces-friendly)
 
 Python 3.12+, no exchange account, API keys or AI tokens required:

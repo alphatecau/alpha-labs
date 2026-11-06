@@ -1,0 +1,2320 @@
+{
+  "evidence_class": "retrospective_attribution",
+  "markets": {
+    "BTCUSDT": {
+      "dataset_sha256": "64b0a9e8f264965249d4c2afaa58946d4eb7fa6e5b285355818e911f5b6daa09",
+      "periods": {
+        "development": {
+          "by_entry_regime": {
+            "TRENDING_UP": {
+              "expectancy_usdt": "0.1731390193546113688704711484",
+              "gross_usdt": "525.3639316071978325774312208",
+              "mean_24h_post_exit_return_pct": "0.3434875846762777296547094189",
+              "mean_entry_gap_bps": "-0.002118291155088297749206427907",
+              "mean_exit_gap_bps": "-0.0008838635034353178791197441860",
+              "mean_holding_hours": 22.953488372093023,
+              "mean_mae_pct": "-0.8815847759976326584163571489",
+              "mean_mfe_pct": "1.895752581234376877255493506",
+              "median_holding_hours": 4,
+              "net_usdt": "37.2248891612414443071512969",
+              "payoff_ratio": "3.817342496376719643654507132",
+              "profit_factor": "1.039039969427982861586433894",
+              "trades": 215,
+              "win_rate_pct": 21.3953488372093
+            }
+          },
+          "by_exit_reason": {
+            "SIGNAL_FLAT": {
+              "expectancy_usdt": "0.3518225862157445322513784855",
+              "gross_usdt": "561.2260854236503029462626318",
+              "mean_24h_post_exit_return_pct": "0.3530991359723981408172518976",
+              "mean_entry_gap_bps": "-0.002128189711887775776071878505",
+              "mean_exit_gap_bps": "-0.0008701814926941552371086962617",
+              "mean_holding_hours": 22.83644859813084,
+              "mean_mae_pct": "-0.8559756822240387463616775126",
+              "mean_mfe_pct": "1.902977058667190369652065397",
+              "median_holding_hours": 4.0,
+              "net_usdt": "75.2900334501693299017949959",
+              "payoff_ratio": "3.952544991390526502251814430",
+              "profit_factor": "1.082244461928358447045139665",
+              "trades": 214,
+              "win_rate_pct": 21.49532710280374
+            },
+            "STOP_AT_CLOSE": {
+              "expectancy_usdt": "-38.065144288927885594643699",
+              "gross_usdt": "-35.86215381645247036883141105",
+              "mean_24h_post_exit_return_pct": "-1.69416129010124943680429607",
+              "mean_entry_gap_bps": "0",
+              "mean_exit_gap_bps": "-0.003811813802044123269484",
+              "mean_holding_hours": 48,
+              "mean_mae_pct": "-6.36193084354672983811779933",
+              "mean_mfe_pct": "0.3497144106122895043891087",
+              "median_holding_hours": 48,
+              "net_usdt": "-38.0651442889278855946436990",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 1,
+              "win_rate_pct": 0.0
+            }
+          },
+          "by_exit_signal_regime": {
+            "RANGING": {
+              "expectancy_usdt": "-8.052488985111745926410562238",
+              "gross_usdt": "-92.80594488530840107557787203",
+              "mean_24h_post_exit_return_pct": "0.4624362983089758285260588056",
+              "mean_entry_gap_bps": "0.0000115292342511750727980625",
+              "mean_exit_gap_bps": "0.0005251742265365260147608125",
+              "mean_holding_hours": 12.375,
+              "mean_mae_pct": "-1.439994455371770031369513204",
+              "mean_mfe_pct": "0.4908628215449199263597355125",
+              "median_holding_hours": 5.0,
+              "net_usdt": "-128.8398237617879348225689958",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 16,
+              "win_rate_pct": 0.0
+            },
+            "TRENDING_UP": {
+              "expectancy_usdt": "0.8344960448393436137171874005",
+              "gross_usdt": "618.1698764925062336530090930",
+              "mean_24h_post_exit_return_pct": "0.3338267754472261074113510930",
+              "mean_entry_gap_bps": "-0.002289532995437200086654025126",
+              "mean_exit_gap_bps": "-0.0009971529691616972876729547739",
+              "mean_holding_hours": 23.804020100502512,
+              "mean_mae_pct": "-0.8366875153444356837065556571",
+              "mean_mfe_pct": "2.008708541812423667277262992",
+              "median_holding_hours": 4,
+              "net_usdt": "166.0647129230293791297202927",
+              "payoff_ratio": "3.995866966177551930509367150",
+              "profit_factor": "1.201371767608937181721770516",
+              "trades": 199,
+              "win_rate_pct": 23.115577889447238
+            }
+          },
+          "closed_trade_summary": {
+            "expectancy_usdt": "0.1731390193546113688704711484",
+            "gross_usdt": "525.3639316071978325774312208",
+            "mean_24h_post_exit_return_pct": "0.3434875846762777296547094189",
+            "mean_entry_gap_bps": "-0.002118291155088297749206427907",
+            "mean_exit_gap_bps": "-0.0008838635034353178791197441860",
+            "mean_holding_hours": 22.953488372093023,
+            "mean_mae_pct": "-0.8815847759976326584163571489",
+            "mean_mfe_pct": "1.895752581234376877255493506",
+            "median_holding_hours": 4,
+            "net_usdt": "37.2248891612414443071512969",
+            "payoff_ratio": "3.817342496376719643654507132",
+            "profit_factor": "1.039039969427982861586433894",
+            "trades": 215,
+            "win_rate_pct": 21.3953488372093
+          },
+          "fees_including_terminal_usdt": "244.0692585410123905362236735",
+          "frozen_base_execution_metrics": {
+            "annualised_return_pct": 0.22721863102250772,
+            "annualised_volatility_pct": 1.704115125792137,
+            "calmar": 0.09857243519027102,
+            "closed_trades": 215,
+            "expectancy_usdt_per_closed_trade": 0.17313901935461137,
+            "exposure_fraction_of_hours": 0.344118262324803,
+            "final_liquidatable_usdt": "10037.22488916124144430715129",
+            "max_daily_mark_to_market_loss_pct": 0.6256437956917881,
+            "max_drawdown_pct": 2.3050930068219917,
+            "modelled_fees_usdt": "244.0692585410123905362236735",
+            "modelled_fills": 430,
+            "modelled_slippage_usdt": "244.0697839049439977340562507",
+            "net_execution_return_pct": 0.3722488916124144,
+            "open_position_at_end": false,
+            "profit_factor": 1.0390399694279828,
+            "risk": {
+              "daily_suspensions": 0,
+              "drawdown_suspension": false,
+              "entry_rejections": {},
+              "exit_reasons": {
+                "SIGNAL_FLAT": 214,
+                "STOP_AT_CLOSE": 1
+              },
+              "max_planned_stop_risk_pct": 0.25
+            },
+            "sharpe_zero_risk_free": 0.14170391979137026,
+            "sortino_zero_target": 0.20475039656700225,
+            "turnover_to_starting_capital": 24.40692585410124
+          },
+          "full_replay_cost_ablations": {
+            "fees_only": {
+              "annualised_return_pct": 1.821136731964157,
+              "annualised_volatility_pct": 1.768946454741707,
+              "calmar": 1.1191872696180385,
+              "closed_trades": 215,
+              "expectancy_usdt_per_closed_trade": 1.3947170309682828,
+              "exposure_fraction_of_hours": 0.344118262324803,
+              "final_liquidatable_usdt": "10299.86416165818081101601911",
+              "max_daily_mark_to_market_loss_pct": 0.6441032015392307,
+              "max_drawdown_pct": 1.6271957172866014,
+              "modelled_fees_usdt": "258.7014320497838272560104673",
+              "modelled_fills": 430,
+              "modelled_slippage_usdt": "0E-38",
+              "net_execution_return_pct": 2.998641616581808,
+              "open_position_at_end": false,
+              "profit_factor": 1.3678915443086075,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 214,
+                  "STOP_AT_CLOSE": 1
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 1.0290865244772114,
+              "sortino_zero_target": 1.5085863722514763,
+              "turnover_to_starting_capital": 25.870143204978383
+            },
+            "price_concession_only": {
+              "annualised_return_pct": 1.821136731964157,
+              "annualised_volatility_pct": 1.768946454741707,
+              "calmar": 1.1191872696180385,
+              "closed_trades": 215,
+              "expectancy_usdt_per_closed_trade": 1.3947170309682828,
+              "exposure_fraction_of_hours": 0.344118262324803,
+              "final_liquidatable_usdt": "10299.86416165818081101601911",
+              "max_daily_mark_to_market_loss_pct": 0.6441032015392307,
+              "max_drawdown_pct": 1.6271957172866014,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 430,
+              "modelled_slippage_usdt": "258.7014320497838272560104673",
+              "net_execution_return_pct": 2.998641616581808,
+              "open_position_at_end": false,
+              "profit_factor": 1.3678915443086075,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 214,
+                  "STOP_AT_CLOSE": 1
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 1.0290865244772114,
+              "sortino_zero_target": 1.5085863722514763,
+              "turnover_to_starting_capital": 25.870087348419013
+            },
+            "zero": {
+              "annualised_return_pct": 3.6001394061760283,
+              "annualised_volatility_pct": 1.8509080939989309,
+              "calmar": 2.7671018405073755,
+              "closed_trades": 215,
+              "expectancy_usdt_per_closed_trade": 2.77260024516811,
+              "exposure_fraction_of_hours": 0.344118262324803,
+              "final_liquidatable_usdt": "10596.10905271114361782889240",
+              "max_daily_mark_to_market_loss_pct": 0.6760882168639563,
+              "max_drawdown_pct": 1.3010505625322077,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 430,
+              "modelled_slippage_usdt": "0E-38",
+              "net_execution_return_pct": 5.961090527111436,
+              "open_position_at_end": false,
+              "profit_factor": 1.8823688560618848,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 214,
+                  "STOP_AT_CLOSE": 1
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 1.9201297495575624,
+              "sortino_zero_target": 2.846068873637554,
+              "turnover_to_starting_capital": 27.51650608306283
+            }
+          },
+          "gross_fixed_fills_usdt": "525.3639316071978325774312208",
+          "matched_passive_diagnostics": {
+            "hourly_pnl_stdev": {
+              "net_return_pct": 4.5500945232178065,
+              "passive_initial_weight": "0.01860186773082068812914649781",
+              "target": "0.0001814766905018191454263782040"
+            },
+            "mean_notional": {
+              "net_return_pct": 2.8886281943865306,
+              "passive_initial_weight": "0.01180939853475775214378117275",
+              "target": "0.02018107721726872804359657292"
+            }
+          },
+          "mean_entry_hourly_volatility_pct": "0.4325023618286150991862953845",
+          "mean_entry_momentum_pct": "1.886425517295523258152118777",
+          "mean_open_notional_fraction_initial_equity": "0.02018107721726872804359657292",
+          "net_after_overhead_usdt": "-159.2271656332791036380541826",
+          "price_concession_including_terminal_usdt": "244.0697839049439977340562506",
+          "scenario_overhead_usdt": "196.4520547945205479452054795",
+          "signal_exit_triggers": {
+            "MOMENTUM_BELOW_ENTRY_THRESHOLD": 198,
+            "RANGING": 16
+          },
+          "signal_exits_reentered_within_24h": 151,
+          "trade_ledger_sha256": "6c95c464531f95d232548fbf69fdb07bf77c0c7f4c4109dfab8740d1e0eca819"
+        },
+        "test_unsealed": {
+          "by_entry_regime": {
+            "TRENDING_UP": {
+              "expectancy_usdt": "-3.228142036089448828519263973",
+              "gross_usdt": "-54.15699896083178932960989186",
+              "mean_24h_post_exit_return_pct": "-0.2696333651060643975654772",
+              "mean_entry_gap_bps": "0.0001899328503710258348459107143",
+              "mean_exit_gap_bps": "-0.0002553021135598744982151607143",
+              "mean_holding_hours": 21.446428571428573,
+              "mean_mae_pct": "-0.8672647740370194105252330741",
+              "mean_mfe_pct": "1.217274385214579964657307345",
+              "median_holding_hours": 5.5,
+              "net_usdt": "-180.7759540210091343970787825",
+              "payoff_ratio": "2.052825913957893255194972699",
+              "profit_factor": "0.3930943239493838148245692402",
+              "trades": 56,
+              "win_rate_pct": 16.071428571428573
+            }
+          },
+          "by_exit_reason": {
+            "SIGNAL_FLAT": {
+              "expectancy_usdt": "-3.228142036089448828519263973",
+              "gross_usdt": "-54.15699896083178932960989186",
+              "mean_24h_post_exit_return_pct": "-0.2696333651060643975654772",
+              "mean_entry_gap_bps": "0.0001899328503710258348459107143",
+              "mean_exit_gap_bps": "-0.0002553021135598744982151607143",
+              "mean_holding_hours": 21.446428571428573,
+              "mean_mae_pct": "-0.8672647740370194105252330741",
+              "mean_mfe_pct": "1.217274385214579964657307345",
+              "median_holding_hours": 5.5,
+              "net_usdt": "-180.7759540210091343970787825",
+              "payoff_ratio": "2.052825913957893255194972699",
+              "profit_factor": "0.3930943239493838148245692402",
+              "trades": 56,
+              "win_rate_pct": 16.071428571428573
+            }
+          },
+          "by_exit_signal_regime": {
+            "RANGING": {
+              "expectancy_usdt": "-10.5862010005748240974336445",
+              "gross_usdt": "-75.02163563676590125976836470",
+              "mean_24h_post_exit_return_pct": "-0.3040228873173502449985668511",
+              "mean_entry_gap_bps": "0.0007253987581337976541111111111",
+              "mean_exit_gap_bps": "0.0002976539207820114059891111111",
+              "mean_holding_hours": 15,
+              "mean_mae_pct": "-1.759603318099728560040799832",
+              "mean_mfe_pct": "0.5674910393860986356475545333",
+              "median_holding_hours": 10,
+              "net_usdt": "-95.2758090051734168769028005",
+              "payoff_ratio": "0.06908210910751195918371577080",
+              "profit_factor": "0.008635263638438994897964471348",
+              "trades": 9,
+              "win_rate_pct": 11.11111111111111
+            },
+            "TRENDING_UP": {
+              "expectancy_usdt": "-1.819152021613525904684595362",
+              "gross_usdt": "20.86463667593411193015847285",
+              "mean_24h_post_exit_return_pct": "-0.2630481374485841289080770540",
+              "mean_entry_gap_bps": "0.00008739682548028229498661702128",
+              "mean_exit_gap_bps": "-0.0003611873116253420117861914894",
+              "mean_holding_hours": 22.680851063829788,
+              "mean_mae_pct": "-0.6963914358122453180648053970",
+              "mean_mfe_pct": "1.341700983351948729786834479",
+              "median_holding_hours": 4,
+              "net_usdt": "-85.5001450158357175201759820",
+              "payoff_ratio": "2.809106436300081224479194590",
+              "profit_factor": "0.5762269612923243537393219672",
+              "trades": 47,
+              "win_rate_pct": 17.02127659574468
+            }
+          },
+          "closed_trade_summary": {
+            "expectancy_usdt": "-3.228142036089448828519263973",
+            "gross_usdt": "-54.15699896083178932960989186",
+            "mean_24h_post_exit_return_pct": "-0.2696333651060643975654772",
+            "mean_entry_gap_bps": "0.0001899328503710258348459107143",
+            "mean_exit_gap_bps": "-0.0002553021135598744982151607143",
+            "mean_holding_hours": 21.446428571428573,
+            "mean_mae_pct": "-0.8672647740370194105252330741",
+            "mean_mfe_pct": "1.217274385214579964657307345",
+            "median_holding_hours": 5.5,
+            "net_usdt": "-180.7759540210091343970787825",
+            "payoff_ratio": "2.052825913957893255194972699",
+            "profit_factor": "0.3930943239493838148245692402",
+            "trades": 56,
+            "win_rate_pct": 16.071428571428573
+          },
+          "fees_including_terminal_usdt": "63.30950460858815294962911030",
+          "frozen_base_execution_metrics": {
+            "annualised_return_pct": -3.2873301398578025,
+            "annualised_volatility_pct": 0.9815514654046381,
+            "calmar": -1.7438795030741876,
+            "closed_trades": 56,
+            "expectancy_usdt_per_closed_trade": -3.228142036089449,
+            "exposure_fraction_of_hours": 0.25120267726417067,
+            "final_liquidatable_usdt": "9819.224045978990865602921211",
+            "max_daily_mark_to_market_loss_pct": 0.34969146685554253,
+            "max_drawdown_pct": 1.8850672503821233,
+            "modelled_fees_usdt": "63.30950460858815294962911028",
+            "modelled_fills": 112,
+            "modelled_slippage_usdt": "63.30945045158919211783978067",
+            "net_execution_return_pct": -1.8077595402100914,
+            "open_position_at_end": false,
+            "profit_factor": 0.3930943239493838,
+            "risk": {
+              "daily_suspensions": 0,
+              "drawdown_suspension": false,
+              "entry_rejections": {},
+              "exit_reasons": {
+                "SIGNAL_FLAT": 56
+              },
+              "max_planned_stop_risk_pct": 0.25
+            },
+            "sharpe_zero_risk_free": -3.4004881779983624,
+            "sortino_zero_target": -4.528990487286965,
+            "turnover_to_starting_capital": 6.330950460858816
+          },
+          "full_replay_cost_ablations": {
+            "fees_only": {
+              "annualised_return_pct": -2.2513420237636472,
+              "annualised_volatility_pct": 1.0066738797660326,
+              "calmar": -1.5022880447133238,
+              "closed_trades": 56,
+              "expectancy_usdt_per_closed_trade": -2.2055019934406643,
+              "exposure_fraction_of_hours": 0.25120267726417067,
+              "final_liquidatable_usdt": "9876.491888367322802523467180",
+              "max_daily_mark_to_market_loss_pct": 0.354441871926912,
+              "max_drawdown_pct": 1.4986087599420808,
+              "modelled_fees_usdt": "66.46474484399923367853820390",
+              "modelled_fills": 112,
+              "modelled_slippage_usdt": "0E-38",
+              "net_execution_return_pct": -1.2350811163267719,
+              "open_position_at_end": false,
+              "profit_factor": 0.5267540995697718,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 56
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -2.2569400252353895,
+              "sortino_zero_target": -3.0701511249071447,
+              "turnover_to_starting_capital": 6.646474484399923
+            },
+            "price_concession_only": {
+              "annualised_return_pct": -2.2513420237636472,
+              "annualised_volatility_pct": 1.0066738797660326,
+              "calmar": -1.5022880447133238,
+              "closed_trades": 56,
+              "expectancy_usdt_per_closed_trade": -2.2055019934406643,
+              "exposure_fraction_of_hours": 0.25120267726417067,
+              "final_liquidatable_usdt": "9876.491888367322802523467177",
+              "max_daily_mark_to_market_loss_pct": 0.354441871926912,
+              "max_drawdown_pct": 1.4986087599420808,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 112,
+              "modelled_slippage_usdt": "66.46474484399923367853820390",
+              "net_execution_return_pct": -1.2350811163267719,
+              "open_position_at_end": false,
+              "profit_factor": 0.5267540995697718,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 56
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -2.2569400252353895,
+              "sortino_zero_target": -3.0701511249071447,
+              "turnover_to_starting_capital": 6.646480188736602
+            },
+            "zero": {
+              "annualised_return_pct": -1.1011937931515559,
+              "annualised_volatility_pct": 1.0490021308729038,
+              "calmar": -0.8151448607314558,
+              "closed_trades": 56,
+              "expectancy_usdt_per_closed_trade": -1.0759224693274168,
+              "exposure_fraction_of_hours": 0.25120267726417067,
+              "final_liquidatable_usdt": "9939.748341717664664849192269",
+              "max_daily_mark_to_market_loss_pct": 0.3596566902118933,
+              "max_drawdown_pct": 1.3509179118953398,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 112,
+              "modelled_slippage_usdt": "0E-38",
+              "net_execution_return_pct": -0.6025165828233533,
+              "open_position_at_end": false,
+              "profit_factor": 0.7313418511366656,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 56
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -1.0503315576738976,
+              "sortino_zero_target": -1.451272111598664,
+              "turnover_to_starting_capital": 6.995047725068643
+            }
+          },
+          "gross_fixed_fills_usdt": "-54.15699896083178932960989186",
+          "matched_passive_diagnostics": {
+            "hourly_pnl_stdev": {
+              "net_return_pct": -0.442748801251916,
+              "passive_initial_weight": "0.02567965105170266117372512788",
+              "target": "0.0001042384830464054832651413770"
+            },
+            "mean_notional": {
+              "net_return_pct": -0.24651512184412894,
+              "passive_initial_weight": "0.01429799988170560899983055041",
+              "target": "0.01448095816716993010524151696"
+            }
+          },
+          "mean_entry_hourly_volatility_pct": "0.3519722180265951613274292842",
+          "mean_entry_momentum_pct": "1.768217366218218467102936080",
+          "mean_open_notional_fraction_initial_equity": "0.01448095816716993010524151696",
+          "net_after_overhead_usdt": "-246.2691047059406412463938510",
+          "price_concession_including_terminal_usdt": "63.30945045158919211783978063",
+          "scenario_overhead_usdt": "65.49315068493150684931506849",
+          "signal_exit_triggers": {
+            "MOMENTUM_BELOW_ENTRY_THRESHOLD": 47,
+            "RANGING": 9
+          },
+          "signal_exits_reentered_within_24h": 32,
+          "trade_ledger_sha256": "46ff392650476c582154c8974575ede98ef7de85d55c2955ca2eaeae40e87cbc"
+        },
+        "validation": {
+          "by_entry_regime": {
+            "TRENDING_UP": {
+              "expectancy_usdt": "-3.710475515950956396327648397",
+              "gross_usdt": "-147.3375201907683633933775698",
+              "mean_24h_post_exit_return_pct": "0.07260424134154079489007824",
+              "mean_entry_gap_bps": "-0.003799233743335224203384868687",
+              "mean_exit_gap_bps": "0.0005595978090657498018927676768",
+              "mean_holding_hours": 15.343434343434344,
+              "mean_mae_pct": "-1.043134876321507038863125923",
+              "mean_mfe_pct": "1.203412638963123890182245008",
+              "median_holding_hours": 3,
+              "net_usdt": "-367.3370760791446832364371913",
+              "payoff_ratio": "1.839497710764590603418488451",
+              "profit_factor": "0.3029760935376972758571628036",
+              "trades": 99,
+              "win_rate_pct": 14.141414141414142
+            }
+          },
+          "by_exit_reason": {
+            "SIGNAL_FLAT": {
+              "expectancy_usdt": "-3.119951025564650960207900675",
+              "gross_usdt": "-87.02838070729370918720899335",
+              "mean_24h_post_exit_return_pct": "0.03667598633128820865849293289",
+              "mean_entry_gap_bps": "-0.003877568459692651506547443299",
+              "mean_exit_gap_bps": "0.0005818092499906611412700618557",
+              "mean_holding_hours": 15.206185567010309,
+              "mean_mae_pct": "-0.8884081080217199467541634062",
+              "mean_mfe_pct": "1.176097805369007382576052393",
+              "median_holding_hours": 3,
+              "net_usdt": "-302.6352494797711431401663655",
+              "payoff_ratio": "2.047603907945250715835740337",
+              "profit_factor": "0.3453789724245001207433778881",
+              "trades": 97,
+              "win_rate_pct": 14.43298969072165
+            },
+            "STOP_AT_CLOSE": {
+              "expectancy_usdt": "-32.3509132996867700481354129",
+              "gross_usdt": "-60.30913948347465420616857631",
+              "mean_24h_post_exit_return_pct": "1.815124609338791227121965635",
+              "mean_entry_gap_bps": "0",
+              "mean_exit_gap_bps": "-0.000517657075792450157906",
+              "mean_holding_hours": 22,
+              "mean_mae_pct": "-8.54738313886118100614780801",
+              "mean_mfe_pct": "2.52818206827777450908258685",
+              "median_holding_hours": 22.0,
+              "net_usdt": "-64.7018265993735400962708258",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 2,
+              "win_rate_pct": 0.0
+            }
+          },
+          "by_exit_signal_regime": {
+            "RANGING": {
+              "expectancy_usdt": "-5.723133071009440037447209973",
+              "gross_usdt": "-38.58501823964916984147618432",
+              "mean_24h_post_exit_return_pct": "-0.5948840097603282175363702045",
+              "mean_entry_gap_bps": "0.00009777612867048307871390909091",
+              "mean_exit_gap_bps": "0.001928851257229954712684",
+              "mean_holding_hours": 3.3636363636363638,
+              "mean_mae_pct": "-1.079674169576991395221351335",
+              "mean_mfe_pct": "0.4127771027135320438696715091",
+              "median_holding_hours": 2,
+              "net_usdt": "-62.9544637811038404119193097",
+              "payoff_ratio": "0.2127041671628752742575977881",
+              "profit_factor": "0.02127041671628752742575977881",
+              "trades": 11,
+              "win_rate_pct": 9.090909090909092
+            },
+            "TRENDING_UP": {
+              "expectancy_usdt": "-3.4588933215686459411877032",
+              "gross_usdt": "-108.7525019511191935519013853",
+              "mean_24h_post_exit_return_pct": "0.1560402727292744214433842956",
+              "mean_entry_gap_bps": "-0.004286359977335937613647215909",
+              "mean_exit_gap_bps": "0.0003884411280452241880438636364",
+              "mean_holding_hours": 16.84090909090909,
+              "mean_mae_pct": "-1.038567464664571494318347747",
+              "mean_mfe_pct": "1.302242080994322870971316695",
+              "median_holding_hours": 3.0,
+              "net_usdt": "-304.3826122980408428245178816",
+              "payoff_ratio": "1.973878255914865092989174746",
+              "profit_factor": "0.3421388976919099494514569560",
+              "trades": 88,
+              "win_rate_pct": 14.772727272727273
+            }
+          },
+          "closed_trade_summary": {
+            "expectancy_usdt": "-3.710475515950956396327648397",
+            "gross_usdt": "-147.3375201907683633933775698",
+            "mean_24h_post_exit_return_pct": "0.07260424134154079489007824",
+            "mean_entry_gap_bps": "-0.003799233743335224203384868687",
+            "mean_exit_gap_bps": "0.0005595978090657498018927676768",
+            "mean_holding_hours": 15.343434343434344,
+            "mean_mae_pct": "-1.043134876321507038863125923",
+            "mean_mfe_pct": "1.203412638963123890182245008",
+            "median_holding_hours": 3,
+            "net_usdt": "-367.3370760791446832364371913",
+            "payoff_ratio": "1.839497710764590603418488451",
+            "profit_factor": "0.3029760935376972758571628036",
+            "trades": 99,
+            "win_rate_pct": 14.141414141414142
+          },
+          "fees_including_terminal_usdt": "109.9998516129482553057115072",
+          "frozen_base_execution_metrics": {
+            "annualised_return_pct": -6.62744758601066,
+            "annualised_volatility_pct": 1.6643208008706833,
+            "calmar": -1.7312840836534782,
+            "closed_trades": 99,
+            "expectancy_usdt_per_closed_trade": -3.7104755159509564,
+            "exposure_fraction_of_hours": 0.31771595900439237,
+            "final_liquidatable_usdt": "9632.662923920855316763562808",
+            "max_daily_mark_to_market_loss_pct": 0.47461472324792814,
+            "max_drawdown_pct": 3.828053205471023,
+            "modelled_fees_usdt": "109.9998516129482553057115074",
+            "modelled_fills": 198,
+            "modelled_slippage_usdt": "109.9997042754280645373481138",
+            "net_execution_return_pct": -3.673370760791447,
+            "open_position_at_end": false,
+            "profit_factor": 0.3029760935376973,
+            "risk": {
+              "daily_suspensions": 0,
+              "drawdown_suspension": false,
+              "entry_rejections": {},
+              "exit_reasons": {
+                "SIGNAL_FLAT": 97,
+                "STOP_AT_CLOSE": 2
+              },
+              "max_planned_stop_risk_pct": 0.25
+            },
+            "sharpe_zero_risk_free": -4.111825176480174,
+            "sortino_zero_target": -5.050187737002106,
+            "turnover_to_starting_capital": 10.999985161294825
+          },
+          "full_replay_cost_ablations": {
+            "fees_only": {
+              "annualised_return_pct": -4.894901076843194,
+              "annualised_volatility_pct": 1.7174765033671837,
+              "calmar": -1.603077846394557,
+              "closed_trades": 99,
+              "expectancy_usdt_per_closed_trade": -2.729238796534119,
+              "exposure_fraction_of_hours": 0.31771595900439237,
+              "final_liquidatable_usdt": "9729.805359143122215279771092",
+              "max_daily_mark_to_market_loss_pct": 0.48531926924923124,
+              "max_drawdown_pct": 3.053439412098543,
+              "modelled_fees_usdt": "115.6835832740819142995224685",
+              "modelled_fills": 198,
+              "modelled_slippage_usdt": "0E-38",
+              "net_execution_return_pct": -2.701946408568778,
+              "open_position_at_end": false,
+              "profit_factor": 0.4086740424647352,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 97,
+                  "STOP_AT_CLOSE": 2
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -2.913573546172067,
+              "sortino_zero_target": -3.622623045527127,
+              "turnover_to_starting_capital": 11.568358327408191
+            },
+            "price_concession_only": {
+              "annualised_return_pct": -4.894901076843194,
+              "annualised_volatility_pct": 1.7174765033671837,
+              "calmar": -1.603077846394557,
+              "closed_trades": 99,
+              "expectancy_usdt_per_closed_trade": -2.729238796534119,
+              "exposure_fraction_of_hours": 0.31771595900439237,
+              "final_liquidatable_usdt": "9729.805359143122215279771093",
+              "max_daily_mark_to_market_loss_pct": 0.48531926924923124,
+              "max_drawdown_pct": 3.053439412098543,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 198,
+              "modelled_slippage_usdt": "115.6835832740819142995224685",
+              "net_execution_return_pct": -2.701946408568778,
+              "open_position_at_end": false,
+              "profit_factor": 0.4086740424647352,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 97,
+                  "STOP_AT_CLOSE": 2
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -2.913573546172067,
+              "sortino_zero_target": -3.622623045527127,
+              "turnover_to_starting_capital": 11.56837377851395
+            },
+            "zero": {
+              "annualised_return_pct": -2.955767311468316,
+              "annualised_volatility_pct": 1.791000508133889,
+              "calmar": -1.1375772728726925,
+              "closed_trades": 99,
+              "expectancy_usdt_per_closed_trade": -1.6405806178143028,
+              "exposure_fraction_of_hours": 0.31771595900439237,
+              "final_liquidatable_usdt": "9837.582518836384025458077795",
+              "max_daily_mark_to_market_loss_pct": 0.4970704740990915,
+              "max_drawdown_pct": 2.5983002490935827,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 198,
+              "modelled_slippage_usdt": "0E-38",
+              "net_execution_return_pct": -1.6241748116361598,
+              "open_position_at_end": false,
+              "profit_factor": 0.5847548518636598,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 97,
+                  "STOP_AT_CLOSE": 2
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -1.6662661022867857,
+              "sortino_zero_target": -2.0956595606099047,
+              "turnover_to_starting_capital": 12.198465906576285
+            }
+          },
+          "gross_fixed_fills_usdt": "-147.3375201907683633933775698",
+          "matched_passive_diagnostics": {
+            "hourly_pnl_stdev": {
+              "net_return_pct": 0.430194380154953,
+              "passive_initial_weight": "0.03145800819556852700087559782",
+              "target": "0.0001745102595461435603479063034"
+            },
+            "mean_notional": {
+              "net_return_pct": 0.23867358850162693,
+              "passive_initial_weight": "0.01745303065197069842996782917",
+              "target": "0.01805294528567301389102122351"
+            }
+          },
+          "mean_entry_hourly_volatility_pct": "0.4944060368692073058287924389",
+          "mean_entry_momentum_pct": "1.978436215691101603946773854",
+          "mean_open_notional_fraction_initial_equity": "0.01805294528567301389102122351",
+          "net_after_overhead_usdt": "-432.8302267640761900857522598",
+          "price_concession_including_terminal_usdt": "109.9997042754280645373481139",
+          "scenario_overhead_usdt": "65.49315068493150684931506849",
+          "signal_exit_triggers": {
+            "MOMENTUM_BELOW_ENTRY_THRESHOLD": 86,
+            "RANGING": 11
+          },
+          "signal_exits_reentered_within_24h": 74,
+          "trade_ledger_sha256": "f825bcbbf94c61e69390c8d30b54b92bd93dcb8268b6573a5fc43912426872c7"
+        }
+      }
+    },
+    "ETHUSDT": {
+      "dataset_sha256": "abe096f50f67ead3cb75114ba0592593c9754f771b14e803a1653264f774269f",
+      "periods": {
+        "development": {
+          "by_entry_regime": {
+            "TRENDING_UP": {
+              "expectancy_usdt": "-1.073508019373511805167255491",
+              "gross_usdt": "229.9562505187453816704652539",
+              "mean_24h_post_exit_return_pct": "0.58381329199839389546405282",
+              "mean_entry_gap_bps": "0.002206704202766095633265994898",
+              "mean_exit_gap_bps": "0.003640469170074531532273576531",
+              "mean_holding_hours": 23.5765306122449,
+              "mean_mae_pct": "-1.193584878261983593116038604",
+              "mean_mfe_pct": "2.228388551737192022104943702",
+              "median_holding_hours": 7.0,
+              "net_usdt": "-210.4075717972083138127820762",
+              "payoff_ratio": "3.517170201105114196019064609",
+              "profit_factor": "0.8184609901942718569352540295",
+              "trades": 196,
+              "win_rate_pct": 18.877551020408163
+            }
+          },
+          "by_exit_reason": {
+            "SIGNAL_FLAT": {
+              "expectancy_usdt": "-0.5847849120584085787385405021",
+              "gross_usdt": "320.9118804795203181543219312",
+              "mean_24h_post_exit_return_pct": "0.5764253485121135179249903491",
+              "mean_entry_gap_bps": "0.001833236853199215294377414508",
+              "mean_exit_gap_bps": "0.003861085225932927266838968912",
+              "mean_holding_hours": 23.647668393782382,
+              "mean_mae_pct": "-1.124617195045934671237183804",
+              "mean_mfe_pct": "2.256769333966788988114929584",
+              "median_holding_hours": 7,
+              "net_usdt": "-112.8634880272728556965383169",
+              "payoff_ratio": "3.767919371677221048876510520",
+              "profit_factor": "0.8936731843080588385155826239",
+              "trades": 193,
+              "win_rate_pct": 19.17098445595855
+            },
+            "STOP_AT_CLOSE": {
+              "expectancy_usdt": "-32.51469458997848603874791977",
+              "gross_usdt": "-90.95562996077493648385667711",
+              "mean_24h_post_exit_return_pct": "1.05664167512033805796405096",
+              "mean_entry_gap_bps": "0.02623310369156873076843133333",
+              "mean_exit_gap_bps": "-0.01055249709014892739143333333",
+              "mean_holding_hours": 19,
+              "mean_mae_pct": "-5.630505831827797567322364063",
+              "mean_mfe_pct": "0.4025582282997872087958519",
+              "median_holding_hours": 5,
+              "net_usdt": "-97.5440837699354581162437593",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 3,
+              "win_rate_pct": 0.0
+            }
+          },
+          "by_exit_signal_regime": {
+            "RANGING": {
+              "expectancy_usdt": "-10.63943839858931463003842561",
+              "gross_usdt": "-201.7862362686231552173024481",
+              "mean_24h_post_exit_return_pct": "0.5514881376691087049039489525",
+              "mean_entry_gap_bps": "0.032330194164309140445999",
+              "mean_exit_gap_bps": "-0.009644962229165164077756208333",
+              "mean_holding_hours": 16.291666666666668,
+              "mean_mae_pct": "-2.013332764447706411833889848",
+              "mean_mfe_pct": "0.84011514345708207703532175",
+              "median_holding_hours": 9.0,
+              "net_usdt": "-255.3465215661435511209222147",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 24,
+              "win_rate_pct": 0.0
+            },
+            "TRENDING_UP": {
+              "expectancy_usdt": "0.2612729637728792866752333634",
+              "gross_usdt": "431.7424867873685368877677022",
+              "mean_24h_post_exit_return_pct": "0.5883501557639076064198568716",
+              "mean_entry_gap_bps": "-0.001996573466286422247580470930",
+              "mean_exit_gap_bps": "0.005494250295549837896463779070",
+              "mean_holding_hours": 24.593023255813954,
+              "mean_mae_pct": "-1.079201452282580409108896570",
+              "mean_mfe_pct": "2.422101120334416665603030485",
+              "median_holding_hours": 6.0,
+              "net_usdt": "44.9389497689352373081401385",
+              "payoff_ratio": "3.830092736282675176152197659",
+              "profit_factor": "1.049729120314510974204676395",
+              "trades": 172,
+              "win_rate_pct": 21.511627906976745
+            }
+          },
+          "closed_trade_summary": {
+            "expectancy_usdt": "-1.073508019373511805167255491",
+            "gross_usdt": "229.9562505187453816704652539",
+            "mean_24h_post_exit_return_pct": "0.58381329199839389546405282",
+            "mean_entry_gap_bps": "0.002206704202766095633265994898",
+            "mean_exit_gap_bps": "0.003640469170074531532273576531",
+            "mean_holding_hours": 23.5765306122449,
+            "mean_mae_pct": "-1.193584878261983593116038604",
+            "mean_mfe_pct": "2.228388551737192022104943702",
+            "median_holding_hours": 7.0,
+            "net_usdt": "-210.4075717972083138127820762",
+            "payoff_ratio": "3.517170201105114196019064609",
+            "profit_factor": "0.8184609901942718569352540295",
+            "trades": 196,
+            "win_rate_pct": 18.877551020408163
+          },
+          "fees_including_terminal_usdt": "220.1817961798515883689328291",
+          "frozen_base_execution_metrics": {
+            "annualised_return_pct": -1.290559241798639,
+            "annualised_volatility_pct": 1.9256563863896543,
+            "calmar": -0.397393605094564,
+            "closed_trades": 196,
+            "expectancy_usdt_per_closed_trade": -1.0735080193735118,
+            "exposure_fraction_of_hours": 0.3222229970016038,
+            "final_liquidatable_usdt": "9789.592428202791686187217920",
+            "max_daily_mark_to_market_loss_pct": 0.46754234678989454,
+            "max_drawdown_pct": 3.247559158611867,
+            "modelled_fees_usdt": "220.1817961798515883689328297",
+            "modelled_fills": 392,
+            "modelled_slippage_usdt": "220.1820261361021071143145004",
+            "net_execution_return_pct": -2.104075717972083,
+            "open_position_at_end": false,
+            "profit_factor": 0.8184609901942719,
+            "risk": {
+              "daily_suspensions": 0,
+              "drawdown_suspension": false,
+              "entry_rejections": {},
+              "exit_reasons": {
+                "SIGNAL_FLAT": 193,
+                "STOP_AT_CLOSE": 3
+              },
+              "max_planned_stop_risk_pct": 0.25
+            },
+            "sharpe_zero_risk_free": -0.6649273385180712,
+            "sortino_zero_target": -0.9650110617039442,
+            "turnover_to_starting_capital": 22.018179617985158
+          },
+          "full_replay_cost_ablations": {
+            "fees_only": {
+              "annualised_return_pct": 0.06749264105125885,
+              "annualised_volatility_pct": 2.0059598987811618,
+              "calmar": 0.025664498892512107,
+              "closed_trades": 196,
+              "expectancy_usdt_per_closed_trade": 0.0563857077293681,
+              "exposure_fraction_of_hours": 0.3222229970016038,
+              "final_liquidatable_usdt": "10011.05159871495614769928066",
+              "max_daily_mark_to_market_loss_pct": 0.4659412752321219,
+              "max_drawdown_pct": 2.629805527625188,
+              "modelled_fees_usdt": "233.0060917285599068796546539",
+              "modelled_fills": 392,
+              "modelled_slippage_usdt": "0E-36",
+              "net_execution_return_pct": 0.11051598714956147,
+              "open_position_at_end": false,
+              "profit_factor": 1.010563408197124,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 193,
+                  "STOP_AT_CLOSE": 3
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 0.043662185725681146,
+              "sortino_zero_target": 0.0640530676845724,
+              "turnover_to_starting_capital": 23.300609172855992
+            },
+            "price_concession_only": {
+              "annualised_return_pct": 0.06749264105125885,
+              "annualised_volatility_pct": 2.0059598987811618,
+              "calmar": 0.025664498892512107,
+              "closed_trades": 196,
+              "expectancy_usdt_per_closed_trade": 0.0563857077293681,
+              "exposure_fraction_of_hours": 0.3222229970016038,
+              "final_liquidatable_usdt": "10011.05159871495614769928064",
+              "max_daily_mark_to_market_loss_pct": 0.4659412752321219,
+              "max_drawdown_pct": 2.629805527625188,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 392,
+              "modelled_slippage_usdt": "233.0060917285599068796546537",
+              "net_execution_return_pct": 0.11051598714956147,
+              "open_position_at_end": false,
+              "profit_factor": 1.010563408197124,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 193,
+                  "STOP_AT_CLOSE": 3
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 0.043662185725681146,
+              "sortino_zero_target": 0.0640530676845724,
+              "turnover_to_starting_capital": 23.300584767086946
+            },
+            "zero": {
+              "annualised_return_pct": 1.5798671552063714,
+              "annualised_volatility_pct": 2.1028279144406072,
+              "calmar": 0.7070284038372969,
+              "closed_trades": 196,
+              "expectancy_usdt_per_closed_trade": 1.326220919987605,
+              "exposure_fraction_of_hours": 0.3222229970016038,
+              "final_liquidatable_usdt": "10259.93930031757054683727550",
+              "max_daily_mark_to_market_loss_pct": 0.47400546257234777,
+              "max_drawdown_pct": 2.234517236693555,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 392,
+              "modelled_slippage_usdt": "0E-36",
+              "net_execution_return_pct": 2.5993930031757055,
+              "open_position_at_end": false,
+              "profit_factor": 1.27858711569097,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 193,
+                  "STOP_AT_CLOSE": 3
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 0.7559451397892464,
+              "sortino_zero_target": 1.1187649658712229,
+              "turnover_to_starting_capital": 24.739342795164404
+            }
+          },
+          "gross_fixed_fills_usdt": "229.9562505187453816704652539",
+          "matched_passive_diagnostics": {
+            "hourly_pnl_stdev": {
+              "net_return_pct": 1.800389310395684,
+              "passive_initial_weight": "0.02369245812796211874309814465",
+              "target": "0.0002031259271884097990978819526"
+            },
+            "mean_notional": {
+              "net_return_pct": 1.0839090788438417,
+              "passive_initial_weight": "0.01426384300147935053618954410",
+              "target": "0.01872556510004548465331305812"
+            }
+          },
+          "mean_entry_hourly_volatility_pct": "0.5110624024446729477539882091",
+          "mean_entry_momentum_pct": "2.193486503392522091385208992",
+          "mean_open_notional_fraction_initial_equity": "0.01872556510004548465331305812",
+          "net_after_overhead_usdt": "-406.8596265917288617579875557",
+          "price_concession_including_terminal_usdt": "220.1820261361021071143145001",
+          "scenario_overhead_usdt": "196.4520547945205479452054795",
+          "signal_exit_triggers": {
+            "MOMENTUM_BELOW_ENTRY_THRESHOLD": 169,
+            "RANGING": 24
+          },
+          "signal_exits_reentered_within_24h": 132,
+          "trade_ledger_sha256": "5c291e05c7db189beb4969faf0bed47306c26b2b887eba6c654f4ba0226b7da7"
+        },
+        "test_unsealed": {
+          "by_entry_regime": {
+            "TRENDING_UP": {
+              "expectancy_usdt": "-0.5880920664763750854688207417",
+              "gross_usdt": "101.7618894592908368400966833",
+              "mean_24h_post_exit_return_pct": "0.3993334645769709167882821653",
+              "mean_entry_gap_bps": "0.001899552576334407018511016667",
+              "mean_exit_gap_bps": "0.003040957659057247146467083333",
+              "mean_holding_hours": 27.616666666666667,
+              "mean_mae_pct": "-1.477503847651648165317181462",
+              "mean_mfe_pct": "3.00352088762666625742497365",
+              "median_holding_hours": 5.0,
+              "net_usdt": "-35.2855239885825051281292445",
+              "payoff_ratio": "3.676538609189518346027201788",
+              "profit_factor": "0.9191346522973795865068004470",
+              "trades": 60,
+              "win_rate_pct": 20.0
+            }
+          },
+          "by_exit_reason": {
+            "SIGNAL_FLAT": {
+              "expectancy_usdt": "0.7825508866425318302134186158",
+              "gross_usdt": "174.9079116856440279988720883",
+              "mean_24h_post_exit_return_pct": "0.4246536515811893075023443448",
+              "mean_entry_gap_bps": "0.002839215056754218737945140351",
+              "mean_exit_gap_bps": "0.002773118439032304114015350877",
+              "mean_holding_hours": 27.49122807017544,
+              "mean_mae_pct": "-1.309089679870030401301894406",
+              "mean_mfe_pct": "3.080717565146572483047377704",
+              "median_holding_hours": 4,
+              "net_usdt": "44.6054005386243143221648611",
+              "payoff_ratio": "4.219256283620283412895427772",
+              "profit_factor": "1.125135008965408910105447406",
+              "trades": 57,
+              "win_rate_pct": 21.05263157894737
+            },
+            "STOP_AT_CLOSE": {
+              "expectancy_usdt": "-26.63030817573560648343136853",
+              "gross_usdt": "-73.14602222635319115877540505",
+              "mean_24h_post_exit_return_pct": "-0.07331002616843904320754518667",
+              "mean_entry_gap_bps": "-0.01595403455164201565073733333",
+              "mean_exit_gap_bps": "0.00812990283953116476305",
+              "mean_holding_hours": 30,
+              "mean_mae_pct": "-4.677373035502385681607635523",
+              "mean_mfe_pct": "1.536784014748447970599296633",
+              "median_holding_hours": 16,
+              "net_usdt": "-79.8909245272068194502941056",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 3,
+              "win_rate_pct": 0.0
+            }
+          },
+          "by_exit_signal_regime": {
+            "RANGING": {
+              "expectancy_usdt": "-12.064576800291791152471528",
+              "gross_usdt": "-78.42999060226500024206985185",
+              "mean_24h_post_exit_return_pct": "0.6797998112920143292955764943",
+              "mean_entry_gap_bps": "0.00964166664481819669890625",
+              "mean_exit_gap_bps": "-0.007712644544087888676856625",
+              "mean_holding_hours": 17.75,
+              "mean_mae_pct": "-2.275706879821659186351624768",
+              "mean_mfe_pct": "1.074500125461622228424101762",
+              "median_holding_hours": 5.5,
+              "net_usdt": "-96.5166144023343292197722240",
+              "payoff_ratio": "0.03398834596256626575252419392",
+              "profit_factor": "0.004855477994652323678932027704",
+              "trades": 8,
+              "win_rate_pct": 12.5
+            },
+            "TRENDING_UP": {
+              "expectancy_usdt": "1.177520969495227386377749606",
+              "gross_usdt": "180.1918800615558370821665352",
+              "mean_24h_post_exit_return_pct": "0.3615783794422535343353771594",
+              "mean_entry_gap_bps": "0.00070845810425997783691175",
+              "mean_exit_gap_bps": "0.004695357998002652657747653846",
+              "mean_holding_hours": 29.134615384615383,
+              "mean_mae_pct": "-1.354703381163954162081113261",
+              "mean_mfe_pct": "3.300293312575134569578953940",
+              "median_holding_hours": 5.0,
+              "net_usdt": "61.2310904137518240916429795",
+              "payoff_ratio": "4.399785403891176718139385416",
+              "profit_factor": "1.180430230312266924378859502",
+              "trades": 52,
+              "win_rate_pct": 21.153846153846153
+            }
+          },
+          "closed_trade_summary": {
+            "expectancy_usdt": "-0.5880920664763750854688207417",
+            "gross_usdt": "101.7618894592908368400966833",
+            "mean_24h_post_exit_return_pct": "0.3993334645769709167882821653",
+            "mean_entry_gap_bps": "0.001899552576334407018511016667",
+            "mean_exit_gap_bps": "0.003040957659057247146467083333",
+            "mean_holding_hours": 27.616666666666667,
+            "mean_mae_pct": "-1.477503847651648165317181462",
+            "mean_mfe_pct": "3.00352088762666625742497365",
+            "median_holding_hours": 5.0,
+            "net_usdt": "-35.2855239885825051281292445",
+            "payoff_ratio": "3.676538609189518346027201788",
+            "profit_factor": "0.9191346522973795865068004470",
+            "trades": 60,
+            "win_rate_pct": 20.0
+          },
+          "fees_including_terminal_usdt": "68.52365584299194133869454366",
+          "frozen_base_execution_metrics": {
+            "annualised_return_pct": -0.6455704662968298,
+            "annualised_volatility_pct": 2.2150636073278367,
+            "calmar": -0.32340388777108703,
+            "closed_trades": 60,
+            "expectancy_usdt_per_closed_trade": -0.5880920664763751,
+            "exposure_fraction_of_hours": 0.3465802133444886,
+            "final_liquidatable_usdt": "9964.714476011417494871870758",
+            "max_daily_mark_to_market_loss_pct": 0.41186675681529944,
+            "max_drawdown_pct": 1.9961741052221977,
+            "modelled_fees_usdt": "68.52365584299194133869454369",
+            "modelled_fills": 120,
+            "modelled_slippage_usdt": "68.52375760488140062953138375",
+            "net_execution_return_pct": -0.35285523988582507,
+            "open_position_at_end": false,
+            "profit_factor": 0.9191346522973796,
+            "risk": {
+              "daily_suspensions": 0,
+              "drawdown_suspension": false,
+              "entry_rejections": {},
+              "exit_reasons": {
+                "SIGNAL_FLAT": 57,
+                "STOP_AT_CLOSE": 3
+              },
+              "max_planned_stop_risk_pct": 0.25
+            },
+            "sharpe_zero_risk_free": -0.2813185434086915,
+            "sortino_zero_target": -0.41051713031876697,
+            "turnover_to_starting_capital": 6.852365584299194
+          },
+          "full_replay_cost_ablations": {
+            "fees_only": {
+              "annualised_return_pct": 0.634015152523526,
+              "annualised_volatility_pct": 2.3102758458334334,
+              "calmar": 0.35547854607833795,
+              "closed_trades": 60,
+              "expectancy_usdt_per_closed_trade": 0.5758894733255687,
+              "exposure_fraction_of_hours": 0.3465802133444886,
+              "final_liquidatable_usdt": "10034.55336839953412213863846",
+              "max_daily_mark_to_market_loss_pct": 0.4311584027048888,
+              "max_drawdown_pct": 1.783553914907163,
+              "modelled_fees_usdt": "71.98350524546812094463925833",
+              "modelled_fills": 120,
+              "modelled_slippage_usdt": "0E-36",
+              "net_execution_return_pct": 0.34553368399534123,
+              "open_position_at_end": false,
+              "profit_factor": 1.0860690543488787,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 57,
+                  "STOP_AT_CLOSE": 3
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 0.28511392982898576,
+              "sortino_zero_target": 0.41948638247775494,
+              "turnover_to_starting_capital": 7.198350524546812
+            },
+            "price_concession_only": {
+              "annualised_return_pct": 0.634015152523526,
+              "annualised_volatility_pct": 2.3102758458334334,
+              "calmar": 0.35547854607833795,
+              "closed_trades": 60,
+              "expectancy_usdt_per_closed_trade": 0.5758894733255687,
+              "exposure_fraction_of_hours": 0.3465802133444886,
+              "final_liquidatable_usdt": "10034.55336839953412213863846",
+              "max_daily_mark_to_market_loss_pct": 0.4311584027048888,
+              "max_drawdown_pct": 1.783553914907163,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 120,
+              "modelled_slippage_usdt": "71.98350524546812094463925833",
+              "net_execution_return_pct": 0.34553368399534123,
+              "open_position_at_end": false,
+              "profit_factor": 1.0860690543488787,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 57,
+                  "STOP_AT_CLOSE": 3
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 0.28511392982898576,
+              "sortino_zero_target": 0.41948638247775494,
+              "turnover_to_starting_capital": 7.1983398708594475
+            },
+            "zero": {
+              "annualised_return_pct": 2.057603374858341,
+              "annualised_volatility_pct": 2.4217268532316605,
+              "calmar": 1.2466093421661586,
+              "closed_trades": 60,
+              "expectancy_usdt_per_closed_trade": 1.8629915827509476,
+              "exposure_fraction_of_hours": 0.3465802133444886,
+              "final_liquidatable_usdt": "10111.77949496505685002404120",
+              "max_daily_mark_to_market_loss_pct": 0.4523016722162782,
+              "max_drawdown_pct": 1.6505598869353624,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 120,
+              "modelled_slippage_usdt": "0E-36",
+              "net_execution_return_pct": 1.1177949496505686,
+              "open_position_at_end": false,
+              "profit_factor": 1.305387182568628,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 57,
+                  "STOP_AT_CLOSE": 3
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 0.8531253623122792,
+              "sortino_zero_target": 1.2641121334267287,
+              "turnover_to_starting_capital": 7.5810331082947515
+            }
+          },
+          "gross_fixed_fills_usdt": "101.7618894592908368400966833",
+          "matched_passive_diagnostics": {
+            "hourly_pnl_stdev": {
+              "net_return_pct": 0.38830971825175475,
+              "passive_initial_weight": "0.02407200539311322876057526505",
+              "target": "0.0002378428144637513772822607538"
+            },
+            "mean_notional": {
+              "net_return_pct": 0.2404746658533028,
+              "passive_initial_weight": "0.01490744934066982554708935541",
+              "target": "0.02098817034083182750056628929"
+            }
+          },
+          "mean_entry_hourly_volatility_pct": "0.5938751008242597475888415756",
+          "mean_entry_momentum_pct": "2.996728254317416938315189243",
+          "mean_open_notional_fraction_initial_equity": "0.02098817034083182750056628929",
+          "net_after_overhead_usdt": "-100.7786746735140119774443130",
+          "price_concession_including_terminal_usdt": "68.52375760488140062953138374",
+          "scenario_overhead_usdt": "65.49315068493150684931506849",
+          "signal_exit_triggers": {
+            "MOMENTUM_BELOW_ENTRY_THRESHOLD": 49,
+            "RANGING": 8
+          },
+          "signal_exits_reentered_within_24h": 35,
+          "trade_ledger_sha256": "e9c00ef301545a9e0d29956f20d552cbe7c6b0ccaecdafb81400b491f4e127aa"
+        },
+        "validation": {
+          "by_entry_regime": {
+            "TRENDING_UP": {
+              "expectancy_usdt": "-3.307193943984783831736533588",
+              "gross_usdt": "-79.67909616758097699077226912",
+              "mean_24h_post_exit_return_pct": "-0.4344551028654461826701532318",
+              "mean_entry_gap_bps": "0.005711201122185109935614594595",
+              "mean_exit_gap_bps": "-0.0009645125946597156065503243243",
+              "mean_holding_hours": 20.675675675675677,
+              "mean_mae_pct": "-1.481777759068791675209276195",
+              "mean_mfe_pct": "2.546521286537480095743250864",
+              "median_holding_hours": 6.5,
+              "net_usdt": "-244.7323518548740035485034855",
+              "payoff_ratio": "2.806849922432586082546938368",
+              "profit_factor": "0.5432612753095327901703751680",
+              "trades": 74,
+              "win_rate_pct": 16.216216216216218
+            }
+          },
+          "by_exit_reason": {
+            "SIGNAL_FLAT": {
+              "expectancy_usdt": "-2.643666204060788805519683393",
+              "gross_usdt": "-29.64699181844897983448001692",
+              "mean_24h_post_exit_return_pct": "-0.2696685134765643399383263932",
+              "mean_entry_gap_bps": "0.002226444234877781146928194444",
+              "mean_exit_gap_bps": "-0.0009913046111780410400656111111",
+              "mean_holding_hours": 21.09722222222222,
+              "mean_mae_pct": "-1.381593595814505216623775612",
+              "mean_mfe_pct": "2.605391100374757998293932789",
+              "median_holding_hours": 6.5,
+              "net_usdt": "-190.3439666923767939974172043",
+              "payoff_ratio": "3.023169823828854513874211971",
+              "profit_factor": "0.6046339647657709027748423941",
+              "trades": 72,
+              "win_rate_pct": 16.666666666666668
+            },
+            "STOP_AT_CLOSE": {
+              "expectancy_usdt": "-27.1941925812486047755431406",
+              "gross_usdt": "-50.03210434913199715629225228",
+              "mean_24h_post_exit_return_pct": "-6.284379026170751599650006",
+              "mean_entry_gap_bps": "0.131162449065248946328325",
+              "mean_exit_gap_bps": "0",
+              "mean_holding_hours": 5.5,
+              "mean_mae_pct": "-5.08840763622310418428729719",
+              "mean_mfe_pct": "0.42720798839547560391870155",
+              "median_holding_hours": 5.5,
+              "net_usdt": "-54.3883851624972095510862812",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 2,
+              "win_rate_pct": 0.0
+            }
+          },
+          "by_exit_signal_regime": {
+            "HIGH_VOLATILITY": {
+              "expectancy_usdt": "-22.21740759293703951512502705",
+              "gross_usdt": "-40.06530097004195208384626129",
+              "mean_24h_post_exit_return_pct": "-5.347718529262614383398257345",
+              "mean_entry_gap_bps": "0.109863285270419531331158",
+              "mean_exit_gap_bps": "0.02197985765844180393088",
+              "mean_holding_hours": 4,
+              "mean_mae_pct": "-4.09751375691314363652761158",
+              "mean_mfe_pct": "1.0959594598073997240027085",
+              "median_holding_hours": 4.0,
+              "net_usdt": "-44.4348151858740790302500541",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 2,
+              "win_rate_pct": 0.0
+            },
+            "RANGING": {
+              "expectancy_usdt": "-9.781201704077454041389495562",
+              "gross_usdt": "-60.41825419824546471190770569",
+              "mean_24h_post_exit_return_pct": "-1.578189372225084881954640441",
+              "mean_entry_gap_bps": "0.006524917913047680020056375",
+              "mean_exit_gap_bps": "0.00711993466558380271154",
+              "mean_holding_hours": 26,
+              "mean_mae_pct": "-1.940000794887968152419343495",
+              "mean_mfe_pct": "2.166555592133711008961162725",
+              "median_holding_hours": 19.5,
+              "net_usdt": "-78.2496136326196323311159645",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 8,
+              "win_rate_pct": 0.0
+            },
+            "TRENDING_UP": {
+              "expectancy_usdt": "-1.906998797443442065424022920",
+              "gross_usdt": "20.80445900070643980498169776",
+              "mean_24h_post_exit_return_pct": "-0.1332423884579629128966277413",
+              "mean_entry_gap_bps": "0.002354733893694963006448640625",
+              "mean_exit_gap_bps": "-0.0026920800725995778818563125",
+              "mean_holding_hours": 20.53125,
+              "mean_mae_pct": "-1.342758129658758616766819802",
+              "mean_mfe_pct": "2.639347055423266243207903830",
+              "median_holding_hours": 6.0,
+              "net_usdt": "-122.0479230363802921871374669",
+              "payoff_ratio": "3.053203856832416621673297962",
+              "profit_factor": "0.7045855054228653742322995295",
+              "trades": 64,
+              "win_rate_pct": 18.75
+            }
+          },
+          "closed_trade_summary": {
+            "expectancy_usdt": "-3.307193943984783831736533588",
+            "gross_usdt": "-79.67909616758097699077226912",
+            "mean_24h_post_exit_return_pct": "-0.4344551028654461826701532318",
+            "mean_entry_gap_bps": "0.005711201122185109935614594595",
+            "mean_exit_gap_bps": "-0.0009645125946597156065503243243",
+            "mean_holding_hours": 20.675675675675677,
+            "mean_mae_pct": "-1.481777759068791675209276195",
+            "mean_mfe_pct": "2.546521286537480095743250864",
+            "median_holding_hours": 6.5,
+            "net_usdt": "-244.7323518548740035485034855",
+            "payoff_ratio": "2.806849922432586082546938368",
+            "profit_factor": "0.5432612753095327901703751680",
+            "trades": 74,
+            "win_rate_pct": 16.216216216216218
+          },
+          "fees_including_terminal_usdt": "82.52666768319459706935410292",
+          "frozen_base_execution_metrics": {
+            "annualised_return_pct": -4.438386063305844,
+            "annualised_volatility_pct": 2.3366040159338315,
+            "calmar": -1.0419953238414734,
+            "closed_trades": 74,
+            "expectancy_usdt_per_closed_trade": -3.307193943984784,
+            "exposure_fraction_of_hours": 0.32001673290106675,
+            "final_liquidatable_usdt": "9755.267648145125996451496512",
+            "max_daily_mark_to_market_loss_pct": 0.7524470761888582,
+            "max_drawdown_pct": 4.259506700033031,
+            "modelled_fees_usdt": "82.52666768319459706935410295",
+            "modelled_fills": 148,
+            "modelled_slippage_usdt": "82.52658800409842948837711213",
+            "net_execution_return_pct": -2.44732351854874,
+            "open_position_at_end": false,
+            "profit_factor": 0.5432612753095328,
+            "risk": {
+              "daily_suspensions": 0,
+              "drawdown_suspension": false,
+              "entry_rejections": {},
+              "exit_reasons": {
+                "SIGNAL_FLAT": 72,
+                "STOP_AT_CLOSE": 2
+              },
+              "max_planned_stop_risk_pct": 0.25
+            },
+            "sharpe_zero_risk_free": -1.9312608399663687,
+            "sortino_zero_target": -2.6424835431548948,
+            "turnover_to_starting_capital": 8.25266676831946
+          },
+          "full_replay_cost_ablations": {
+            "fees_only": {
+              "annualised_return_pct": -3.090608975244147,
+              "annualised_volatility_pct": 2.4372981290750864,
+              "calmar": -0.8245698449001545,
+              "closed_trades": 74,
+              "expectancy_usdt_per_closed_trade": -2.2956777836626387,
+              "exposure_fraction_of_hours": 0.32001673290106675,
+              "final_liquidatable_usdt": "9830.119844008964736914745218",
+              "max_daily_mark_to_market_loss_pct": 0.7526546979609293,
+              "max_drawdown_pct": 3.7481469815554345,
+              "modelled_fees_usdt": "86.67609346334554404227863937",
+              "modelled_fills": 148,
+              "modelled_slippage_usdt": "0E-36",
+              "net_execution_return_pct": -1.6988015599103525,
+              "open_position_at_end": false,
+              "profit_factor": 0.6545192526928892,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 72,
+                  "STOP_AT_CLOSE": 2
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -1.275869078069252,
+              "sortino_zero_target": -1.7599005421645115,
+              "turnover_to_starting_capital": 8.667609346334554
+            },
+            "price_concession_only": {
+              "annualised_return_pct": -3.090608975244147,
+              "annualised_volatility_pct": 2.4372981290750864,
+              "calmar": -0.8245698449001545,
+              "closed_trades": 74,
+              "expectancy_usdt_per_closed_trade": -2.2956777836626387,
+              "exposure_fraction_of_hours": 0.32001673290106675,
+              "final_liquidatable_usdt": "9830.119844008964736914745219",
+              "max_daily_mark_to_market_loss_pct": 0.7526546979609293,
+              "max_drawdown_pct": 3.7481469815554345,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 148,
+              "modelled_slippage_usdt": "86.67609346334554404227863940",
+              "net_execution_return_pct": -1.6988015599103525,
+              "open_position_at_end": false,
+              "profit_factor": 0.6545192526928892,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 72,
+                  "STOP_AT_CLOSE": 2
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -1.275869078069252,
+              "sortino_zero_target": -1.7599005421645115,
+              "turnover_to_starting_capital": 8.667617666740806
+            },
+            "zero": {
+              "annualised_return_pct": -1.5892089719568236,
+              "annualised_volatility_pct": 2.5559193974267633,
+              "calmar": -0.49470435038879096,
+              "closed_trades": 74,
+              "expectancy_usdt_per_closed_trade": -1.176361346212221,
+              "exposure_fraction_of_hours": 0.32001673290106675,
+              "final_liquidatable_usdt": "9912.949260380295645487937655",
+              "max_daily_mark_to_market_loss_pct": 0.7528828009342436,
+              "max_drawdown_pct": 3.212441877068304,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 148,
+              "modelled_slippage_usdt": "0E-36",
+              "net_execution_return_pct": -0.8705073961970435,
+              "open_position_at_end": false,
+              "profit_factor": 0.8049662092036226,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 72,
+                  "STOP_AT_CLOSE": 2
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -0.6139916841012492,
+              "sortino_zero_target": -0.8533698963438049,
+              "turnover_to_starting_capital": 9.126404802638092
+            }
+          },
+          "gross_fixed_fills_usdt": "-79.67909616758097699077226912",
+          "matched_passive_diagnostics": {
+            "hourly_pnl_stdev": {
+              "net_return_pct": -0.8791378245075752,
+              "passive_initial_weight": "0.03676274918612018466589487319",
+              "target": "0.0002449682699868451974147095630"
+            },
+            "mean_notional": {
+              "net_return_pct": -0.5608301555583084,
+              "passive_initial_weight": "0.02345213431847420506034394362",
+              "target": "0.01870312731359032324643576287"
+            }
+          },
+          "mean_entry_hourly_volatility_pct": "0.6773245824373476991697437152",
+          "mean_entry_momentum_pct": "2.628088281187674388412136745",
+          "mean_open_notional_fraction_initial_equity": "0.01870312731359032324643576287",
+          "net_after_overhead_usdt": "-310.2255025398055103978185540",
+          "price_concession_including_terminal_usdt": "82.52658800409842948837711213",
+          "scenario_overhead_usdt": "65.49315068493150684931506849",
+          "signal_exit_triggers": {
+            "HIGH_VOLATILITY": 1,
+            "MOMENTUM_BELOW_ENTRY_THRESHOLD": 63,
+            "RANGING": 8
+          },
+          "signal_exits_reentered_within_24h": 47,
+          "trade_ledger_sha256": "8fa9a587ab50cd94995d84d30e1284ce4bcf3e88252903b115809c26875caea3"
+        }
+      }
+    },
+    "SOLUSDT": {
+      "dataset_sha256": "de365e95e1624d0768b0bd7c37544956ad864b5aa367ef84a5adb1a3d11fb563",
+      "periods": {
+        "development": {
+          "by_entry_regime": {
+            "TRENDING_UP": {
+              "expectancy_usdt": "2.444781654799280242139127534",
+              "gross_usdt": "1114.240022684074316304916983",
+              "mean_24h_post_exit_return_pct": "0.7745159317820448698477865363",
+              "mean_entry_gap_bps": "-0.1546479645270670705730446121",
+              "mean_exit_gap_bps": "-0.1063339581334517852608776379",
+              "mean_holding_hours": 22.56896551724138,
+              "mean_mae_pct": "-1.666520080863874287445658153",
+              "mean_mfe_pct": "3.8017194465769210650303295",
+              "median_holding_hours": 4.0,
+              "net_usdt": "567.1893439134330161762775880",
+              "payoff_ratio": "3.813116415630750244326201757",
+              "profit_factor": "1.360234510839039560841510572",
+              "trades": 232,
+              "win_rate_pct": 26.29310344827586
+            }
+          },
+          "by_exit_reason": {
+            "SIGNAL_FLAT": {
+              "expectancy_usdt": "4.848222792023578470424681833",
+              "gross_usdt": "1564.628240230459395678259329",
+              "mean_24h_post_exit_return_pct": "0.7573671907664250826496701131",
+              "mean_entry_gap_bps": "-0.1246659568434363943148107604",
+              "mean_exit_gap_bps": "-0.09916880101074851453372723041",
+              "mean_holding_hours": 22.649769585253456,
+              "mean_mae_pct": "-1.324636515524950605727409696",
+              "mean_mfe_pct": "3.854101166632116948896606138",
+              "median_holding_hours": 4,
+              "net_usdt": "1052.064345869116528082155962",
+              "payoff_ratio": "5.026597640251566240378092706",
+              "profit_factor": "1.965528564457343209378613174",
+              "trades": 217,
+              "win_rate_pct": 28.110599078341014
+            },
+            "STOP_AT_CLOSE": {
+              "expectancy_usdt": "-32.32500013037890079372522465",
+              "gross_usdt": "-450.3882175463850793733423504",
+              "mean_24h_post_exit_return_pct": "1.02145780240696980550066303",
+              "mean_entry_gap_bps": "-0.5883876756835908537754943333",
+              "mean_exit_gap_bps": "-0.2099898978418924351136535333",
+              "mean_holding_hours": 21.4,
+              "mean_mae_pct": "-6.612435659433636882969652495",
+              "mean_mfe_pct": "3.043930563111753945098194133",
+              "median_holding_hours": 14,
+              "net_usdt": "-484.8750019556835119058783698",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 15,
+              "win_rate_pct": 0.0
+            }
+          },
+          "by_exit_signal_regime": {
+            "HIGH_VOLATILITY": {
+              "expectancy_usdt": "63.18499024665305623289755022",
+              "gross_usdt": "1182.128271375135425963690139",
+              "mean_24h_post_exit_return_pct": "2.844402339375264017708383594",
+              "mean_entry_gap_bps": "-0.8531350451415991927979598889",
+              "mean_exit_gap_bps": "1.107668133827651783988065389",
+              "mean_holding_hours": 34.666666666666664,
+              "mean_mae_pct": "-2.726882066496058076842120944",
+              "mean_mfe_pct": "16.37694368678847122439528772",
+              "median_holding_hours": 14.0,
+              "net_usdt": "1137.329824439755012192155905",
+              "payoff_ratio": "3.784742810748856874118137814",
+              "profit_factor": "13.24659983762099905941348235",
+              "trades": 18,
+              "win_rate_pct": 77.77777777777777
+            },
+            "RANGING": {
+              "expectancy_usdt": "-9.714418505560631865331115815",
+              "gross_usdt": "-96.16997817896744865736939220",
+              "mean_24h_post_exit_return_pct": "1.571090722308309904145846704",
+              "mean_entry_gap_bps": "0.3910411229218132230686155385",
+              "mean_exit_gap_bps": "-0.6177737602389093177611124615",
+              "mean_holding_hours": 14.23076923076923,
+              "mean_mae_pct": "-2.1359126019338865940589268",
+              "mean_mfe_pct": "1.381142750899072056723297692",
+              "median_holding_hours": 5,
+              "net_usdt": "-126.2874405722882142493045056",
+              "payoff_ratio": "0.06651054448925954317086151521",
+              "profit_factor": "0.01209282627077446239470209367",
+              "trades": 13,
+              "win_rate_pct": 15.384615384615385
+            },
+            "TRENDING_UP": {
+              "expectancy_usdt": "-2.208224079373302396848625922",
+              "gross_usdt": "28.28172948790633899859623473",
+              "mean_24h_post_exit_return_pct": "0.5364487937144479193109588902",
+              "mean_entry_gap_bps": "-0.1273902067448474965297267363",
+              "mean_exit_gap_bps": "-0.1819723672276254983154941642",
+              "mean_holding_hours": 22.024875621890548,
+              "mean_mae_pct": "-1.541203570837558525280937642",
+              "mean_mfe_pct": "2.832134674039628200549842762",
+              "median_holding_hours": 4,
+              "net_usdt": "-443.8530399540337817665738104",
+              "payoff_ratio": "2.330093424185436371250395221",
+              "profit_factor": "0.6721423338996451070914601617",
+              "trades": 201,
+              "win_rate_pct": 22.388059701492537
+            }
+          },
+          "closed_trade_summary": {
+            "expectancy_usdt": "2.444781654799280242139127534",
+            "gross_usdt": "1114.240022684074316304916983",
+            "mean_24h_post_exit_return_pct": "0.7745159317820448698477865363",
+            "mean_entry_gap_bps": "-0.1546479645270670705730446121",
+            "mean_exit_gap_bps": "-0.1063339581334517852608776379",
+            "mean_holding_hours": 22.56896551724138,
+            "mean_mae_pct": "-1.666520080863874287445658153",
+            "mean_mfe_pct": "3.8017194465769210650303295",
+            "median_holding_hours": 4.0,
+            "net_usdt": "567.1893439134330161762775880",
+            "payoff_ratio": "3.813116415630750244326201757",
+            "profit_factor": "1.360234510839039560841510572",
+            "trades": 232,
+            "win_rate_pct": 26.29310344827586
+          },
+          "fees_including_terminal_usdt": "273.5247822653093080271615435",
+          "frozen_base_execution_metrics": {
+            "annualised_return_pct": 3.427331591995575,
+            "annualised_volatility_pct": 3.3604332002956316,
+            "calmar": 1.1918614614747647,
+            "closed_trades": 232,
+            "expectancy_usdt_per_closed_trade": 2.4447816547992804,
+            "exposure_fraction_of_hours": 0.36510703577156406,
+            "final_liquidatable_usdt": "10567.18934391343301617627760",
+            "max_daily_mark_to_market_loss_pct": 0.818399384160727,
+            "max_drawdown_pct": 2.875612395214729,
+            "modelled_fees_usdt": "273.5247822653093080271615439",
+            "modelled_fills": 464,
+            "modelled_slippage_usdt": "273.5258965053319921014778498",
+            "net_execution_return_pct": 5.6718934391343305,
+            "open_position_at_end": false,
+            "profit_factor": 1.3602345108390395,
+            "risk": {
+              "daily_suspensions": 0,
+              "drawdown_suspension": false,
+              "entry_rejections": {},
+              "exit_reasons": {
+                "SIGNAL_FLAT": 217,
+                "STOP_AT_CLOSE": 15
+              },
+              "max_planned_stop_risk_pct": 0.25
+            },
+            "sharpe_zero_risk_free": 1.0196149275040851,
+            "sortino_zero_target": 1.5501634503404362,
+            "turnover_to_starting_capital": 27.35247822653093
+          },
+          "full_replay_cost_ablations": {
+            "fees_only": {
+              "annualised_return_pct": 5.3574279475883335,
+              "annualised_volatility_pct": 3.513027751429418,
+              "calmar": 2.0663065317663425,
+              "closed_trades": 232,
+              "expectancy_usdt_per_closed_trade": 3.8445584992756614,
+              "exposure_fraction_of_hours": 0.36510703577156406,
+              "final_liquidatable_usdt": "10891.93757183195346355887138",
+              "max_daily_mark_to_market_loss_pct": 0.8217733131074402,
+              "max_drawdown_pct": 2.592755656155546,
+              "modelled_fees_usdt": "290.7654519434694803329452484",
+              "modelled_fills": 464,
+              "modelled_slippage_usdt": "0E-35",
+              "net_execution_return_pct": 8.919375718319534,
+              "open_position_at_end": false,
+              "profit_factor": 1.6087707114996228,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 217,
+                  "STOP_AT_CLOSE": 15
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 1.503129546710355,
+              "sortino_zero_target": 2.3002164734767754,
+              "turnover_to_starting_capital": 29.07654519434695
+            },
+            "price_concession_only": {
+              "annualised_return_pct": 5.3574279475883335,
+              "annualised_volatility_pct": 3.513027751429418,
+              "calmar": 2.0663065317663425,
+              "closed_trades": 232,
+              "expectancy_usdt_per_closed_trade": 3.8445584992756614,
+              "exposure_fraction_of_hours": 0.36510703577156406,
+              "final_liquidatable_usdt": "10891.93757183195346355887138",
+              "max_daily_mark_to_market_loss_pct": 0.8217733131074402,
+              "max_drawdown_pct": 2.592755656155546,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 464,
+              "modelled_slippage_usdt": "290.7654519434694803329452484",
+              "net_execution_return_pct": 8.919375718319534,
+              "open_position_at_end": false,
+              "profit_factor": 1.6087707114996228,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 217,
+                  "STOP_AT_CLOSE": 15
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 1.503129546710355,
+              "sortino_zero_target": 2.3002164734767754,
+              "turnover_to_starting_capital": 29.076426924044572
+            },
+            "zero": {
+              "annualised_return_pct": 7.5174971307869765,
+              "annualised_volatility_pct": 3.6863664948749997,
+              "calmar": 3.180955611700423,
+              "closed_trades": 232,
+              "expectancy_usdt_per_closed_trade": 5.43060241739681,
+              "exposure_fraction_of_hours": 0.36510703577156406,
+              "final_liquidatable_usdt": "11259.89976083606000486766158",
+              "max_daily_mark_to_market_loss_pct": 0.8254797547304364,
+              "max_drawdown_pct": 2.363282625867387,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 464,
+              "modelled_slippage_usdt": "0E-35",
+              "net_execution_return_pct": 12.5989976083606,
+              "open_position_at_end": false,
+              "profit_factor": 1.9242583340646862,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 217,
+                  "STOP_AT_CLOSE": 15
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 1.9846860295803983,
+              "sortino_zero_target": 3.054914974007499,
+              "turnover_to_starting_capital": 31.026457790804987
+            }
+          },
+          "gross_fixed_fills_usdt": "1114.240022684074316304916983",
+          "matched_passive_diagnostics": {
+            "hourly_pnl_stdev": {
+              "net_return_pct": 7.3871376772742225,
+              "passive_initial_weight": "0.006778257913850255786920949665",
+              "target": "0.0003716045134999914709809156499"
+            },
+            "mean_notional": {
+              "net_return_pct": 5.309641193295613,
+              "passive_initial_weight": "0.004871997654637091788938808029",
+              "target": "0.02253201357471641635828376223"
+            }
+          },
+          "mean_entry_hourly_volatility_pct": "0.8627962229484027346972709236",
+          "mean_entry_momentum_pct": "3.366720179448038997243689160",
+          "mean_open_notional_fraction_initial_equity": "0.02253201357471641635828376223",
+          "net_after_overhead_usdt": "370.7372891189124682310721085",
+          "price_concession_including_terminal_usdt": "273.5258965053319921014778482",
+          "scenario_overhead_usdt": "196.4520547945205479452054795",
+          "signal_exit_triggers": {
+            "HIGH_VOLATILITY": 17,
+            "MOMENTUM_BELOW_ENTRY_THRESHOLD": 187,
+            "RANGING": 13
+          },
+          "signal_exits_reentered_within_24h": 159,
+          "trade_ledger_sha256": "07a96f92ed2181432655c3f2ff779cb3ef3cdad783a564957179a20e78378559"
+        },
+        "test_unsealed": {
+          "by_entry_regime": {
+            "TRENDING_UP": {
+              "expectancy_usdt": "-5.084900669109363912309084676",
+              "gross_usdt": "-176.0490457000829297819311423",
+              "mean_24h_post_exit_return_pct": "-0.0164452910626117277184681955",
+              "mean_entry_gap_bps": "0.01259780035168756277246554839",
+              "mean_exit_gap_bps": "-0.08873645743015192432967003226",
+              "mean_holding_hours": 25.177419354838708,
+              "mean_mae_pct": "-1.756443670436394959237731736",
+              "mean_mfe_pct": "2.80595269525966965225253015",
+              "median_holding_hours": 7.5,
+              "net_usdt": "-315.2638414847805625631632499",
+              "payoff_ratio": "1.456470005238540925548735219",
+              "profit_factor": "0.4248037515279077699517144386",
+              "trades": 62,
+              "win_rate_pct": 22.580645161290324
+            }
+          },
+          "by_exit_reason": {
+            "SIGNAL_FLAT": {
+              "expectancy_usdt": "-2.802760601802050897937642302",
+              "gross_usdt": "-30.93115249823176726899638428",
+              "mean_24h_post_exit_return_pct": "0.30910108153910684868958292",
+              "mean_entry_gap_bps": "-0.006085438548419605986649946429",
+              "mean_exit_gap_bps": "-0.07115865066862151331457135714",
+              "mean_holding_hours": 24.732142857142858,
+              "mean_mae_pct": "-1.422484912127293775874658614",
+              "mean_mfe_pct": "2.911377100495679267537388702",
+              "median_holding_hours": 6.5,
+              "net_usdt": "-156.9545937009148502845079689",
+              "payoff_ratio": "1.792002259049437815944597758",
+              "profit_factor": "0.5973340863498126053148659192",
+              "trades": 56,
+              "win_rate_pct": 25.0
+            },
+            "STOP_AT_CLOSE": {
+              "expectancy_usdt": "-26.38487463064428537977588017",
+              "gross_usdt": "-145.1178932018511625129347580",
+              "mean_24h_post_exit_return_pct": "-2.946362644478078915390928235",
+              "mean_entry_gap_bps": "0.1869746967526878045242101667",
+              "mean_exit_gap_bps": "-0.252795987204435760470591",
+              "mean_holding_hours": 29.333333333333332,
+              "mean_mae_pct": "-4.873392081321339337293080867",
+              "mean_mfe_pct": "1.821991579723579909593850333",
+              "median_holding_hours": 34.0,
+              "net_usdt": "-158.3092477838657122786552810",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 6,
+              "win_rate_pct": 0.0
+            }
+          },
+          "by_exit_signal_regime": {
+            "RANGING": {
+              "expectancy_usdt": "-19.46558121069812639054768681",
+              "gross_usdt": "-137.9298999018195718718344743",
+              "mean_24h_post_exit_return_pct": "0.72322849798944336706045713",
+              "mean_entry_gap_bps": "0.20084962292243826812012225",
+              "mean_exit_gap_bps": "-0.4625113991637493743559035",
+              "mean_holding_hours": 22,
+              "mean_mae_pct": "-3.604753619038398251146158248",
+              "mean_mfe_pct": "1.116374123680670157373164888",
+              "median_holding_hours": 14.5,
+              "net_usdt": "-155.7246496855850111243814945",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 8,
+              "win_rate_pct": 0.0
+            },
+            "TRENDING_UP": {
+              "expectancy_usdt": "-2.954429477762880582199662137",
+              "gross_usdt": "-38.11914579826335791009666790",
+              "mean_24h_post_exit_return_pct": "-0.1302412586090817422998413225",
+              "mean_entry_gap_bps": "-0.01529135854768291209385396296",
+              "mean_exit_gap_bps": "-0.03336239198813748728874655556",
+              "mean_holding_hours": 25.64814814814815,
+              "mean_mae_pct": "-1.482619974347209286362409289",
+              "mean_mfe_pct": "3.056260631789891799642065744",
+              "median_holding_hours": 7.0,
+              "net_usdt": "-159.5391917991955514387817554",
+              "payoff_ratio": "1.695426835516109201612762709",
+              "profit_factor": "0.5933993924306382205644669478",
+              "trades": 54,
+              "win_rate_pct": 25.925925925925927
+            }
+          },
+          "closed_trade_summary": {
+            "expectancy_usdt": "-5.084900669109363912309084676",
+            "gross_usdt": "-176.0490457000829297819311423",
+            "mean_24h_post_exit_return_pct": "-0.0164452910626117277184681955",
+            "mean_entry_gap_bps": "0.01259780035168756277246554839",
+            "mean_exit_gap_bps": "-0.08873645743015192432967003226",
+            "mean_holding_hours": 25.177419354838708,
+            "mean_mae_pct": "-1.756443670436394959237731736",
+            "mean_mfe_pct": "2.80595269525966965225253015",
+            "median_holding_hours": 7.5,
+            "net_usdt": "-315.2638414847805625631632499",
+            "payoff_ratio": "1.456470005238540925548735219",
+            "profit_factor": "0.4248037515279077699517144386",
+            "trades": 62,
+            "win_rate_pct": 22.580645161290324
+          },
+          "fees_including_terminal_usdt": "69.60748591687166643208094486",
+          "frozen_base_execution_metrics": {
+            "annualised_return_pct": -5.7005145603519995,
+            "annualised_volatility_pct": 2.3106872917892267,
+            "calmar": -1.7092726968573828,
+            "closed_trades": 62,
+            "expectancy_usdt_per_closed_trade": -5.084900669109364,
+            "exposure_fraction_of_hours": 0.32650073206442165,
+            "final_liquidatable_usdt": "9684.736158515219437436836753",
+            "max_daily_mark_to_market_loss_pct": 0.5793735772750876,
+            "max_drawdown_pct": 3.335052722033642,
+            "modelled_fees_usdt": "69.60748591687166643208094489",
+            "modelled_fills": 124,
+            "modelled_slippage_usdt": "69.60730986782596634915116291",
+            "net_execution_return_pct": -3.1526384148478055,
+            "open_position_at_end": false,
+            "profit_factor": 0.4248037515279078,
+            "risk": {
+              "daily_suspensions": 0,
+              "drawdown_suspension": false,
+              "entry_rejections": {},
+              "exit_reasons": {
+                "SIGNAL_FLAT": 56,
+                "STOP_AT_CLOSE": 6
+              },
+              "max_planned_stop_risk_pct": 0.25
+            },
+            "sharpe_zero_risk_free": -2.528569491708915,
+            "sortino_zero_target": -3.4450124840498204,
+            "turnover_to_starting_capital": 6.9607485916871665
+          },
+          "full_replay_cost_ablations": {
+            "fees_only": {
+              "annualised_return_pct": -4.6805919681383035,
+              "annualised_volatility_pct": 2.413939247806946,
+              "calmar": -1.5509690416319848,
+              "closed_trades": 62,
+              "expectancy_usdt_per_closed_trade": -4.165073802205708,
+              "exposure_fraction_of_hours": 0.32650073206442165,
+              "final_liquidatable_usdt": "9741.765424263246112149789378",
+              "max_daily_mark_to_market_loss_pct": 0.6067893888115432,
+              "max_drawdown_pct": 3.017850029561659,
+              "modelled_fees_usdt": "73.08377174947073213026245260",
+              "modelled_fills": 124,
+              "modelled_slippage_usdt": "0E-35",
+              "net_execution_return_pct": -2.582345757367539,
+              "open_position_at_end": false,
+              "profit_factor": 0.5036325021893272,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 56,
+                  "STOP_AT_CLOSE": 6
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -1.9737573965745139,
+              "sortino_zero_target": -2.7089819148168623,
+              "turnover_to_starting_capital": 7.308377174947073
+            },
+            "price_concession_only": {
+              "annualised_return_pct": -4.6805919681383035,
+              "annualised_volatility_pct": 2.413939247806946,
+              "calmar": -1.5509690416319848,
+              "closed_trades": 62,
+              "expectancy_usdt_per_closed_trade": -4.165073802205708,
+              "exposure_fraction_of_hours": 0.32650073206442165,
+              "final_liquidatable_usdt": "9741.765424263246112149789384",
+              "max_daily_mark_to_market_loss_pct": 0.6067893888115432,
+              "max_drawdown_pct": 3.017850029561659,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 124,
+              "modelled_slippage_usdt": "73.08377174947073213026245259",
+              "net_execution_return_pct": -2.582345757367539,
+              "open_position_at_end": false,
+              "profit_factor": 0.5036325021893272,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 56,
+                  "STOP_AT_CLOSE": 6
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -1.9737573965745139,
+              "sortino_zero_target": -2.7089819148168623,
+              "turnover_to_starting_capital": 7.308395690027472
+            },
+            "zero": {
+              "annualised_return_pct": -3.5482041863188485,
+              "annualised_volatility_pct": 2.5341827031036632,
+              "calmar": -1.3297037100898392,
+              "closed_trades": 62,
+              "expectancy_usdt_per_closed_trade": -3.149040765555918,
+              "exposure_fraction_of_hours": 0.32650073206442165,
+              "final_liquidatable_usdt": "9804.759472535533090261455460",
+              "max_daily_mark_to_market_loss_pct": 0.6368654907768951,
+              "max_drawdown_pct": 2.6684171514262527,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 124,
+              "modelled_slippage_usdt": "0E-35",
+              "net_execution_return_pct": -1.9524052746446692,
+              "open_position_at_end": false,
+              "profit_factor": 0.6019785807179499,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 56,
+                  "STOP_AT_CLOSE": 6
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": -1.4129092665560725,
+              "sortino_zero_target": -1.9535955651904375,
+              "turnover_to_starting_capital": 7.692508499189255
+            }
+          },
+          "gross_fixed_fills_usdt": "-176.0490457000829297819311423",
+          "matched_passive_diagnostics": {
+            "hourly_pnl_stdev": {
+              "net_return_pct": -0.5015752000966772,
+              "passive_initial_weight": "0.02682905797155627887216503548",
+              "target": "0.0002447952119950049162612174335"
+            },
+            "mean_notional": {
+              "net_return_pct": -0.31262321739134963,
+              "passive_initial_weight": "0.01672209156479489734000838007",
+              "target": "0.01896842434102468808827560811"
+            }
+          },
+          "mean_entry_hourly_volatility_pct": "0.7268114955539535519356753501",
+          "mean_entry_momentum_pct": "3.147319290188317898707560226",
+          "mean_open_notional_fraction_initial_equity": "0.01896842434102468808827560811",
+          "net_after_overhead_usdt": "-380.7569921697120694124783184",
+          "price_concession_including_terminal_usdt": "69.60730986782596634915116296",
+          "scenario_overhead_usdt": "65.49315068493150684931506849",
+          "signal_exit_triggers": {
+            "MOMENTUM_BELOW_ENTRY_THRESHOLD": 50,
+            "RANGING": 6
+          },
+          "signal_exits_reentered_within_24h": 34,
+          "trade_ledger_sha256": "1aee758a7f57ca120accff19806be229a199b2b6138a93fa74f50d5d7c5aaf11"
+        },
+        "validation": {
+          "by_entry_regime": {
+            "TRENDING_UP": {
+              "expectancy_usdt": "0.4226926415187638152513623528",
+              "gross_usdt": "143.1520312657436900044212214",
+              "mean_24h_post_exit_return_pct": "0.09721498989916296382019442192",
+              "mean_entry_gap_bps": "0.1348278756802443622438875283",
+              "mean_exit_gap_bps": "-0.09173731533647733863025592453",
+              "mean_holding_hours": 21.71698113207547,
+              "mean_mae_pct": "-1.586619852564627554135897566",
+              "mean_mfe_pct": "3.340416101450896661274682043",
+              "median_holding_hours": 7,
+              "net_usdt": "22.4027100004944822083222047",
+              "payoff_ratio": "4.036355589519511801381508648",
+              "profit_factor": "1.057140749636062614647537979",
+              "trades": 53,
+              "win_rate_pct": 20.754716981132077
+            }
+          },
+          "by_exit_reason": {
+            "SIGNAL_FLAT": {
+              "expectancy_usdt": "2.169654681096699363224600574",
+              "gross_usdt": "222.5856509065761060328032476",
+              "mean_24h_post_exit_return_pct": "0.09610894224455540666880345408",
+              "mean_entry_gap_bps": "0.15307086327842525405263998",
+              "mean_exit_gap_bps": "-0.08665562295936009846323562",
+              "mean_holding_hours": 21.08,
+              "mean_mae_pct": "-1.383509959044339526202703977",
+              "mean_mfe_pct": "3.422090373012998827419789882",
+              "median_holding_hours": 6.0,
+              "net_usdt": "108.4827340548349681612300287",
+              "payoff_ratio": "4.802459132707743336378177135",
+              "profit_factor": "1.354539755379107094875896115",
+              "trades": 50,
+              "win_rate_pct": 22.0
+            },
+            "STOP_AT_CLOSE": {
+              "expectancy_usdt": "-28.69334135144682865096927467",
+              "gross_usdt": "-79.43361964083241602838202627",
+              "mean_24h_post_exit_return_pct": "0.1152804349244197306262468967",
+              "mean_entry_gap_bps": "-0.16922191762277050123532",
+              "mean_exit_gap_bps": "-0.1764321882884313414139276667",
+              "mean_holding_hours": 32.333333333333336,
+              "mean_mae_pct": "-4.97178474456942801968912404",
+              "mean_mfe_pct": "1.979178242082527225522884733",
+              "median_holding_hours": 36,
+              "net_usdt": "-86.0800240543404859529078240",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 3,
+              "win_rate_pct": 0.0
+            }
+          },
+          "by_exit_signal_regime": {
+            "HIGH_VOLATILITY": {
+              "expectancy_usdt": "173.3615129940821839421803611",
+              "gross_usdt": "175.9724427398637758588851740",
+              "mean_24h_post_exit_return_pct": "4.9776915615906886517943744",
+              "mean_entry_gap_bps": "0",
+              "mean_exit_gap_bps": "0",
+              "mean_holding_hours": 72,
+              "mean_mae_pct": "-0.04579686545898636271117444",
+              "mean_mfe_pct": "32.3020557704050478322817016",
+              "median_holding_hours": 72,
+              "net_usdt": "173.3615129940821839421803611",
+              "payoff_ratio": null,
+              "profit_factor": null,
+              "trades": 1,
+              "win_rate_pct": 100.0
+            },
+            "RANGING": {
+              "expectancy_usdt": "-13.21222671644208000855898959",
+              "gross_usdt": "-87.69809084908555405811691773",
+              "mean_24h_post_exit_return_pct": "-0.6059268675063176876661066075",
+              "mean_entry_gap_bps": "0.00156466894805698380121625",
+              "mean_exit_gap_bps": "-0.10390551730605934291403325",
+              "mean_holding_hours": 10.875,
+              "mean_mae_pct": "-2.430995593516691676760328889",
+              "mean_mfe_pct": "1.093720409134239792558027162",
+              "median_holding_hours": 8.5,
+              "net_usdt": "-105.6978137315366400684719167",
+              "payoff_ratio": null,
+              "profit_factor": "0E+25",
+              "trades": 8,
+              "win_rate_pct": 0.0
+            },
+            "TRENDING_UP": {
+              "expectancy_usdt": "-1.028658846864796856031505448",
+              "gross_usdt": "54.87767937496546820365296509",
+              "mean_24h_post_exit_return_pct": "0.1145326244934029527484788",
+              "mean_entry_gap_bps": "0.1621218195333748938299161136",
+              "mean_exit_gap_bps": "-0.09160985396329145918389313636",
+              "mean_holding_hours": 22.545454545454547,
+              "mean_mae_pct": "-1.468115694825744104372926487",
+              "mean_mfe_pct": "3.090687143941330838063914305",
+              "median_holding_hours": 5.5,
+              "net_usdt": "-45.2609892620510616653862397",
+              "payoff_ratio": "2.862616371797514857665229201",
+              "profit_factor": "0.8419459917051514287250674120",
+              "trades": 44,
+              "win_rate_pct": 22.727272727272727
+            }
+          },
+          "closed_trade_summary": {
+            "expectancy_usdt": "0.4226926415187638152513623528",
+            "gross_usdt": "143.1520312657436900044212214",
+            "mean_24h_post_exit_return_pct": "0.09721498989916296382019442192",
+            "mean_entry_gap_bps": "0.1348278756802443622438875283",
+            "mean_exit_gap_bps": "-0.09173731533647733863025592453",
+            "mean_holding_hours": 21.71698113207547,
+            "mean_mae_pct": "-1.586619852564627554135897566",
+            "mean_mfe_pct": "3.340416101450896661274682043",
+            "median_holding_hours": 7,
+            "net_usdt": "22.4027100004944822083222047",
+            "payoff_ratio": "4.036355589519511801381508648",
+            "profit_factor": "1.057140749636062614647537979",
+            "trades": 53,
+            "win_rate_pct": 20.754716981132077
+          },
+          "fees_including_terminal_usdt": "60.37458905660897102620450650",
+          "frozen_base_execution_metrics": {
+            "annualised_return_pct": 0.41085686229245244,
+            "annualised_volatility_pct": 2.3782114426782077,
+            "calmar": 0.20890921458584988,
+            "closed_trades": 53,
+            "expectancy_usdt_per_closed_trade": 0.4226926415187638,
+            "exposure_fraction_of_hours": 0.24074461409746914,
+            "final_liquidatable_usdt": "10022.40271000049448220832222",
+            "max_daily_mark_to_market_loss_pct": 0.470803702937872,
+            "max_drawdown_pct": 1.9666765925426113,
+            "modelled_fees_usdt": "60.37458905660897102620450649",
+            "modelled_fills": 106,
+            "modelled_slippage_usdt": "60.37473220864023676989451094",
+            "net_execution_return_pct": 0.22402710000494483,
+            "open_position_at_end": false,
+            "profit_factor": 1.0571407496360625,
+            "risk": {
+              "daily_suspensions": 0,
+              "drawdown_suspension": false,
+              "entry_rejections": {},
+              "exit_reasons": {
+                "SIGNAL_FLAT": 50,
+                "STOP_AT_CLOSE": 3
+              },
+              "max_planned_stop_risk_pct": 0.25
+            },
+            "sharpe_zero_risk_free": 0.18428909814651817,
+            "sortino_zero_target": 0.2817866694414644,
+            "turnover_to_starting_capital": 6.037458905660897
+          },
+          "full_replay_cost_ablations": {
+            "fees_only": {
+              "annualised_return_pct": 1.5994808294888196,
+              "annualised_volatility_pct": 2.4837637511626265,
+              "calmar": 0.8334874611944176,
+              "closed_trades": 53,
+              "expectancy_usdt_per_closed_trade": 1.6411545041855558,
+              "exposure_fraction_of_hours": 0.24074461409746914,
+              "final_liquidatable_usdt": "10086.98118872183445820344340",
+              "max_daily_mark_to_market_loss_pct": 0.4813192752290778,
+              "max_drawdown_pct": 1.9190220656669577,
+              "modelled_fees_usdt": "63.38611555361731368457297503",
+              "modelled_fills": 106,
+              "modelled_slippage_usdt": "0E-35",
+              "net_execution_return_pct": 0.8698118872183446,
+              "open_position_at_end": false,
+              "profit_factor": 1.240509691339556,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 50,
+                  "STOP_AT_CLOSE": 3
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 0.6512907160199033,
+              "sortino_zero_target": 1.003659013530516,
+              "turnover_to_starting_capital": 6.338611555361731
+            },
+            "price_concession_only": {
+              "annualised_return_pct": 1.5994808294888196,
+              "annualised_volatility_pct": 2.4837637511626265,
+              "calmar": 0.8334874611944176,
+              "closed_trades": 53,
+              "expectancy_usdt_per_closed_trade": 1.6411545041855558,
+              "exposure_fraction_of_hours": 0.24074461409746914,
+              "final_liquidatable_usdt": "10086.98118872183445820344340",
+              "max_daily_mark_to_market_loss_pct": 0.4813192752290778,
+              "max_drawdown_pct": 1.9190220656669577,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 106,
+              "modelled_slippage_usdt": "63.38611555361731368457297503",
+              "net_execution_return_pct": 0.8698118872183446,
+              "open_position_at_end": false,
+              "profit_factor": 1.240509691339556,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 50,
+                  "STOP_AT_CLOSE": 3
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 0.6512907160199033,
+              "sortino_zero_target": 1.003659013530516,
+              "turnover_to_starting_capital": 6.338596518631304
+            },
+            "zero": {
+              "annualised_return_pct": 2.92040799980251,
+              "annualised_volatility_pct": 2.6053443659240125,
+              "calmar": 1.5645012922514958,
+              "closed_trades": 53,
+              "expectancy_usdt_per_closed_trade": 2.9876693418783304,
+              "exposure_fraction_of_hours": 0.24074461409746914,
+              "final_liquidatable_usdt": "10158.34647511955150205374319",
+              "max_daily_mark_to_market_loss_pct": 0.492862257494705,
+              "max_drawdown_pct": 1.8666702381560258,
+              "modelled_fees_usdt": "0E-25",
+              "modelled_fills": 106,
+              "modelled_slippage_usdt": "0E-35",
+              "net_execution_return_pct": 1.583464751195515,
+              "open_position_at_end": false,
+              "profit_factor": 1.478943091204067,
+              "risk": {
+                "daily_suspensions": 0,
+                "drawdown_suspension": false,
+                "entry_rejections": {},
+                "exit_reasons": {
+                  "SIGNAL_FLAT": 50,
+                  "STOP_AT_CLOSE": 3
+                },
+                "max_planned_stop_risk_pct": 0.25
+              },
+              "sharpe_zero_risk_free": 1.117894140869706,
+              "sortino_zero_target": 1.7350438644489905,
+              "turnover_to_starting_capital": 6.671310759309233
+            }
+          },
+          "gross_fixed_fills_usdt": "143.1520312657436900044212214",
+          "matched_passive_diagnostics": {
+            "hourly_pnl_stdev": {
+              "net_return_pct": -1.0966747833961668,
+              "passive_initial_weight": "0.03012780437974881496694115013",
+              "target": "0.0002541359547960082906410332309"
+            },
+            "mean_notional": {
+              "net_return_pct": -0.6767862646242965,
+              "passive_initial_weight": "0.01859264432465383998587296794",
+              "target": "0.01423855181213750848343546453"
+            }
+          },
+          "mean_entry_hourly_volatility_pct": "0.8775885458388540717222474301",
+          "mean_entry_momentum_pct": "3.105192038487350669123762442",
+          "mean_open_notional_fraction_initial_equity": "0.01423855181213750848343546453",
+          "net_after_overhead_usdt": "-43.09044068443702464099286379",
+          "price_concession_including_terminal_usdt": "60.37473220864023676989451087",
+          "scenario_overhead_usdt": "65.49315068493150684931506849",
+          "signal_exit_triggers": {
+            "HIGH_VOLATILITY": 1,
+            "MOMENTUM_BELOW_ENTRY_THRESHOLD": 42,
+            "RANGING": 7
+          },
+          "signal_exits_reentered_within_24h": 31,
+          "trade_ledger_sha256": "bbda69f28fd0685d03c329910518813640f5c504688942af321097a63c0347cc"
+        }
+      }
+    }
+  },
+  "registry_sha256": "50b1475aadf7f9290fa435e7632dbde56199a94744758b0b554ee0d24c0c2811"
+}

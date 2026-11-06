@@ -28,6 +28,10 @@ See [the completed evidence audit](docs/25_MULTYEAR_EVIDENCE_REVIEW_20261105.md)
 
 The v0.8 review branch passed 117 Python tests and 36 website tests locally, plus the existing three-width browser smoke test and synthetic baseline CLI.
 
+## Strategy Research v0.9 decision
+
+**FAIL across all six registered variants.** Completed v0.8 loss attribution, four-family research review, a frozen six-variant study and shared-cash research accounting. The four-hour breakout returned +1.724% net on the shared portfolio in the final historical partition and +0.903% at doubled friction. It passed neither the forward-fold nor the minimum-sample hurdle. A separate implementation reproduced 894 ledgers. See the [results, verification and next gate](docs/29_STRATEGY_RESEARCH_V09.md).
+
 ## Outstanding
 
 - Gate 1 is **partially evidenced**, not fully cleared: venue/account eligibility, permissible dataset usage, independent venue price checks, historical publication-time reconstruction and executable bid/ask/cost calibration remain unverified.
@@ -36,4 +40,4 @@ The v0.8 review branch passed 117 Python tests and 36 website tests locally, plu
 
 ## Next stage
 
-Review the v0.8 results and close the experiment. Any successor requires a separate registration and a genuinely unseen evaluation window. Complete the source and cost prerequisites before any future promotion review. Paper/live execution, broker connection and capital release remain outside this research stage.
+Keep the v0.8 and v0.9 candidates rejected. Establish admissible market data and executable spot costs before registering the next trend hypothesis. Preserve the reserved prospective window. Paper/live execution, broker connection and capital release remain outside this research stage.

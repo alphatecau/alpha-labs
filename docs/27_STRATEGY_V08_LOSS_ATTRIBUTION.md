@@ -15,7 +15,7 @@ The unsealed test covers 4,781 hours starting 15 June 2025 at 19:00 UTC. Each ma
 | Market | Rerun with zero friction | Fees only | Price concession only | Base, zero overhead | Mean open notional / initial equity | Exposure-matched passive | Risk-matched passive |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | BTC | −0.603% | −1.235% | −1.235% | −1.808% | 1.45% | −0.247% | −0.443% |
-| ETH | +1.118% | +0.345% | +0.346% | −0.353% | 2.10% | +0.240% | +0.388% |
+| ETH | +1.118% | +0.346% | +0.346% | −0.353% | 2.10% | +0.240% | +0.388% |
 | SOL | −1.952% | −2.582% | −2.582% | −3.153% | 1.90% | −0.313% | −0.502% |
 
 Cost ablations rerun sizing, risk and equity, with no scenario overhead. The matched buy-and-hold diagnostics use base friction and initial weights scaled retrospectively to the candidate's mean hourly notional or hourly P&L standard deviation, both normalised by starting capital. Neither was a live-calibrated benchmark. All three candidates trailed both matched exposures even with candidate overhead set to zero.

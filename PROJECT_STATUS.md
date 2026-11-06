@@ -32,6 +32,8 @@ The v0.8 review branch passed 117 Python tests and 36 website tests locally, plu
 
 **FAIL across all six registered variants.** Completed v0.8 loss attribution, four-family research review, a frozen six-variant study and shared-cash research accounting. The four-hour breakout returned +1.724% net on the shared portfolio in the final historical partition and +0.903% at doubled friction. It passed neither the forward-fold nor the minimum-sample hurdle. A separate implementation reproduced 894 ledgers. See the [results, verification and next gate](docs/29_STRATEGY_RESEARCH_V09.md).
 
+The [v0.9 follow-up](docs/31_STRATEGY_V09_FOLLOWUP_REVIEW.md) corrected risk suspension between fills at the same open. The six rejection decisions held across the replay. The two additional development and validation diagnostics also failed their screens. The follow-up adds a fixed 20/40/60/80 bps cost grid and an offline downtrend signal diagnostic.
+
 ## Outstanding
 
 - Gate 1 is **partially evidenced**, not fully cleared: venue/account eligibility, permissible dataset usage, independent venue price checks, historical publication-time reconstruction and executable bid/ask/cost calibration remain unverified.

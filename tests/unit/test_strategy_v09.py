@@ -109,12 +109,31 @@ class TestSharedReplay(unittest.TestCase):
 
     def test_previous_fill_friction_counts_towards_the_next_admission(self):
         state = Portfolio(RULES, COSTS.twice())
-        state.cash = D("9501")
+        state.cash = state.day_start = D("9501")
         prices = {"BTC": D(100), "ETH": D(100)}
         state.enter(1, "BTC", LONG, prices)
         self.assertLess(state.mark(prices)[0], D("9500"))
         state.enter(1, "ETH", LONG, prices)
         self.assertEqual([fill.symbol for fill in state.fills], ["BTC"])
+        self.assertEqual(state.forced_exit(), "PORTFOLIO_DRAWDOWN")
+
+    def test_friction_breach_latches_daily_halt_before_next_market(self):
+        data = bars(5, variations={2: ("57.3", 105, 57, 105), 3: (105, 106, 104, 105)})
+        markets = {symbol: data for symbol in ("BTC", "ETH", "SOL")}
+        signals = {
+            "BTC": (LONG, None, None, None, None),
+            "ETH": (None, LONG, None, None, None),
+            "SOL": (None, LONG, None, None, None),
+        }
+        rules = replace(RULES, close_triggered_stop=True)
+        result = replay_portfolio(markets, signals, 1, 4, rules, COSTS)
+        self.assertEqual([(row.index, row.symbol, row.reason) for row in result.fills], [
+            (1, "BTC", "SIGNAL"), (2, "ETH", "SIGNAL"),
+            (3, "BTC", "DAILY_LOSS"), (3, "ETH", "DAILY_LOSS"),
+        ])
+        self.assertEqual(result.daily_suspensions, 1)
+        self.assertGreater(result.nav[1], D("9800"))
+        ReferenceAudit().replay(markets, signals, 1, 4, rules, COSTS, result)
 
     def test_stop_gap_uses_worse_open(self):
         data = bars(4, variations={2: (88, 91, 87, 90)})

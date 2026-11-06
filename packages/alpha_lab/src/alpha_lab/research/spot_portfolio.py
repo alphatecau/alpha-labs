@@ -152,6 +152,10 @@ class Portfolio:
         lot = Position(units, i, price, outlay, stop, planned)
         self.positions[symbol] = lot
         self.fill(i, symbol, "BUY", "SIGNAL", price, lot)
+        if risk:
+            # A fill can consume the remaining daily or drawdown allowance
+            # before another market submits at this same opening price.
+            self.observe(self.mark(prices)[0])
 
     def exit(self, i, symbol, reason, price):
         lot = self.positions.pop(symbol)

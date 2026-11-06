@@ -154,6 +154,9 @@ def reference_replay(markets, decisions, start, end, rules, fee, slip):
             positions[symbol] = (qty, i, stop, planned)
             fills.append((i, symbol, "BUY", "SIGNAL", price, qty, -outlay, qty * price * (1 + slip) * fee,
                           qty * price * slip, stop, planned))
+            if limits:
+                after_fill = cash + fsum(q * rows[s][1] * credit for s, (q, _, _, _) in positions.items())
+                check_mark(after_fill)
 
         for symbol in tuple(positions):
             stop = positions[symbol][2]

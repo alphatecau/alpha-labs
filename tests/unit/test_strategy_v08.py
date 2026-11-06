@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 import json
 from pathlib import Path
+import runpy
 from statistics import stdev
 from tempfile import TemporaryDirectory
 import unittest
@@ -12,7 +13,7 @@ from unittest.mock import patch
 from archive_fixture import two_month_transport
 from alpha_lab.backtest.costs import CostModel
 from alpha_lab.data.adapters.binance_archive import build_dataset
-from alpha_lab.data.csv_import import Bar, Dataset
+from alpha_lab.data.csv_import import Bar, Dataset, load_csv
 from alpha_lab.research.multiple_testing import moving_block_lower_bound, paired_daily_excess_bps
 from alpha_lab.research.strategies.regime_trend import Regime, classify, momentum_signals
 from alpha_lab.research.strategy_v08 import COMPARATORS, evaluate_market, load_study, run_study
@@ -206,6 +207,10 @@ class StudyTests(unittest.TestCase):
                 before = report["periods"]["test_unsealed"]["base_friction"]
                 self.assertLess(before["candidate_after_primary_overhead_pct"], before["candidate"]["net_execution_return_pct"])
                 self.assertEqual(before["flat"]["net_execution_return_pct"], 0)
+                reference = runpy.run_path(str(REGISTRY.parents[1] / "scripts" / "audit_strategy_v08.py"))
+                candles = load_csv(verified["csv"], quote_currency="USDT").bars
+                prices = [(bar.time, float(bar.open), float(bar.close)) for bar in candles]
+                self.assertEqual(reference["verify"](report, prices, fixture.registry), 32)
                 with self.assertRaises(FileExistsError):
                     run_study(root, root / "first", REGISTRY)
                 Path(verified["csv"]).write_text("changed", encoding="utf-8")

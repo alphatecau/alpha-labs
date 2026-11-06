@@ -48,6 +48,8 @@ def ledger(candles, desired, lo, hi, capital, allocation, fee, slip, risk=None):
     fills = closures = exposure = 0
     day = stop = None
     suspend_day = suspend_window = exit_next = False
+    if risk is not None:
+        distance, per_trade, aggregate, daily, drawdown = risk
     for i in range(lo, hi):
         time, open_price, close = candles[i]
         if time.date() != day:
@@ -62,7 +64,6 @@ def ledger(candles, desired, lo, hi, capital, allocation, fee, slip, risk=None):
         elif not shares and want and not (suspend_day or suspend_window):
             shares = min(cash, capital * allocation) / (open_price * debit)
             if risk is not None:
-                distance, per_trade, aggregate, daily, drawdown = risk
                 stop = open_price * (1 - distance)
                 loss_per_share = open_price * debit - stop * credit
                 shares = min(shares, cash * allocation / (open_price * debit),
@@ -89,10 +90,10 @@ def ledger(candles, desired, lo, hi, capital, allocation, fee, slip, risk=None):
 def verify(report, candles, registry):
     n = len(candles)
     param, = registry["candidates"]
-    signals = targets([close for _, _, close in candles], param)
+    closes = [close for _, _, close in candles]
+    signals = targets(closes, param)
     if sha256(bytes(signals)).hexdigest() != report["candidate_targets_sha256"]:
         raise ValueError("Full target stream differs from the reference indicators")
-    closes = [close for _, _, close in candles]
     fast, slow = ema(closes, 12), ema(closes, 48)
     desired = {"candidate": signals, "ema_12_48_frozen": [i >= 48 and a > b for i, (a, b) in enumerate(zip(fast, slow))],
                "passive_hold": [True] * n, "flat": [False] * n}
@@ -123,6 +124,10 @@ def verify(report, candles, registry):
             if not equal:
                 raise ValueError(f"{label}/{key}: report {reported} differs from reference {value}")
 
+    def after_overhead(metrics, lo, hi, annual):
+        return metrics["net_execution_return_pct"] - 100 * float(annual) * (hi - lo) / (365 * 24 * capital)
+
+    primary_cost = costs["primary_annual_candidate_overhead_usdt"]
     checks = 0
     for period, (lo, hi) in intervals.items():
         actual = report["periods"][period]
@@ -135,10 +140,36 @@ def verify(report, candles, registry):
                 controls = risk_config if name == "candidate" else None
                 expected = ledger(candles, signal, lo, hi, capital, allocation, fee * multiple, slip * multiple, controls)
                 check(actual[scenario][name], expected, f"{period}/{scenario}/{name}")
+                if name == "candidate":
+                    for annual in costs["annual_candidate_overhead_usdt"]:
+                        check(actual[scenario]["candidate_operating_cost_sensitivity"][annual],
+                              {"net_return_pct": after_overhead(expected, lo, hi, annual)},
+                              f"{period}/{scenario}/overhead_{annual}")
                 checks += 1
         expected = ledger(candles, signals, lo, hi, capital, allocation, fee, slip, half)
         check(actual["half_stop_risk_base_friction"], expected, f"{period}/half_risk")
         checks += 1
+
+    step = protocol["walk_forward_step_hours"]
+    fold_bounds = [(edge + embargo, min(edge + step, n)) for edge in range(t1, n, step)
+                   if min(edge + step, n) - edge - embargo >= protocol["minimum_final_fold_hours"]]
+    for index, ((lo, hi), fold) in enumerate(zip(fold_bounds, report["walk_forward"], strict=True)):
+        if (fold["start_utc"] != candles[lo][0].isoformat()
+                or fold["end_exclusive_utc"] != (candles[hi - 1][0] + timedelta(hours=1)).isoformat()
+                or fold["hours"] != hi - lo):
+            raise ValueError(f"Wrong dates in fold {index}")
+        candidate = ledger(candles, signals, lo, hi, capital, allocation, fee, slip, risk_config)
+        multiplier = costs["friction_stress_multiplier"]
+        stress = ledger(candles, signals, lo, hi, capital, allocation, fee * multiplier, slip * multiplier, risk_config)
+        net = after_overhead(candidate, lo, hi, primary_cost)
+        check(fold, {"candidate_after_primary_overhead_pct": net,
+                     "candidate_double_friction_after_primary_overhead_pct": after_overhead(stress, lo, hi, primary_cost),
+                     "candidate_closed_trades": candidate["closed_trades"],
+                     "candidate_max_drawdown_pct": candidate["max_drawdown_pct"]}, f"fold {index}")
+        for name in ("ema_12_48_frozen", "passive_hold", "flat"):
+            benchmark = ledger(candles, desired[name], lo, hi, capital, allocation, fee, slip)
+            check(fold["excess_vs_benchmarks_pp"], {name: net - benchmark["net_execution_return_pct"]}, f"fold {index}")
+        checks += 5
     return checks
 
 

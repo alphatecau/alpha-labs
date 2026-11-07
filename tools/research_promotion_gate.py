@@ -66,12 +66,16 @@ def evaluate(record: dict) -> dict:
         positive = metrics["positive_forward_folds"]
         if total < 1 or not 0 <= positive <= total or positive / total < 0.6:
             reasons.append("forward_fold_consistency_failed")
+    # Evidence gaps take precedence over numerical rejection. A negative screen
+    # remains visible in reasons, but incomplete evidence is never certified.
+    incomplete = any(r.startswith(("missing_", "missing_or_")) for r in reasons)
+    decision = ("BLOCKED" if incomplete else
+                "REJECT" if reasons else "ELIGIBLE_FOR_INDEPENDENT_REVIEW")
     # Never return a live-trading authorisation.
     return {
         "schema": "alpha-labs.research-gate.v1",
         "experiment_id": name,
-        "decision": "REJECT" if reasons and all(not r.startswith(("missing_", "missing_or_")) for r in reasons)
-                    else ("BLOCKED" if reasons else "ELIGIBLE_FOR_INDEPENDENT_REVIEW"),
+        "decision": decision,
         "live_trading_authorised": False,
         "reasons": reasons,
         "note": "Eligibility is not proof of alpha and never authorises execution.",

@@ -14,3 +14,5 @@ datasets/raw/**
 datasets/curated/**
 datasets/replay/**
 !datasets/**/.gitkeep
+.alpha-paper/
+operator-tokens.json

@@ -1,0 +1,73 @@
+{
+  "browser": "153.0.8010.0",
+  "results": [
+    {
+      "width": 320,
+      "status": "PASS",
+      "checks": [
+        "login",
+        "autonomous-cycle",
+        "fourteen-roles",
+        "tenant-isolation",
+        "journal-export",
+        "HALT",
+        "reduce-only-close",
+        "disabled-live",
+        "signout-revocation",
+        "no-horizontal-overflow",
+        "no-page-errors"
+      ]
+    },
+    {
+      "width": 390,
+      "status": "PASS",
+      "checks": [
+        "login",
+        "autonomous-cycle",
+        "fourteen-roles",
+        "tenant-isolation",
+        "journal-export",
+        "HALT",
+        "reduce-only-close",
+        "disabled-live",
+        "signout-revocation",
+        "no-horizontal-overflow",
+        "no-page-errors"
+      ]
+    },
+    {
+      "width": 768,
+      "status": "PASS",
+      "checks": [
+        "login",
+        "autonomous-cycle",
+        "fourteen-roles",
+        "tenant-isolation",
+        "journal-export",
+        "HALT",
+        "reduce-only-close",
+        "disabled-live",
+        "signout-revocation",
+        "no-horizontal-overflow",
+        "no-page-errors"
+      ]
+    },
+    {
+      "width": 1440,
+      "status": "PASS",
+      "checks": [
+        "login",
+        "autonomous-cycle",
+        "fourteen-roles",
+        "tenant-isolation",
+        "journal-export",
+        "HALT",
+        "reduce-only-close",
+        "disabled-live",
+        "signout-revocation",
+        "no-horizontal-overflow",
+        "no-page-errors"
+      ]
+    }
+  ]
+}

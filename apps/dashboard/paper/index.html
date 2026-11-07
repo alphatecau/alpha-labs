@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101410">
+  <title>Alpha Labs · Simulation Terminal</title>
+  <link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Alpha Labs home"><span class="brand-symbol">α</span><span>ALPHA LABS<small>RESEARCH TERMINAL</small></span></a>
+    <div class="workspace-label">WORKSPACE / v0.12</div>
+    <nav aria-label="Workspace">
+      <button data-view="overview" class="selected" aria-current="page">Overview <span>01</span></button>
+      <button data-view="markets">Market scanner <span>02</span></button>
+      <button data-view="committee">Agent committee <span>03</span></button>
+      <button data-view="journal">Trading journal <span>04</span></button>
+      <button data-view="evidence">Strategy evidence <span>05</span></button>
+      <button data-view="controls">Control centre <span>06</span></button>
+    </nav>
+    <div class="sidebar-bottom"><span class="status-dot"></span> Local simulation only<p>No real broker connections.<br>No live order transport.</p></div>
+  </aside>
+  <main>
+    <header class="topbar"><span class="breadcrumb">WORKSPACE <span>/</span> <b id="page-name">Overview</b></span><div class="top-actions"><span class="mode-badge">SIMULATION</span><button id="signout" class="quiet" hidden>Sign out</button></div></header>
+    <section class="intro"><div><div class="eyebrow">EVIDENCE BEFORE EXECUTION</div><h1>Your research.<br><span>Under control.</span></h1><p>A transparent workspace for autonomous research and synthetic paper execution.</p></div><div class="version-tag">GLOBAL FOUNDATION<span>0.12 / DEVELOPMENT</span></div></section>
+    <div class="safety-note"><span class="status-dot"></span><strong>Live trading disabled.</strong><span>All fills in this terminal are synthetic software scenarios.</span></div>
+    <section id="login" class="panel login-panel">
+      <div><div class="eyebrow">LOCAL OPERATOR ACCESS</div><h2>Open your workspace</h2><p>Use a short-lived operator token from your private local credentials file. Each operator has an isolated account.</p></div>
+      <form id="login-form"><label for="token">Operator token</label><div class="login-row"><input id="token" type="password" autocomplete="off" required placeholder="Enter local operator token"><button class="primary" type="submit">Connect <span>↗</span></button></div><small>Tokens stay in memory and expire after one hour. Registration, MFA and passkeys are not available in this development terminal.</small></form>
+    </section>
+    <div id="message" role="status" aria-live="polite">Connect to inspect your simulated account.</div>
+    <div id="workspace" hidden>
+      <div class="workspace-heading"><div><span class="eyebrow" id="operator-label">YOUR WORKSPACE</span><h2 id="section-title">Account overview</h2></div><div class="timestamp"><span id="account-status">Suspended</span><small id="updated-at">No account snapshot</small></div></div>
+      <section data-panel="overview">
+        <div class="metrics">
+          <article class="metric"><span>Simulated equity</span><strong id="equity">—</strong><small id="currency-note">Reporting currency</small></article>
+          <article class="metric"><span>Net simulated P&amp;L</span><strong id="pnl">—</strong><small>Includes modelled trading friction</small></article>
+          <article class="metric"><span>Current drawdown</span><strong id="drawdown">—</strong><small>Historical maximum unverified</small></article>
+          <article class="metric"><span>Modelled fees</span><strong id="fees">—</strong><small>Venue calibration unverified</small></article>
+        </div>
+        <div class="two-columns"><section class="panel"><div class="panel-heading"><h3>Open positions</h3><span class="small-badge">SIMULATED</span></div><div id="positions" class="rows"></div></section><section class="panel"><div class="panel-heading"><h3>Risk authority</h3><span id="risk-badge" class="small-badge">INDEPENDENT POLICY</span></div><div id="risk-limits" class="rows"></div><p class="footnote">Stop-losses cannot guarantee a loss limit. Synthetic gap exits use the observed adverse price.</p></section></div>
+        <section class="panel next-step"><div><span class="eyebrow">GUIDED NEXT ACTION</span><h3 id="next-title">Enable a synthetic paper session</h3><p id="next-copy">Inspect the risk limits, then use the control centre to run a fixture cycle.</p></div><button data-open="controls">Open controls ↗</button></section>
+      </section>
+      <section data-panel="markets" hidden><section class="panel"><div class="panel-heading"><h3>Global market coverage</h3><span class="small-badge">PROVIDERS UNVERIFIED</span></div><p class="muted">Real-time feeds, venue eligibility and data licences must be verified before market research is admitted.</p><div id="markets" class="rows"></div><p class="footnote">TEST/AUD is an artificial fixture. No displayed fixture price represents a cryptocurrency, equity or other real instrument.</p></section></section>
+      <section data-panel="committee" hidden><div class="section-note">Fourteen recorded workflow roles. These are deterministic software assessments; no language model is connected. News and fundamentals remain unverified.</div><div id="committee" class="agent-grid"></div></section>
+      <section data-panel="journal" hidden><section class="panel"><div class="panel-heading"><h3>Account event journal</h3><button id="export" class="quiet">Export my records ↓</button></div><div id="reconciliation" class="section-note"></div><div id="journal" class="journal-list"></div></section></section>
+      <section data-panel="evidence" hidden><section class="panel"><div class="panel-heading"><h3>Strategy evidence</h3><span class="small-badge">FAILS CLOSED</span></div><p class="muted">The v0.8 strategy, six registered v0.9 variants and two exploratory rules remain rejected. No real strategy is eligible for execution.</p><div id="strategies" class="rows"></div><p class="footnote">AI consensus, positive backtest returns and passing CI cannot establish profitability. The reserved 2027 prospective window remains outside this work.</p></section></section>
+      <section data-panel="controls" hidden>
+        <div class="two-columns"><section class="panel"><div class="panel-heading"><h3>Paper session</h3><span class="small-badge">LOCAL FIXTURES</span></div><p class="muted">The fixture uses TEST/AUD, 2 units, a stop reference of 98, assumed 10 bps fees and 5 bps slippage. This is a software check.</p><div class="control-grid"><button data-control="enable" class="primary">Enable simulation</button><button data-control="suspend">Suspend entries</button><button data-fixture="cycle">Run synthetic cycle ↗</button><button data-fixture="close">Close simulated position</button><button data-fixture="gap">Apply synthetic gap</button><button data-control="clear_halt">Review / clear HALT</button></div><p class="footnote">Clearing HALT does not reset loss anchors or enable a session. Open positions must be closed first.</p></section>
+        <section class="panel emergency"><div class="eyebrow">IMMEDIATE CONTROL</div><h3>Emergency HALT</h3><p>Persistently block new entries and cancel pending simulated orders. Existing positions remain visible and may be closed with reduce-only checks.</p><button id="halt" class="danger">HALT simulated trading</button><small>HALT survives process restarts.</small></section></div>
+        <section class="panel live-gate"><div><h3>Future live trading</h3><p id="live-gate-note">Blocked by strategy evidence, security, broker, operational and jurisdiction-specific regulatory gates. Separate authorisation is required.</p></div><button disabled aria-describedby="live-gate-note">Live trading unavailable</button></section>
+      </section>
+    </div>
+    <footer>ALPHA LABS <span>Analyse evidence. Control risk.</span><small>Local development · no profitability claim · production deployment disabled</small></footer>
+  </main>
+</body>
+</html>

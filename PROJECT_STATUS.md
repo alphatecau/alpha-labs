@@ -30,3 +30,11 @@ See [the completed evidence audit](docs/25_MULTYEAR_EVIDENCE_REVIEW_20261105.md)
 ## Next stage
 
 Integrate the reviewed research infrastructure after current CI passes. Register the Strategy Research v0.8 regime-filtered momentum hypothesis and its falsification/candidate budget before evaluation; preserve EMA(12,48) as the frozen comparator. Complete the remaining source/cost prerequisites before promoting any candidate. No paper/live bot, broker connection or capital release is approved by this engineering review.
+
+## v0.12 additive draft — 7 November 2026
+
+Main baseline `9d705bd` and PRs #9–#11 were audited before implementation. Development is isolated on `development/global-foundation-v0.12`; no research branch was merged. The prior research/strategy failures remain preserved.
+
+Implemented locally: opaque development-token identity and tenant/role checks; immutable causal quote/proposal contracts; fourteen recorded deterministic committee roles; fail-closed real-strategy gates; transactional simulation risk checks; durable market/marketable-limit/partial/reject/cancel/fill lifecycle; long inventory, adverse stop-gap exits, journal replay, persistent HALT and backup/restore; responsive authenticated local dashboard. No actual language model, market feed, customer registration, managed secret service or broker order transport is connected.
+
+Global commercial beta remains **NO-GO**. Hosted auth/MFA/passkeys/recovery, process-isolated risk authority, licensed feeds, empirical strategy/execution validation, equities integration, distributed load/security, customer billing/privacy/regional legal review and physical device acceptance remain incomplete or unverified. See `docs/v0.12/` for exact scope, evidence and remaining gates. Existing backend/security scaffolds are not represented as operational services. Live trading, capital release and production deployment remain disabled.

@@ -1,0 +1,90 @@
+{
+  "audit_commit": "51cc493ec10cc551df080dfb24ed62a499608274",
+  "baseline_sha": "9d705bd1982396b19006b9abd3ec8b6a254f2972",
+  "branch": "development/global-foundation-v0.12",
+  "browser": "153.0.8010.0",
+  "checks": [
+    {
+      "command": "PYTHONPATH=packages/alpha_lab/src python -m unittest discover -s tests/unit -p 'test_*.py' -v",
+      "exit_code": 0,
+      "tests": 102
+    },
+    {
+      "command": "PYTHONPATH=packages/alpha_lab/src python -m unittest discover -s tests/paper -p 'test_*.py' -v",
+      "exit_code": 0,
+      "tests": 81
+    },
+    {
+      "command": "node --test apps/sites/tests/*.test.cjs",
+      "exit_code": 0,
+      "tests": 36
+    },
+    {
+      "checks_per_viewport": 11,
+      "command": "node tests/browser/paper-terminal.cjs",
+      "exit_code": 0,
+      "viewports": [
+        320,
+        390,
+        768,
+        1440
+      ]
+    },
+    {
+      "command": "python -m alpha_lab.paper.cli replay (twice) + cmp",
+      "exit_code": 0,
+      "sha256": "f8af5696f1a7653e86917b29b4875a2fcdcff01d6223fbb2a0a8c31bc42dcd68"
+    },
+    {
+      "command": "legacy synthetic CLI, compileall, node --check, git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "ci_status_at_record_creation": "UNVERIFIED: inspect the exact pushed draft head checks; local results do not establish CI",
+  "github_ci_verification": {
+    "record": "docs/evidence/v0.12/github-ci.json",
+    "scope": "same source hashes; documentation-only followups are checked separately on PR #12",
+    "source_commit": "f8bb445d953a7dc67a5a430e9ef3bed40bcb5690",
+    "status": "PASS"
+  },
+  "live_trading_enabled": false,
+  "node": "v24.22.1",
+  "playwright": "1.62.1",
+  "production_deployment_enabled": false,
+  "python": "3.12.14",
+  "schema": "alpha-labs.local-verification.v1",
+  "scope": "local synthetic software checks; not trading evidence",
+  "sha256": {
+    ".github/workflows/paper-ci.yml": "326b6133111f4a1c36b8796b584a721a72f73a64a44f9eae929f87adb78b281e",
+    "apps/dashboard/paper/app.js": "58ec4063fa33b437b7f614394bbe629bb2e48e03602791a632683caa4dc280f8",
+    "apps/dashboard/paper/index.html": "6a8cde83130ff3473372eb66c049304e339e3a9667998c6071abf292c22a13fb",
+    "apps/dashboard/paper/style.css": "b399ba26fe3e4894f3c4b81ee590f73ed885c844f8750fd55e6f56231ab2dc29",
+    "contracts/paper/agent-assessment.schema.json": "0db63134bb30bbb56dc7109d69a01a128e2a8576b3bef630668db10a3987eafd",
+    "contracts/paper/proposal.schema.json": "4b8f58da29441cd74065cb002c0ab2f40a008a876a85fb19424176ccc4b24bec",
+    "contracts/paper/quote.schema.json": "2d0841fbb6a4c4f3560ceb721d8aae0325dbd8a371d2b415163d577c41f5cc1a",
+    "packages/alpha_lab/src/alpha_lab/paper/__init__.py": "a2d8812d2602edc472103669ff2e0c3b6f087756261b25cfbf8a8323c64d0c73",
+    "packages/alpha_lab/src/alpha_lab/paper/analytics.py": "81d4c58dc1b1d6cb1d18e825739e41e29f59dc962deb6b76a1ffa04c5b82a2f9",
+    "packages/alpha_lab/src/alpha_lab/paper/api.py": "3aad726af4737ca4344cd4a6984eb3c2d2d635c42f399293ccee5642ee2228d1",
+    "packages/alpha_lab/src/alpha_lab/paper/brokers.py": "9b5c9c3f2e618f05bc80d9dba337c01380b8f30f5e3ba3ec7692872f9e76277b",
+    "packages/alpha_lab/src/alpha_lab/paper/cli.py": "268bf7930d23dd573e3a4b1bf79c50d21058cfb5e7aceb197f0f100d010733fc",
+    "packages/alpha_lab/src/alpha_lab/paper/committee.py": "57fa520dc7207663459a930f86636866b5205ad8e1026482fd6df8e35b42a52f",
+    "packages/alpha_lab/src/alpha_lab/paper/contracts.py": "39a1c00a15c568592df3ff7a31f03028a3756ba1b873548911bcba5d58042f8d",
+    "packages/alpha_lab/src/alpha_lab/paper/engine.py": "7cbc2e2831b140b95a8ff8c24c81f5aaabb833f0b616f2e605f6a760e2bb2e02",
+    "packages/alpha_lab/src/alpha_lab/paper/identity.py": "f380513e0fe217c41d0c2ac1aea5d8b55d65024cc709b35890ef0e8c7bf564e7",
+    "packages/alpha_lab/src/alpha_lab/paper/ledger.py": "5250da2f62a487045edc4a2875282c5232dfc5ca59672cbbe57f89aec9055239",
+    "packages/alpha_lab/src/alpha_lab/paper/market_data.py": "b08162610c9d7a8bf09672126b863942d012ded713d7e107ee08a1f54e5af9c0",
+    "packages/alpha_lab/src/alpha_lab/paper/risk.py": "3e3c5e11ff8eb4cad74f87a3b82d3a8ca76cfea2bc9782bd790d2bfbb31eef61",
+    "packages/alpha_lab/src/alpha_lab/paper/runner.py": "c0a32d4fb572bce3845fb5d481a64ccbca2b4dde02d95216440b8a9824be0ac6",
+    "packages/alpha_lab/src/alpha_lab/paper/store.py": "6a27fd34d72d59e44efe2084c349aa923863a437043d31e84d29af3a7109348c",
+    "tests/browser/paper-terminal.cjs": "0a90fb51a52c11aeed6d6fea86c50419886e209bae1115cf632206d663e9db5e",
+    "tests/paper/fixtures.py": "691a9f12a3fd815d83133f03fb791950dae2c45cd7d12c57eaa9d50b3ad03600",
+    "tests/paper/test_agents.py": "35e7a206fbfd94f017921365034aca1e7fbd0892cee8b575590e89a7a23216a7",
+    "tests/paper/test_api.py": "ffb48c2706f1caf5eb131e9920eb4902736a77e1eff5497fbd030781c21b89cf",
+    "tests/paper/test_contracts.py": "55a7aead42e072e8a8698815a21ff08cb31915de2db13b87cf9f7bc6705bf467",
+    "tests/paper/test_engine.py": "096cc95848fefdc7973017fb60cd481bfa7f7945fdbbeda108e70f91bb25b19d",
+    "tests/paper/test_load.py": "229628fc948af3df896fe48e1d67cc0c3a9ae48a5da69171a042e16d78b7231c",
+    "tests/paper/test_preservation.py": "e5a4e7d967e6c60e82b2910cc36b6d509e10d0e5090f35ae415091af5d5e9e5d",
+    "tests/paper/test_risk.py": "15dd6c8c57fe05e75122e4db8116e120ec953a0e7e2f077f694c3ea83b89f3ce",
+    "tests/paper/test_runner.py": "14211f4397619c981d2ebbfcae62f1eee96f3a80f55ce883f55819ea45547218"
+  }
+}

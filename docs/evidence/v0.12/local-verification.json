@@ -41,6 +41,12 @@
     }
   ],
   "ci_status_at_record_creation": "UNVERIFIED: inspect the exact pushed draft head checks; local results do not establish CI",
+  "github_ci_verification": {
+    "record": "docs/evidence/v0.12/github-ci.json",
+    "scope": "same source hashes; documentation-only followups are checked separately on PR #12",
+    "source_commit": "f8bb445d953a7dc67a5a430e9ef3bed40bcb5690",
+    "status": "PASS"
+  },
   "live_trading_enabled": false,
   "node": "v24.22.1",
   "playwright": "1.62.1",

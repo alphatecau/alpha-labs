@@ -30,10 +30,10 @@ COMPLETE below means complete **for the documented increment**, not complete for
 | 12 | Broker interfaces | PARTIAL | `paper/brokers.py`; neutral capabilities, simulation broker and blocked Binance/IBKR interfaces; actual adapters/sandbox eligibility UNVERIFIED |
 | 13 | Security/threat model | COMPLETE | `docs/v0.12/SECURITY_AND_THREAT_MODEL.md`; security controls, residual risks and incident procedure; independent penetration review UNVERIFIED |
 | 14 | Automated tests | COMPLETE | `tests/paper/`, `tests/browser/paper-terminal.cjs`; scoped counts below; not a complete global-platform validation |
-| 15 | CI integration | PARTIAL | `.github/workflows/paper-ci.yml`; unit/security/lifecycle/replay/browser checks; exact remote head/check outcomes must be read on draft PR after push |
+| 15 | CI integration | COMPLETE | `.github/workflows/paper-ci.yml`; unit/security/lifecycle/replay/browser checks; all six push/PR source checks passed at `f8bb445`; decoded simulation job log confirms 81 tests and four browser widths; see `docs/evidence/v0.12/github-ci.json` |
 | 16 | Commercial/regulatory checklist | COMPLETE | `docs/v0.12/ROADMAP_AND_COMMERCIAL_GATES.md`; proposed AUD tiers only; no billing, launch approval or legal opinion |
 | 17 | Operational runbooks | PARTIAL | `docs/v0.12/OPERATIONS.md`; local operator/recovery/backup verified; hosted SLO/on-call/DR drills UNVERIFIED |
-| 18 | Draft PR | UNVERIFIED at report creation | Open the dedicated branch as a draft against main after commit/push; final handoff provides exact PR/commit/CI URLs |
+| 18 | Draft PR | COMPLETE | [Draft PR #12](https://github.com/alphatecau/alpha-labs/pull/12), base main; implemented source `f8bb445d953a7dc67a5a430e9ef3bed40bcb5690`; no merge |
 
 `paper/` above means `packages/alpha_lab/src/alpha_lab/paper/`. Existing `apps/sites` and Python research/data/risk files remain unchanged. Source/test/schema/workflow hashes: `docs/evidence/v0.12/local-verification.json` plus the PR diff.
 
@@ -88,3 +88,7 @@ Separate the risk authority and trusted evidence registry from the application p
 ## G. Explicit controls
 
 **Live trading: DISABLED. Production deployment: DISABLED. No PR merge, production-secret/infrastructure change, unrestricted broker permission, withdrawal capability, actual order, billing or capital release occurred.** The new local server was started only for tests and stopped afterwards. No existing public Site was modified or published.
+
+## Published CI evidence
+
+All six push/pull-request checks succeeded for implemented source `f8bb445d953a7dc67a5a430e9ef3bed40bcb5690`. PR-triggered runs: [research](https://github.com/alphatecau/alpha-labs/actions/runs/42379740804), [website](https://github.com/alphatecau/alpha-labs/actions/runs/42379740822), [simulation/browser](https://github.com/alphatecau/alpha-labs/actions/runs/42379740866). The decoded simulation push-job log independently records 81 passing tests and browser PASS at all four widths using Chromium 151.0.7922.34. The later documentation-only evidence commit does not change the 31 tested source/test/schema/workflow hashes; inspect PR checks for the final head. The draft remains open and unmerged.

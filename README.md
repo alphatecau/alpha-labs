@@ -42,3 +42,15 @@ The main page at `/` is now the mobile-first Research-mode operator dashboard. T
 * `docs/future`: real-money execution documentation only, no signing keys or live execution code.
 
 No AI model is called in the hot path. No live wallet or market orders are possible.
+
+## v0.12 local simulation foundation (draft)
+
+An additive local foundation now lives in `alpha_lab.paper` and `apps/dashboard/paper`. It records a fourteen-role deterministic committee, rejects all unverified/rejected real strategies, applies independent application-code risk checks, and runs durable synthetic order/fill/stop/accounting cycles with tenant isolation and persistent HALT. It does not connect a language model or real broker. Commercial beta remains **NO-GO**.
+
+```sh
+PYTHONPATH=packages/alpha_lab/src python -m unittest discover -s tests/paper -p 'test_*.py' -v
+PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.paper.cli replay
+PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.paper.cli serve --state-dir "$PWD/.alpha-paper" --port 8765
+```
+
+See [baseline audit](docs/v0.12/BASELINE_AUDIT.md), [architecture](docs/v0.12/ARCHITECTURE.md), [security gaps](docs/v0.12/SECURITY_AND_THREAT_MODEL.md), [roadmap](docs/v0.12/ROADMAP_AND_COMMERCIAL_GATES.md), and [local operator runbook](docs/v0.12/OPERATIONS.md). Existing research, rejected findings, Sites UI and open drafts are preserved. Live trading and production deployment remain disabled.

@@ -1,0 +1,44 @@
+✔ deterministic chronological partitions are disjoint with embargo (4.105839ms)
+✔ refuses insufficient data and invalid zero-cost assumptions (3.572714ms)
+✔ candidate selection does not read the final test period (27.919741ms)
+✔ evaluation windows reset starting capital, and do not trade before evaluation start (1.684099ms)
+✔ future data cannot change completed training or validation results (11.578693ms)
+✔ fixed selection reproducible, never outputs live trade approval (11.677672ms)
+✔ AI budget is zero at zero calls, bounded and accurate for a known fixture (0.374306ms)
+✔ approved four-screen information architecture and separate settings are present (1.487748ms)
+✔ mobile-first dark design uses approved tokens and safe-area navigation (0.337738ms)
+✔ all operator JavaScript assets exist with no external runtime dependency (0.44503ms)
+✔ research mode is explicit and trade routes are absent (0.302802ms)
+✔ initial financial values are unavailable rather than fictional returns (0.202512ms)
+✔ synthetic preview uses unequivocal provenance, never becomes live (0.146387ms)
+✔ markets, activity, forecast and rejection states are coded (0.262425ms)
+✔ Advanced links preserve all six specialist research sections (0.834916ms)
+✔ UI never conflates synthetic data with paper or real profitability (0.347346ms)
+✔ demo fixtures deterministic and plausible OHLC (14.493281ms)
+✔ CSV roundtrip preserves all observations (3.365573ms)
+✔ CSV accepts timezone offset timestamp and BOM (3.296112ms)
+✔ CSV rejects duplicate timestamps (1.484351ms)
+✔ CSV rejects inconsistent OHLC and zero price (0.586056ms)
+✔ flat market has no strategy trades and preserves capital before fees (1.421022ms)
+✔ long signal never uses same-bar closing information (0.684672ms)
+✔ higher fixed execution costs cannot improve same-signal flat-market strategy results (0.758612ms)
+✔ cash equity never negative due to buy friction; benchmark and strategy series align (5.124073ms)
+✔ input settings validated at boundaries (0.553345ms)
+✔ stress report has stable multipliers and matches standalone baseline (4.125607ms)
+✔ changing a future candle never changes earlier decisions and fills (0.993335ms)
+✔ end-of-run ledger reconciles closed and estimated open position P&L (1.45685ms)
+✔ all navigation pages have section destinations (4.930214ms)
+✔ all locally referenced script/stylesheets are supplied (0.904066ms)
+✔ no fetch, signing or exchange execution in frontend research scripts (0.764774ms)
+✔ site warns about synthetic data and no actual trading (0.272454ms)
+✔ research page includes full hypothesis falsification input (0.319583ms)
+✔ evidence page keeps real trading prohibited and AI prices editable (0.223613ms)
+✔ bootstraps after state declarations, avoiding temporal-dead-zone runtime failure (0.20166ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 184.561023

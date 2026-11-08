@@ -57,17 +57,20 @@ def simulate(bars: dict, targets: list, start: int, end: int, cost_bps: int) -> 
         target=targets[i]
         if target is not None and target not in symbols:
             raise ValueError("Invalid target")
+        exited_this_hour=False
         for s in symbols:
             if holdings[s] and stops[s] is not None and bars[s][i].open<=stops[s]:
                 sell(s,i,bars[s][i].open,"gap_stop")
+                exited_this_hour=True
         for s in symbols:
             if holdings[s] and target!=s:
                 sell(s,i,bars[s][i].open,"signal_exit")
+                exited_this_hour=True
         open_nav=liquidation(i,"open")
         peak=max(peak,open_nav)
         if open_nav<=day_start*Decimal(".98"):blocked=True
         if open_nav<=peak*Decimal(".95"):halted=True
-        if target is not None and not holdings[target] and not blocked and not halted:
+        if target is not None and not holdings[target] and not exited_this_hour and not blocked and not halted:
             # Lagged 14-hour true-range ATR, no future candle.
             history=bars[target]
             tr=[]

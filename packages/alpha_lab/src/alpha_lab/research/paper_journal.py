@@ -23,10 +23,12 @@ class PaperJournal:
             previous = digest
         return previous
 
-    def append(self, event):
+    def append(self, event, *, expected_previous_hash=None):
         self.connection.execute("BEGIN IMMEDIATE")
         try:
             previous = self.verify()
+            if expected_previous_hash is not None and previous != expected_previous_hash:
+                raise ValueError('concurrent journal modification: HALT')
             payload = json.dumps(event, sort_keys=True, separators=(",", ":"), allow_nan=False)
             digest = sha256((previous + payload).encode()).hexdigest()
             self.connection.execute("INSERT INTO events(previous_hash,payload,digest) VALUES(?,?,?)",

@@ -1,0 +1,59 @@
+name: Alpha Labs Week 2 frozen-evidence audit (research only)
+on:
+  push:
+    branches: [research/strategy-evidence-gates-v1]
+    paths:
+      - '.github/workflows/week2-frozen-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  frozen-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: packages/alpha_lab/src
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify offline research tests
+        run: python -m unittest discover -s tests/unit -p 'test_*.py' -v
+      - name: Retrieve immutable original GitHub artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p frozen-input
+          curl --fail --location --retry 3 \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/alphatecau/alpha-labs/actions/artifacts/13613248485/zip" \
+            --output frozen-input/original.zip
+          echo '5f6007bd36125e047879b8cc7c4d162938a53b2ce120b95199cee92b0b165986  frozen-input/original.zip' | sha256sum --check
+      - name: Run historical NAV folds and descriptive uncertainty audit
+        run: |
+          python scripts/week2_frozen_artifact_audit.py \
+            frozen-input/original.zip --output week2-output/frozen-audit.json
+      - name: Verify no promotion or live execution claim
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('week2-output/frozen-audit.json'))
+          assert len(r['reports'])==9
+          assert r['decision']=='INCONCLUSIVE'
+          assert r['trading_enabled'] is False
+          assert r['promotion_authorised'] is False
+          assert r['fresh_walk_forward_replay'] is False
+          assert r['regime_analysis'].startswith('UNAVAILABLE')
+          print('PASS: 9 reports, frozen digest, no strategy promotion')
+          PY
+      - name: Upload research-only audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpha-labs-week2-frozen-audit
+          path: week2-output/frozen-audit.json
+          retention-days: 7
+          if-no-files-found: error

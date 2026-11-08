@@ -29,6 +29,8 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tes
     seen = set()
     fold_ids = set()
     prior_timestamp = None
+    gaps_between_folds = 0
+    previous_fold_last = None
     returns = []
     fold_returns = []
     closed_trades = 0
@@ -68,6 +70,12 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tes
             if not isinstance(start, int) or isinstance(start, bool) or not isinstance(end, int) or isinstance(end, bool) or len(rows) != end - start or (prior_end is not None and start < prior_end):
                 raise ValueError("OVERLAPPING_OR_INCONSISTENT_FOLDS")
             prior_end = end
+            first_dt = datetime.fromisoformat(rows[0]["timestamp_utc"].replace("Z", "+00:00"))
+            if previous_fold_last is not None:
+                interval_seconds = fold["interval_minutes"] * 60
+                if (first_dt - previous_fold_last).total_seconds() != interval_seconds:
+                    gaps_between_folds += 1
+            previous_row_dt = None
             initial = Decimal(fold["capital"])
             nav = initial
             for row in rows:
@@ -77,6 +85,9 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tes
                     raise ValueError("NON_UTC_TIMESTAMP")
                 if prior_timestamp is not None and dt <= prior_timestamp:
                     raise ValueError("NONCHRONOLOGICAL_TIMESTAMP")
+                if previous_row_dt is not None and (dt - previous_row_dt).total_seconds() != fold["interval_minutes"] * 60:
+                    raise ValueError("IRREGULAR_CANDLE_INTERVAL")
+                previous_row_dt = dt
                 prior_timestamp = dt
                 if stamp in seen or row["fold_id"] != fold["fold_id"]:
                     raise ValueError("DUPLICATE_TIMESTAMP_OR_FOLD")
@@ -91,11 +102,18 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tes
                 initial = nav
             if abs(nav - Decimal(fold["final_liquidatable_value"])) > Decimal("1e-8"):
                 raise ValueError("FINAL_NAV_MISMATCH")
+            previous_fold_last = prior_timestamp
             fold_returns.append(float(nav / Decimal(fold["capital"]) - 1))
             closed_trades += fold["closed_trades"]
         if closed_trades < 0 or any(not isinstance(fold.get("closed_trades"), int) or isinstance(fold.get("closed_trades"), bool) or fold["closed_trades"] < 0 for fold in folds):
             raise ValueError("INVALID_TRADE_COUNT")
         report["observation_count"] = len(returns)
+        report["fold_gaps_count"] = gaps_between_folds
+        report["bootstrap_crosses_fold_boundaries"] = len(folds) > 1
+        if gaps_between_folds:
+            report["reasons"].append("DISCONTINUOUS_FOLD_HISTORY")
+        if len(folds) > 1:
+            report["reasons"].append("BOOTSTRAP_IGNORES_FOLD_BOUNDARIES")
         screen = evaluate_oos(tuple(returns), trades=closed_trades,
                               fold_net_returns=tuple(fold_returns),
                               additional_cost_per_period=additional_cost_per_period)

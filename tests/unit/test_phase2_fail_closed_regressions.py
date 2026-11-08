@@ -45,6 +45,21 @@ class Phase2FailClosedTests(unittest.TestCase):
                 self.assertIs(result["live_trading_authorised"], False)
                 self.assertIs(result["trading_enabled"], False)
 
+    def test_bridge_missing_provenance_explicitly_denies(self):
+        report = {
+            "trading_enabled": False,
+            "oos_period_net_returns": [0.01] * 60,
+            "oos_fold_net_returns": [0.01] * 5,
+            "oos_trade_count": 60,
+            "additional_cost_per_period": 0.001,
+            "promotion_authorised": True,
+            "live_trading_authorised": True,
+        }
+        result = screen_research_report(report)
+        self.assertEqual(result["status"], "INSUFFICIENT_EVIDENCE")
+        self.assertIs(result["promotion_authorised"], False)
+        self.assertIs(result["live_trading_authorised"], False)
+
     def test_bridge_rejects_trading_enabled_input(self):
         with self.assertRaises(ValueError):
             screen_research_report({"trading_enabled": True})

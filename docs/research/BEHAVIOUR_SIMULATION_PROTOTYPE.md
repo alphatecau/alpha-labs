@@ -41,3 +41,26 @@ python -m unittest discover -s tests/unit -p 'test_behaviour_simulation.py' -v
 - No real MiroFish integration, LLM, Zep or OASIS execution
 - No market data, performance claims, backtests or live trading
 - No frontend integration, deployment, merge or production changes
+
+
+## External provider adapter (development branch)
+`alpha_lab.simulation_adapter.SandboxedSimulationAdapter` is a transport-injected
+integration boundary, not an installed MiroFish client. A reviewed transport
+must supply a bounded response object containing the matching `event_id` and
+`observations: [{persona: string, narrative: string}]`. Provider-generated
+trade recommendations and confidence scores are deliberately discarded.
+Responses remain `UNVERIFIED` and `NO_SIGNAL`.
+
+**Before connecting a real provider:** implement an out-of-process worker with
+network egress allowlisting, authentication, TLS, timeouts, concurrency/token
+quotas, prompt-injection filtering, content provenance, isolated memory, secret
+management and audit logs. Do not pass broker credentials or privileged tools.
+Review MiroFish's actual API protocol and licence first; this generic contract
+is not asserted to be compatible with its current endpoints.
+
+Run:
+```sh
+PYTHONPATH=packages/alpha_lab/src python -m unittest discover -s tests/unit -p 'test_simulation_adapter.py' -v
+```
+CI status for the adapter commit must be verified separately from the earlier
+successful PR workflow.

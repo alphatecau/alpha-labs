@@ -42,7 +42,11 @@ def verify_etf_csv(path,*,expected_symbol,expected_sha256,calendar_sessions):
     payload=path.read_bytes()
     if sha256(payload).hexdigest()!=expected_sha256:
         raise ValueError("ETF data checksum mismatch")
-    try:\n        reader=csv.DictReader(payload.decode("utf-8-sig").splitlines(), strict=True)\n        rows=list(reader)\n    except (UnicodeError, csv.Error) as exc:\n        raise ValueError("Malformed ETF CSV") from exc
+    try:
+        reader=csv.DictReader(payload.decode("utf-8-sig").splitlines(), strict=True)
+        rows=list(reader)
+    except (UnicodeError, csv.Error) as exc:
+        raise ValueError("Malformed ETF CSV") from exc
     if not rows:raise ValueError("Empty ETF dataset")
     required={"date","symbol","adjusted_close","volume","corporate_actions_verified"}
     if not required.issubset(reader.fieldnames or ()) or any(None in row for row in rows):
@@ -55,7 +59,10 @@ def verify_etf_csv(path,*,expected_symbol,expected_sha256,calendar_sessions):
             raise ValueError("Invalid, duplicated or unsorted ETF session")
         if r["symbol"]!=expected_symbol or r["corporate_actions_verified"]!="true":
             raise ValueError("ETF corporate-action provenance unverified")
-        try:\n            px=Decimal(r["adjusted_close"]);vol=Decimal(r["volume"])\n        except (InvalidOperation, TypeError, ValueError) as exc:\n            raise ValueError("Invalid ETF adjusted close or volume") from exc
+        try:
+            px=Decimal(r["adjusted_close"]);vol=Decimal(r["volume"])
+        except (InvalidOperation, TypeError, ValueError) as exc:
+            raise ValueError("Invalid ETF adjusted close or volume") from exc
         if not px.is_finite() or px<=0 or not vol.is_finite() or vol<0:
             raise ValueError("Invalid ETF adjusted close or volume")
         seen.add(d);last=d

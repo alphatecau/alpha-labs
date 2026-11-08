@@ -2,7 +2,6 @@
 from __future__ import annotations
 from dataclasses import asdict
 from decimal import Decimal
-from hashlib import sha256
 import json
 from pathlib import Path
 from alpha_lab.data.csv_import import load_csv
@@ -26,7 +25,7 @@ def evaluate_breakout_csv(source: str | Path, output: str | Path, *,
     if not all(x.is_finite() and 0 <= x <= 1000 for x in (fees, slippage)):
         raise ValueError("Invalid cost assumptions")
     signals = breakout_signals(data.bars)
-    model = CostModel(fee_bps=fees, slippage_bps=slippage)
+    model = CostModel(fee_bps=fees, adverse_slippage_bps=slippage)
     candidate = replay(data.bars, signals, start, end, costs=model)
     passive = replay(data.bars, signals, start, end, costs=model, passive=True)
     result = {

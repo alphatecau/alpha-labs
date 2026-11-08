@@ -39,5 +39,20 @@ class AccountingReconciliationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Dataset checksum mismatch"):
             reconcile_evidence(self.dataset, doc)
 
+
+    def test_detects_tampered_order_ledger(self):
+        doc = copy.deepcopy(self.evidence)
+        if not doc["orders"]:
+            self.skipTest("Fixture generated no orders")
+        doc["orders"][0]["quantity"] = "999"
+        with self.assertRaisesRegex(ValueError, "Order ledger mismatch"):
+            reconcile_evidence(self.dataset, doc)
+
+    def test_detects_tampered_order_count(self):
+        doc = copy.deepcopy(self.evidence)
+        doc["modelled_order_count"] += 1
+        with self.assertRaisesRegex(ValueError, "Order count mismatch"):
+            reconcile_evidence(self.dataset, doc)
+
 if __name__ == "__main__":
     unittest.main()

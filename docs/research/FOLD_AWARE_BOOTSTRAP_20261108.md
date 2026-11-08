@@ -20,3 +20,6 @@ The fold-aware estimator fails closed when a fold is shorter than its block size
 3. Validate on authentic historical datasets with independent price checks.
 4. Test realistic variable spread, impact, latency and exchange-specific fees.
 5. Preserve draft PR and disabled trading until explicit authorisation.
+
+## CI verification checkpoint
+The regression test `test_fold_bootstrap_limitations_disclosed` was updated after the earlier failed run on commit `11c9be6`. Verify the complete current branch, not a rerun of that superseded commit. Passing earlier revisions does not certify the current head.

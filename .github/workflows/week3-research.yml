@@ -1,0 +1,48 @@
+name: Alpha Labs Week 3 preregistered development diagnostics
+on:
+  push:
+    branches: [research/week3-preregistered-strategy-discovery]
+    paths: ['.github/workflows/week3-research.yml']
+permissions:
+  contents: read
+jobs:
+  research-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      PYTHONPATH: packages/alpha_lab/src
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify all offline unit tests
+        run: python -m unittest discover -s tests/unit -p 'test_*.py' -v
+      - name: Fetch and checksum verify development history only
+        run: |
+          python scripts/multi_year_research.py fetch --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-04 --through-month 2025-12
+          python scripts/multi_year_research.py verify --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-04 --through-month 2025-12
+      - name: Execute all predeclared development comparisons
+        run: python scripts/week3_development_diagnostics.py --output week3-output/development.json
+      - name: Enforce fail-closed research and accounting decision
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('week3-output/development.json'))
+          assert d['comparison_count']==21 and d['fold_count']==105
+          assert d['decision']=='INCONCLUSIVE'
+          assert d['trading_enabled'] is False
+          assert d['promotion_authorised'] is False
+          assert d['independent_holdout'] is False
+          assert all(x['cash_ledger_reconciliation']=='PASS' for s in d['scenarios'] for x in s['folds'])
+          assert all(not s['statistically_significant'] for s in d['scenarios'])
+          print('PASS: 21 research comparisons; 105 accounting checks; no promotion')
+          PY
+      - name: Upload research evidence only
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpha-labs-week3-development-diagnostics
+          path: week3-output/development.json
+          retention-days: 14
+          if-no-files-found: error

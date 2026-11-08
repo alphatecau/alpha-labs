@@ -14,10 +14,15 @@ class PaperRuntime:
         self.journal = PaperJournal(path)
         self.ledger = PaperLedger(starting_cash)
         self.recovery_verified = False
+        self._seen_ids = set()
         try:
             self.journal.verify()
             for (payload,) in self.journal.connection.execute("SELECT payload FROM events ORDER BY seq"):
                 event = json.loads(payload)
+                request_id = event.get("request_id")
+                if not isinstance(request_id, str) or not request_id or request_id in self._seen_ids:
+                    raise ValueError("invalid or duplicate request id: HALT")
+                self._seen_ids.add(request_id)
                 if event.get("type") != "FILL" or event.get("simulated") is not True:
                     raise ValueError("unknown journal event: HALT")
                 self.ledger.enable_simulation(operator_approved=True)
@@ -36,9 +41,16 @@ class PaperRuntime:
 
     def execute(self, *, symbol, side, quantity, reference_mid, executed_price, fee,
                 quote_timestamp, now, marks, proposed_loss, aggregate_open_risk,
-                gross_notional, peak_nav, day_start_nav, operator_approved=False):
+                gross_notional, peak_nav, day_start_nav, operator_approved=False,
+                request_id=None, authoritative_risk_verified=False):
         if not self.recovery_verified or self.ledger.halted or operator_approved is not True:
             raise PermissionError("HALT: operator approval and recovered ledger required")
+        if authoritative_risk_verified is not True:
+            self.ledger.halt()
+            raise PermissionError("HALT: independently authoritative risk inputs unavailable")
+        if not isinstance(request_id, str) or not request_id or len(request_id) > 128 or request_id in self._seen_ids:
+            self.ledger.halt()
+            raise PermissionError("HALT: invalid or duplicate request id")
         if not isinstance(now, datetime) or not isinstance(quote_timestamp, datetime):
             self.ledger.halt()
             raise ValueError("missing quote time: HALT")
@@ -62,9 +74,10 @@ class PaperRuntime:
         candidate = copy.deepcopy(self.ledger)
         fill = candidate.fill(symbol=symbol,side=side,quantity=quantity,
             reference_mid=reference_mid,executed_price=executed_price,fee=fee)
-        event = {"type":"FILL",**fill}
+        event = {"type":"FILL","request_id":request_id,**fill}
         self.journal.append(event)
         self.ledger = candidate
+        self._seen_ids.add(request_id)
         return fill
 
     def enable(self, *, operator_approved=False):

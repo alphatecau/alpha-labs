@@ -86,5 +86,20 @@ class EvidenceAssessmentTests(unittest.TestCase):
         result = assess_evidence([invalid], additional_cost_per_period=0.0001)
         self.assertTrue(any("INVALID_SOURCE_CHECKSUM" in x for x in result["reasons"]))
 
+
+    def test_irregular_candle_interval_rejected_even_with_valid_hash(self):
+        from alpha_lab.research.evidence_assessment import _canonical_sha
+        invalid = copy.deepcopy(self.first)
+        invalid["periods"][5]["timestamp_utc"] = invalid["periods"][4]["timestamp_utc"].replace("04:00", "04:30")
+        invalid["evidence_sha256"] = _canonical_sha(invalid)
+        result = assess_evidence([invalid], additional_cost_per_period=0.0001)
+        self.assertTrue(any("IRREGULAR_CANDLE_INTERVAL" in x or "NONCHRONOLOGICAL_TIMESTAMP" in x for x in result["reasons"]))
+
+    def test_fold_bootstrap_limitations_disclosed(self):
+        result = assess_evidence([self.first, self.second], additional_cost_per_period=0.0001)
+        self.assertTrue(result["bootstrap_crosses_fold_boundaries"])
+        self.assertIn("BOOTSTRAP_IGNORES_FOLD_BOUNDARIES", result["reasons"])
+        self.assertEqual(result["fold_gaps_count"], 0)
+
 if __name__ == "__main__":
     unittest.main()

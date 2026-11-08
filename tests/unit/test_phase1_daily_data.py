@@ -21,6 +21,17 @@ class DailyDataTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             aggregate_crypto_utc_daily(bars)
 
+    def test_reject_whole_missing_utc_day(self):
+        t=datetime(2025,1,1,tzinfo=timezone.utc)
+        def candle(start):
+            return [Bar(start+timedelta(hours=i),Decimal("100"),Decimal("102"),
+                        Decimal("99"),Decimal("101"),Decimal("1")) for i in range(24)]
+        contiguous=candle(t)+candle(t+timedelta(days=1))
+        self.assertEqual(len(aggregate_crypto_utc_daily(contiguous)),2)
+        missing_day=candle(t)+candle(t+timedelta(days=2))
+        with self.assertRaisesRegex(ValueError,"Gap between"):
+            aggregate_crypto_utc_daily(missing_day)
+
     def test_etf_checksum_calendar_and_corporate_actions(self):
         content="date,symbol,adjusted_close,volume,corporate_actions_verified\n2025-01-02,SPY,100,1000,true\n"
         with TemporaryDirectory() as tmp:

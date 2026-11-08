@@ -80,6 +80,7 @@ def replay_breakout_risk(bars: tuple[Bar, ...], signals: list[bool],
             day = bar.time.date()
             day_start_nav = cash + costs.sell_proceeds(qty, bar.open)
             daily_block = False
+        exited_this_bar = False
         if qty > 0 and not signals[i-1]:
             px = costs.sell_price(bar.open)
             proceeds = qty*px*(1-costs.fee_bps/10000)
@@ -88,7 +89,7 @@ def replay_breakout_risk(bars: tuple[Bar, ...], signals: list[bool],
             orders.append({"kind":"SELL","reason":"signal","time":bar.time.isoformat(),"price":str(px),
                            "quantity":str(qty),"quote_received":str(proceeds),"fee":str(fee),
                            "modelled_trade_pnl":str(proceeds-entry_outlay)})
-            qty=Decimal(0);stop=None;closed+=1
+            qty=Decimal(0);stop=None;closed+=1;exited_this_bar=True
         # Gap at open crosses the protective stop: cannot fill at the stale stop price.
         if qty > 0 and stop is not None and bar.open <= stop:
             px=costs.sell_price(bar.open)
@@ -104,7 +105,7 @@ def replay_breakout_risk(bars: tuple[Bar, ...], signals: list[bool],
         if open_nav > peak: peak=open_nav
         if open_nav <= day_start_nav*(1-DAILY_HALT): daily_block=True
         if open_nav <= peak*(1-DRAWDOWN_HALT): permanent_halt=True
-        if (qty == 0 and signals[i-1] and last_atr is not None
+        if (qty == 0 and not exited_this_bar and signals[i-1] and last_atr is not None
             and not daily_block and not permanent_halt):
             distance=STOP_ATR*last_atr
             if distance > 0 and distance < bar.open:

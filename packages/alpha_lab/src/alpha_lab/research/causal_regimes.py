@@ -13,14 +13,17 @@ def causal_regime_labels(closes: list[float], *, slow_hours: int = 168,
     if any(not isfinite(x) or x <= 0 for x in closes):
         raise ValueError("Invalid prices")
     labels = ["INSUFFICIENT_HISTORY"] * len(closes)
+    squared = [0.0] + [log(closes[j]/closes[j-1])**2 for j in range(1,len(closes))]
+    prefix = [0.0]
+    for value in squared:
+        prefix.append(prefix[-1]+value)
     for i in range(slow_hours+1,len(closes)):
-        prior = closes[:i]
-        long_ret = log(prior[-1]/prior[-1-slow_hours])
-        returns = [log(prior[j]/prior[j-1]) for j in range(i-slow_hours,i)]
-        fast = returns[-fast_hours:]
-        slow = returns[:-fast_hours]
-        fast_vol = sqrt(sum(x*x for x in fast)/len(fast))
-        slow_vol = sqrt(sum(x*x for x in slow)/len(slow))
+        long_ret = log(closes[i-1]/closes[i-1-slow_hours])
+        # Hour i uses returns through hour i-1 only.
+        fast_sum = prefix[i]-prefix[i-fast_hours]
+        slow_sum = prefix[i-fast_hours]-prefix[i-slow_hours]
+        fast_vol = sqrt(max(0.0,fast_sum/fast_hours))
+        slow_vol = sqrt(max(0.0,slow_sum/(slow_hours-fast_hours)))
         if slow_vol > 0 and fast_vol > 1.5*slow_vol:
             labels[i] = "VOLATILITY_EXPANSION"
         elif long_ret > .05:

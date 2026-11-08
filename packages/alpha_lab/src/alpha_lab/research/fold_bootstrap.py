@@ -57,3 +57,32 @@ def fold_aware_bootstrap(folds: tuple[tuple[float, ...], ...], *,
     return FoldBootstrapResult(samples[index],
                                sum(sum(fold) for fold in folds) / total,
                                total, len(folds), draws, block_size, confidence)
+
+def block_size_sensitivity(folds: tuple[tuple[float, ...], ...], *,
+                           block_sizes: tuple[int, ...] = (4, 8, 16),
+                           draws: int = 1000, confidence: float = 0.95,
+                           seed: int = 42) -> dict:
+    """Report diagnostic bounds without selecting the best-looking block size.
+
+    All requested sizes must be feasible; otherwise the entire calculation
+    fails closed. This is not a multiplicity correction or promotion test.
+    """
+    if (not isinstance(block_sizes, tuple) or not block_sizes
+        or len(set(block_sizes)) != len(block_sizes)
+        or any(not isinstance(x, int) or isinstance(x, bool) or x < 1
+               for x in block_sizes)):
+        raise ValueError("Invalid block size sensitivity configuration")
+    results = tuple(fold_aware_bootstrap(folds, block_size=size, draws=draws,
+                                         confidence=confidence, seed=seed)
+                    for size in block_sizes)
+    return {
+        "status": "DIAGNOSTIC_ONLY",
+        "bounds_by_block_size": {
+            str(item.block_size): item.lower_confidence_bound for item in results
+        },
+        "all_lower_bounds_positive": all(item.lower_confidence_bound > 0 for item in results),
+        "minimum_lower_bound": min(item.lower_confidence_bound for item in results),
+        "maximum_lower_bound": max(item.lower_confidence_bound for item in results),
+        "boundary_crossings": 0,
+        "promotion_authorised": False,
+    }

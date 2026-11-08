@@ -7,6 +7,7 @@ import json
 from math import isfinite
 import re
 from alpha_lab.strategy_evidence import evaluate_oos
+from alpha_lab.research.fold_bootstrap import fold_aware_bootstrap
 
 def _canonical_sha(document: dict) -> str:
     unsigned = {k: v for k, v in document.items() if k != "evidence_sha256"}
@@ -33,6 +34,7 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tes
     previous_fold_last = None
     returns = []
     fold_returns = []
+    per_fold_period_returns = []
     closed_trades = 0
     try:
         if not isinstance(additional_cost_per_period, (int, float)) or isinstance(additional_cost_per_period, bool) or not isfinite(additional_cost_per_period) or additional_cost_per_period < 0:
@@ -76,6 +78,7 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tes
                 if (first_dt - previous_fold_last).total_seconds() != interval_seconds:
                     gaps_between_folds += 1
             previous_row_dt = None
+            current_fold_returns = []
             initial = Decimal(fold["capital"])
             nav = initial
             for row in rows:
@@ -99,9 +102,11 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tes
                 if not nav.is_finite() or nav <= 0 or not initial.is_finite() or initial <= 0 or abs(float(nav / initial - 1) - r) > 1e-9:
                     raise ValueError("INVALID_NAV")
                 returns.append(r)
+                current_fold_returns.append(r)
                 initial = nav
             if abs(nav - Decimal(fold["final_liquidatable_value"])) > Decimal("1e-8"):
                 raise ValueError("FINAL_NAV_MISMATCH")
+            per_fold_period_returns.append(tuple(current_fold_returns))
             previous_fold_last = prior_timestamp
             fold_returns.append(float(nav / Decimal(fold["capital"]) - 1))
             closed_trades += fold["closed_trades"]
@@ -109,19 +114,31 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tes
             raise ValueError("INVALID_TRADE_COUNT")
         report["observation_count"] = len(returns)
         report["fold_gaps_count"] = gaps_between_folds
-        report["bootstrap_crosses_fold_boundaries"] = len(folds) > 1
+        report["bootstrap_crosses_fold_boundaries"] = False
         if gaps_between_folds:
             report["reasons"].append("DISCONTINUOUS_FOLD_HISTORY")
-        if len(folds) > 1:
-            report["reasons"].append("BOOTSTRAP_IGNORES_FOLD_BOUNDARIES")
+
         screen = evaluate_oos(tuple(returns), trades=closed_trades,
                               fold_net_returns=tuple(fold_returns),
                               additional_cost_per_period=additional_cost_per_period)
         report["screen_status"] = screen.status
+        report["legacy_pooled_bootstrap_lower_bound_diagnostic_only"] = screen.lower_confidence_bound
+        report["fold_aware_bootstrap_status"] = "UNVERIFIED"
+        try:
+            diagnostic = fold_aware_bootstrap(tuple(per_fold_period_returns))
+            report["fold_aware_bootstrap_lower_bound"] = diagnostic.lower_confidence_bound
+            report["fold_aware_bootstrap_status"] = "DIAGNOSTIC_ONLY"
+            report["fold_aware_bootstrap_block_size"] = diagnostic.block_size
+            report["fold_aware_bootstrap_draws"] = diagnostic.draws
+            report["fold_aware_bootstrap_boundary_crossings"] = diagnostic.boundary_crossings
+            if diagnostic.lower_confidence_bound <= 0:
+                report["reasons"].append("NONPOSITIVE_FOLD_AWARE_LOWER_BOUND")
+        except ValueError as bootstrap_error:
+            report["reasons"].append("FOLD_AWARE_BOOTSTRAP_UNAVAILABLE:" + str(bootstrap_error))
         if tested_strategies > 1:
             report["reasons"].append("MULTIPLE_COMPARISON_CORRECTION_NOT_APPLIED")
         report["screen_reasons"] = list(screen.reasons)
-        report["lower_confidence_bound"] = screen.lower_confidence_bound
+        report["lower_confidence_bound"] = report.get("fold_aware_bootstrap_lower_bound")
         report["max_drawdown"] = screen.max_drawdown
         report["reasons"].append("HOLDOUT_NOT_INDEPENDENTLY_SEALED")
         report["reasons"].append("MODELLED_FILLS_NOT_EXECUTABLE_QUOTES")

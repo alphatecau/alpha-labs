@@ -40,4 +40,33 @@ class DailyDataTests(unittest.TestCase):
                 verify_etf_csv(p,expected_symbol="SPY",
                     expected_sha256=sha256(p.read_bytes()).hexdigest(),
                     calendar_sessions={date(2025,1,2)})
+
+    def test_reject_nonfinite_crypto_and_negative_volume(self):
+        t=datetime(2025,1,1,tzinfo=timezone.utc)
+        bars=[Bar(t+timedelta(hours=i),Decimal("100"),Decimal("102"),
+                  Decimal("99"),Decimal("101"),Decimal("1")) for i in range(24)]
+        for invalid in (
+            Bar(bars[5].time,Decimal("NaN"),Decimal("102"),Decimal("99"),Decimal("101"),Decimal("1")),
+            Bar(bars[5].time,Decimal("100"),Decimal("102"),Decimal("99"),Decimal("101"),Decimal("-1")),
+            Bar(bars[5].time,Decimal("100"),Decimal("Infinity"),Decimal("99"),Decimal("101"),Decimal("1")),
+        ):
+            with self.subTest(invalid=str(invalid)), self.assertRaises(ValueError):
+                aggregate_crypto_utc_daily(bars[:5]+[invalid]+bars[6:])
+
+    def test_reject_malformed_etf_rows(self):
+        prefix="date,symbol,adjusted_close,volume,corporate_actions_verified\\n"
+        for row in (
+            "2025-01-02,SPY,NaN,1000,true\\n",
+            "2025-01-02,SPY,100,-1,true\\n",
+            "2025-01-02,SPY,100,1000,true,EXTRA\\n",
+            "2025-01-02,SPY,not-a-number,1000,true\\n",
+        ):
+            with self.subTest(row=row), TemporaryDirectory() as tmp:
+                p=Path(tmp)/"SPY.csv"
+                p.write_text(prefix+row)
+                with self.assertRaises(ValueError):
+                    verify_etf_csv(p,expected_symbol="SPY",
+                        expected_sha256=sha256(p.read_bytes()).hexdigest(),
+                        calendar_sessions={date(2025,1,2)})
+
 if __name__=="__main__":unittest.main()

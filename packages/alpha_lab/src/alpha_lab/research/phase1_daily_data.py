@@ -1,7 +1,7 @@
 """Strict daily-bar data gates. No external download or fabricated ETF prices."""
 from __future__ import annotations
 from datetime import datetime,timedelta,timezone
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from pathlib import Path
 import csv
@@ -21,7 +21,7 @@ def aggregate_crypto_utc_daily(bars):
         for j,b in enumerate(day):
             if b.time!=midnight+timedelta(hours=j):
                 raise ValueError("Gap, duplicate or misordered crypto hour")
-            if b.low<=0 or b.high<max(b.open,b.close) or b.low>min(b.open,b.close):
+            if any(not Decimal(str(v)).is_finite() for v in (b.open,b.high,b.low,b.close,b.volume)) or b.volume<0 or b.low<=0 or b.high<max(b.open,b.close) or b.low>min(b.open,b.close):
                 raise ValueError("Invalid OHLC")
         days.append({"date":midnight.date().isoformat(),"open":str(day[0].open),
                      "high":str(max(b.high for b in day)),
@@ -36,16 +36,16 @@ def verify_etf_csv(path,*,expected_symbol,expected_sha256,calendar_sessions):
     The session calendar must be externally verified and supplied by caller.
     This function does NOT certify calendar provenance or adjustment quality.
     """
-    if expected_symbol not in ETF or len(expected_sha256)!=64 or not calendar_sessions:
+    if expected_symbol not in ETF or not isinstance(expected_sha256,str) or len(expected_sha256)!=64 or not calendar_sessions:
         raise ValueError("Missing ETF provenance or calendar")
     path=Path(path)
     payload=path.read_bytes()
     if sha256(payload).hexdigest()!=expected_sha256:
         raise ValueError("ETF data checksum mismatch")
-    rows=list(csv.DictReader(payload.decode("utf-8-sig").splitlines()))
+    try:\n        reader=csv.DictReader(payload.decode("utf-8-sig").splitlines(), strict=True)\n        rows=list(reader)\n    except (UnicodeError, csv.Error) as exc:\n        raise ValueError("Malformed ETF CSV") from exc
     if not rows:raise ValueError("Empty ETF dataset")
     required={"date","symbol","adjusted_close","volume","corporate_actions_verified"}
-    if not required.issubset(rows[0]):
+    if not required.issubset(reader.fieldnames or ()) or any(None in row for row in rows):
         raise ValueError("Missing required adjusted ETF fields")
     seen=set()
     last=None
@@ -55,7 +55,7 @@ def verify_etf_csv(path,*,expected_symbol,expected_sha256,calendar_sessions):
             raise ValueError("Invalid, duplicated or unsorted ETF session")
         if r["symbol"]!=expected_symbol or r["corporate_actions_verified"]!="true":
             raise ValueError("ETF corporate-action provenance unverified")
-        px=Decimal(r["adjusted_close"]);vol=Decimal(r["volume"])
+        try:\n            px=Decimal(r["adjusted_close"]);vol=Decimal(r["volume"])\n        except (InvalidOperation, TypeError, ValueError) as exc:\n            raise ValueError("Invalid ETF adjusted close or volume") from exc
         if not px.is_finite() or px<=0 or not vol.is_finite() or vol<0:
             raise ValueError("Invalid ETF adjusted close or volume")
         seen.add(d);last=d

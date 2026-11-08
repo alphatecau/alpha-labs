@@ -72,5 +72,20 @@ class LiquidationBpsRegressionTests(unittest.TestCase):
             reconstruct(self.orders, {"BTC": "Infinity"}, starting_cash="1000")
 
 
+    def test_simulator_effective_exit_haircut_contract(self):
+        # Simulator marks an open position with both exit slippage and exit fee.
+        # The ledger accepts the equivalent effective haircut expressed in bps.
+        for one_way_bps in ("10", "20", "40"):
+            with self.subTest(one_way_bps=one_way_bps):
+                rate = Decimal(one_way_bps) / Decimal("10000")
+                effective_bps = Decimal("10000") * (1 - (1 - rate) ** 2)
+                audit = reconstruct(
+                    self.orders, {"BTC": "110"}, starting_cash="1000",
+                    liquidation_bps=effective_bps,
+                )
+                oracle = Decimal("799") + Decimal("220") * (1 - rate) ** 2
+                self.assertEqual(Decimal(audit["final_liquidation_nav"]), oracle)
+
+
 if __name__ == "__main__":
     unittest.main()

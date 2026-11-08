@@ -1,0 +1,41 @@
+name: Phase 2 full crypto-enabled research verification
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/phase2-crypto-no-skips.yml'
+      - 'packages/alpha_lab/src/alpha_lab/research/**'
+      - 'tests/unit/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-crypto-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install required archive signature verifier
+        run: python -m pip install 'cryptography>=44,<47'
+      - name: Run all research tests and fail on any skip
+        env:
+          PYTHONPATH: packages/alpha_lab/src:.
+        run: |
+          python - <<'PY'
+          import sys
+          import unittest
+
+          suite = unittest.defaultTestLoader.discover(
+              'tests/unit', pattern='test_*.py')
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          print(f'Executed {result.testsRun} tests; skipped {len(result.skipped)}')
+          if result.testsRun < 234 or result.skipped or not result.wasSuccessful():
+              print('FAIL CLOSED: incomplete crypto-enabled research verification', file=sys.stderr)
+              sys.exit(1)
+          print('PASS: full suite executed without skips')
+          PY

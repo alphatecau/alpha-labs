@@ -1,4 +1,7 @@
 name: Alpha Labs Week 2 FINAL one-shot evaluation (research only)
+# Integrity amendment: re-generated manifests contain volatile retrieval timestamps.
+# Frozen CSV digests and source archive checksum verification remain mandatory.
+# Initial attempt failed before evaluation; this is the first eligible replay.
 on:
   push:
     branches: [research/strategy-evidence-gates-v1]

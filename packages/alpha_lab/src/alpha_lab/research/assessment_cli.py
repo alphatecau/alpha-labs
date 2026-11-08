@@ -2,6 +2,8 @@
 from __future__ import annotations
 import argparse
 import json
+from hashlib import sha256
+from datetime import datetime, timezone
 from pathlib import Path
 from alpha_lab.research.evidence_assessment import assess_evidence
 
@@ -15,10 +17,29 @@ def run_assessment(files: list[str | Path], output: str | Path, *,
         raise ValueError("Output cannot overwrite evidence input")
     if target.exists():
         raise FileExistsError("Refusing to overwrite assessment")
-    folds = [json.loads(p.read_text(encoding="utf-8")) for p in sources]
+    raw = [p.read_bytes() for p in sources]
+    folds = [json.loads(payload) for payload in raw]
     report = assess_evidence(folds, additional_cost_per_period=additional_cost_per_period)
     report["evidence_file_count"] = len(sources)
     report["research_only"] = True
+    report["schema"] = "alpha-labs.offline-assessment.v1"
+    report["input_files"] = [
+        {"filename": source.name, "sha256": sha256(payload).hexdigest(),
+         "bytes": len(payload)}
+        for source, payload in zip(sources, raw)
+    ]
+    report["cost_stress_per_period_assumed"] = additional_cost_per_period
+    report["dataset_sha256_declared"] = sorted({
+        fold.get("dataset_sha256") for fold in folds
+        if isinstance(fold, dict) and isinstance(fold.get("dataset_sha256"), str)
+    })
+    report["code_revisions_declared"] = sorted({
+        fold.get("code_revision_declared") for fold in folds
+        if isinstance(fold, dict) and isinstance(fold.get("code_revision_declared"), str)
+    })
+    report["source_price_independently_authenticated"] = False
+    report["strategy_profitable_verified"] = False
+    report["promotion_authorised"] = False
     payload = json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n"
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("x", encoding="utf-8") as stream:

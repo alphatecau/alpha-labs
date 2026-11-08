@@ -57,7 +57,7 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float) -> 
                 if not isfinite(r) or r <= -1:
                     raise ValueError("INVALID_PERIOD_RETURN")
                 nav = Decimal(row["net_modelled_nav"])
-                if nav <= 0 or abs(float(nav / initial - 1) - (float(nav / initial - 1))) > 1e-12:
+                if nav <= 0 or abs(float(nav / initial - 1) - r) > 1e-9:
                     raise ValueError("INVALID_NAV")
                 returns.append(r)
                 initial = nav

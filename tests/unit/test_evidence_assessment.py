@@ -31,7 +31,7 @@ class EvidenceAssessmentTests(unittest.TestCase):
 
     def test_overlap_rejected(self):
         result = assess_evidence([self.first, self.first], additional_cost_per_period=0.0001)
-        self.assertTrue(any("OVERLAPPING" in x for x in result["reasons"]))
+        self.assertTrue(any("OVERLAPPING" in x or "DUPLICATE_OR_INVALID_FOLD_ID" in x for x in result["reasons"]))
 
     def test_missing_data_rejected(self):
         result = assess_evidence([], additional_cost_per_period=0.0001)

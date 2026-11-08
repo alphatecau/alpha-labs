@@ -1,0 +1,80 @@
+name: Alpha Labs historical breakout diagnostics (research only)
+on:
+  push:
+    branches:
+      - research/strategy-evidence-gates-v1
+    paths:
+      - '.github/workflows/historical-breakout-research.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: alpha-labs-historical-breakout-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  historical-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      PYTHONPATH: packages/alpha_lab/src
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify all offline research unit tests first
+        run: python -m unittest discover -s tests/unit -p 'test_*.py' -v
+      - name: Download official checksum-verified spot archive history
+        run: |
+          python scripts/multi_year_research.py fetch --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-04 --through-month 2025-12
+      - name: Independently re-verify raw archives and curated CSVs
+        run: |
+          python scripts/multi_year_research.py verify --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-04 --through-month 2025-12
+      - name: Run three-market cost-stress diagnostic with reconciled risk replay
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from alpha_lab.data.adapters.binance_archive import verify_dataset
+          p=Path('datasets/curated/binance-vision/BTCUSDT-1h-2023-04_to_2025-12.csv')
+          m=p.with_suffix('.manifest.json')
+          print('Verified BTC candles:',verify_dataset(p,m)['candle_count'])
+          PY
+          python scripts/breakout_archive_research.py \
+            --data-root datasets \
+            --output-root research-output \
+            --from-month 2023-04 --through-month 2025-12 \
+            --start-index 840 --end-index 24000 \
+            --symbols BTCUSDT ETHUSDT SOLUSDT
+      - name: Summarise non-promotional diagnostics
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rows=[]
+          for file in sorted(Path('research-output').glob('*.json')):
+              d=json.loads(file.read_text())
+              rows.append({'report':file.name,'sha256':d['dataset_sha256'],
+                           'risk_model_return_pct':d['risk_constrained_candidate']['return_pct'],
+                           'passive_return_pct':d['passive_comparator']['return_pct'],
+                           'reconciliation':d['risk_constrained_reconciliation']['status'],
+                           'profitability_verified':False,'trading_enabled':False})
+          Path('research-output/summary.json').write_text(json.dumps({
+              'status':'UNSEALED_HISTORICAL_RESEARCH_ONLY',
+              'source_period':'2023-04..2025-12',
+              'evaluation_hours':'[840,24000)',
+              'real_executable_quotes':False,
+              'independent_holdout':False,
+              'portfolio_risk_authorised':False,
+              'reports':rows},indent=2)+'\n')
+          print('Produced',len(rows),'modelled diagnostics; no profitable-edge claim')
+          PY
+      - name: Upload diagnostic reports (no raw market archives)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpha-labs-unsealed-breakout-diagnostics
+          path: research-output/
+          if-no-files-found: error
+          retention-days: 7

@@ -36,13 +36,18 @@ class Phase2FailClosedTests(unittest.TestCase):
             {"trading_enabled": False},
             {"trading_enabled": False, "promotion_authorised": True,
              "live_trading_authorised": True},
-            {"trading_enabled": True, "promotion_authorised": True},
+            {"trading_enabled": False, "point_in_time_provenance_verified": True,
+             "promotion_authorised": True},
         ):
             with self.subTest(payload=payload):
                 result = screen_research_report(payload)
                 self.assertIs(result["promotion_authorised"], False)
                 self.assertIs(result["live_trading_authorised"], False)
                 self.assertIs(result["trading_enabled"], False)
+
+    def test_bridge_rejects_trading_enabled_input(self):
+        with self.assertRaises(ValueError):
+            screen_research_report({"trading_enabled": True})
 
     def test_archive_gate_rejects_missing_inputs(self):
         for availability, provenance in (

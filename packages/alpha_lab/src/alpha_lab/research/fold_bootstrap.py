@@ -8,7 +8,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from math import isfinite
 from random import Random
-from statistics import mean
 
 @dataclass(frozen=True)
 class FoldBootstrapResult:

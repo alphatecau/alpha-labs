@@ -7,6 +7,7 @@ on:
       - 'tests/unit/test_authorisation_surface_inventory.py'
       - 'tests/unit/test_phase2_archive_boundary_adversarial.py'
       - 'tests/unit/test_assessment_forged_evidence_boundary.py'
+      - 'tests/unit/test_phase2_accounting_adversarial.py'
       - '.github/workflows/phase2-three-gates.yml'
   workflow_dispatch:
 
@@ -29,6 +30,7 @@ jobs:
           python -m unittest discover -s tests/unit -p 'test_authorisation_surface_inventory.py' -v
           python -m unittest discover -s tests/unit -p 'test_phase2_archive_boundary_adversarial.py' -v
           python -m unittest discover -s tests/unit -p 'test_assessment_forged_evidence_boundary.py' -v
+          python -m unittest discover -s tests/unit -p 'test_phase2_accounting_adversarial.py' -v
           python - <<'PY'
           import unittest
           loader = unittest.TestLoader()
@@ -37,11 +39,12 @@ jobs:
               'test_authorisation_surface_inventory.py',
               'test_phase2_archive_boundary_adversarial.py',
               'test_assessment_forged_evidence_boundary.py',
+              'test_phase2_accounting_adversarial.py',
           ):
               suite.addTests(loader.discover('tests/unit', pattern=pattern))
           result = unittest.TestResult()
           suite.run(result)
-          assert result.testsRun >= 8, f'Only {result.testsRun} tests executed'
+          assert result.testsRun >= 14, f'Only {result.testsRun} tests executed'
           assert not result.skipped and result.wasSuccessful(), 'Research gate tests failed'
           print(f'Confirmed {result.testsRun} tests executed without skips')
           PY

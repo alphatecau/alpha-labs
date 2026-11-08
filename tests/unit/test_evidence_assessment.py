@@ -64,5 +64,27 @@ class EvidenceAssessmentTests(unittest.TestCase):
         result = assess_evidence([self.first, duplicate], additional_cost_per_period=0.0001)
         self.assertTrue(any("DUPLICATE_OR_INVALID_FOLD_ID" in x for x in result["reasons"]))
 
+
+    def test_multiple_comparisons_disclosed(self):
+        result = assess_evidence([self.first, self.second],
+                                 additional_cost_per_period=0.0001,
+                                 tested_strategies=6)
+        self.assertEqual(result["tested_strategies_declared"], 6)
+        self.assertFalse(result["multiple_comparison_adjustment_applied"])
+        self.assertIn("MULTIPLE_COMPARISON_CORRECTION_NOT_APPLIED", result["reasons"])
+
+    def test_invalid_strategy_count_rejected(self):
+        result = assess_evidence([self.first], additional_cost_per_period=0.0001,
+                                 tested_strategies=0)
+        self.assertIn("INVALID_MULTIPLE_TEST_COUNT", result["reasons"])
+
+    def test_bad_source_digest_rejected(self):
+        from alpha_lab.research.evidence_assessment import _canonical_sha
+        invalid = copy.deepcopy(self.first)
+        invalid["dataset_sha256"] = "not-a-digest"
+        invalid["evidence_sha256"] = _canonical_sha(invalid)
+        result = assess_evidence([invalid], additional_cost_per_period=0.0001)
+        self.assertTrue(any("INVALID_SOURCE_CHECKSUM" in x for x in result["reasons"]))
+
 if __name__ == "__main__":
     unittest.main()

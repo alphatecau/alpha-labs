@@ -5,14 +5,12 @@ No HTTP server, broker, external orders, background scheduler or credential acce
 from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 import json
-import threading
 from alpha_lab.research.paper_simulator import PaperLedger, number
 from alpha_lab.research.paper_journal import PaperJournal
 from alpha_lab.research.paper_risk import authorise_simulated_order
 
 class PaperRuntime:
     def __init__(self, path, *, starting_cash="10000"):
-        self._lock = threading.RLock()
         self.journal = PaperJournal(path)
         self.ledger = PaperLedger(starting_cash)
         self.recovery_verified = False

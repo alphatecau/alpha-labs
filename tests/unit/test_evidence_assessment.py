@@ -97,8 +97,9 @@ class EvidenceAssessmentTests(unittest.TestCase):
 
     def test_fold_bootstrap_limitations_disclosed(self):
         result = assess_evidence([self.first, self.second], additional_cost_per_period=0.0001)
-        self.assertTrue(result["bootstrap_crosses_fold_boundaries"])
-        self.assertIn("BOOTSTRAP_IGNORES_FOLD_BOUNDARIES", result["reasons"])
+        self.assertFalse(result["bootstrap_crosses_fold_boundaries"])
+        self.assertEqual(result["fold_aware_bootstrap_boundary_crossings"], 0)
+        self.assertEqual(result["fold_aware_bootstrap_status"], "DIAGNOSTIC_ONLY")
         self.assertEqual(result["fold_gaps_count"], 0)
 
 if __name__ == "__main__":

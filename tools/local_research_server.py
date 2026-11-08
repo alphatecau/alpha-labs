@@ -99,6 +99,8 @@ def load_snapshot(root: Path = ROOT, *, market: str = "solusd", now: datetime | 
         "periods": results,
         "note": "Historical snapshot, not streaming prices, validated alpha, paper P&L or live trades.",
         "trading_enabled": False,
+        "promotion_authorised": False,
+        "live_trading_authorised": False,
     }
 
 

@@ -1,0 +1,34 @@
+name: Alpha Labs Phase 1 integrated research safety
+on:
+  push:
+    branches: [research/phase1-integrated-audit-20261108]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integrated-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: packages/alpha_lab/src
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run all unit tests and adversarial research tests
+        run: python -m unittest discover -s tests/unit -p 'test_*.py' -v
+      - name: Compile integration and daily-data gates
+        run: |
+          python -m py_compile packages/alpha_lab/src/alpha_lab/research/week3_portfolio.py packages/alpha_lab/src/alpha_lab/research/phase1_accounting.py packages/alpha_lab/src/alpha_lab/research/phase1_daily_data.py
+      - name: Assert research-only and no broker connection
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for p in ['phase1_accounting.py','phase1_daily_data.py','week3_portfolio.py']:
+              s=(Path('packages/alpha_lab/src/alpha_lab/research')/p).read_text()
+              assert 'place_order(' not in s and 'create_order(' not in s
+              assert 'requests.' not in s and 'httpx.' not in s
+          print('PASS: offline only; no broker order integration')
+          PY

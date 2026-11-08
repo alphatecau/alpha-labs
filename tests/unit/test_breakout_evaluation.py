@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from decimal import Decimal
 from alpha_lab.research.breakout_evaluation import evaluate_breakout_csv
 
 class BreakoutEvaluationTests(unittest.TestCase):
@@ -33,8 +34,8 @@ class BreakoutEvaluationTests(unittest.TestCase):
                                              provenance="synthetic-test-fixture",
                                              start=840, end=1200,
                                              fee_bps="40", slippage_bps="40")
-            self.assertLessEqual(stressed["candidate"]["final_liquidatable_value"],
-                                 report["candidate"]["final_liquidatable_value"])
+            self.assertLessEqual(Decimal(stressed["candidate"]["final_liquidatable_value"]),
+                                 Decimal(report["candidate"]["final_liquidatable_value"]))
 
     def test_rejects_unlabelled_source(self):
         with self.assertRaisesRegex(ValueError, "provenance"):

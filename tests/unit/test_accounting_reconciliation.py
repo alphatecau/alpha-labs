@@ -54,5 +54,35 @@ class AccountingReconciliationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Order count mismatch"):
             reconcile_evidence(self.dataset, doc)
 
+
+    def test_zero_trade_flat_market(self):
+        start = datetime(2025, 1, 1, tzinfo=timezone.utc)
+        bars = tuple(Bar(start + timedelta(hours=i), Decimal("100"),
+                         Decimal("101"), Decimal("99"), Decimal("100"),
+                         Decimal("10")) for i in range(200))
+        dataset = Dataset(bars, "USDT", "f"*64, "synthetic-flat", 60)
+        evidence = export_replay_evidence(dataset, start=80, end=180, fold_id="flat")
+        result = reconcile_evidence(dataset, evidence)
+        self.assertEqual(result["modelled_order_count"], 0)
+        self.assertEqual(result["closed_trades"], 0)
+        self.assertEqual(result["max_drawdown_pct"], 0.0)
+
+    def test_cost_sensitivity_and_open_position(self):
+        from alpha_lab.backtest.costs import CostModel
+        start = datetime(2025, 1, 1, tzinfo=timezone.utc)
+        bars = tuple(Bar(start + timedelta(hours=i), Decimal(100+i),
+                         Decimal(101+i), Decimal(99+i), Decimal(100+i),
+                         Decimal(10)) for i in range(200))
+        dataset = Dataset(bars, "USDT", "e"*64, "synthetic-trend", 60)
+        for fee, slippage in ((0, 0), (10, 10), (35, 75)):
+            with self.subTest(fee=fee, slippage=slippage):
+                costs = CostModel(Decimal(fee), Decimal(slippage))
+                evidence = export_replay_evidence(dataset, start=80, end=180,
+                                                  fold_id="trend", costs=costs)
+                result = reconcile_evidence(dataset, evidence)
+                self.assertEqual(result["modelled_order_count"], len(evidence["orders"]))
+                self.assertGreaterEqual(result["max_drawdown_pct"], 0)
+                self.assertEqual(result["closed_trades"], evidence["closed_trades"])
+
 if __name__ == "__main__":
     unittest.main()

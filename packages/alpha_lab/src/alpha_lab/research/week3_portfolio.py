@@ -126,7 +126,7 @@ def simulate(bars: dict, targets: list, start: int, end: int, cost_bps: int) -> 
     # and liquidation fee are embedded in the original simulator NAV.
     audit=reconcile_simulation(result,
         {s:bars[s][end-1].close for s in symbols},
-        liquidation_bps=1-(1-bps)**2)
+        liquidation_bps=Decimal(10000)*(1-(1-bps)**2))
     result["independent_position_nav_reconciliation"]="PASS"
     result["independent_audit_order_count"]=audit["order_count"]
     return result

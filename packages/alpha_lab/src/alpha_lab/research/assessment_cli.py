@@ -6,6 +6,7 @@ from hashlib import sha256
 from datetime import datetime, timezone
 from pathlib import Path
 from alpha_lab.research.evidence_assessment import assess_evidence
+from alpha_lab.research.promotion_authority import decide_strategy_promotion
 
 def run_assessment(files: list[str | Path], output: str | Path, *,
                    additional_cost_per_period: float, tested_strategies: int = 1) -> dict:
@@ -39,7 +40,13 @@ def run_assessment(files: list[str | Path], output: str | Path, *,
     })
     report["source_price_independently_authenticated"] = False
     report["strategy_profitable_verified"] = False
-    report["promotion_authorised"] = False
+    report["archive_provenance_independently_authenticated"] = False
+    report["historical_capture_independently_attested"] = False
+    report["provenance_gate_status"] = "NOT_INTEGRATED_OR_NOT_INDEPENDENTLY_VERIFIED"
+    decision = decide_strategy_promotion(assessment=report)
+    report["promotion_decision"] = decision
+    report["promotion_authorised"] = decision["promotion_authorised"]
+    report["live_trading_authorised"] = decision["live_trading_authorised"]
     payload = json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n"
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("x", encoding="utf-8") as stream:

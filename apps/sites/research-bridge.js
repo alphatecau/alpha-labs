@@ -43,7 +43,8 @@
     .then(async response => {
       if (!response.ok) throw new Error('Read-only research API unavailable');
       const record = await response.json();
-      if (record.schema !== 'alpha-labs.historical-research.v1' || record.trading_enabled !== false ||
+      if (record.schema !== 'alpha-labs.historical-research.v1' || record.trading_enabled !== false || record.promotion_authorised !== false ||
+          record.live_trading_authorised !== false ||
           !['historical','stale'].includes(record.status)) throw new Error('Invalid research schema');
       const training = record.periods.training;
       const holdout = record.periods.holdout;
@@ -115,7 +116,8 @@
   };
   const validate = (data, market) => {
     if (!data || data.schema !== 'alpha-labs.historical-research.v1' ||
-        data.trading_enabled !== false || data.market !== market ||
+        data.trading_enabled !== false || data.promotion_authorised !== false ||
+        data.live_trading_authorised !== false || data.market !== market ||
         !['historical', 'stale'].includes(data.status) ||
         !Number.isSafeInteger(data.complete_candles) || data.complete_candles < 80 ||
         data.complete_candles > 720 || data.interval_minutes !== 60 ||

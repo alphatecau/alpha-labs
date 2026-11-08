@@ -53,7 +53,7 @@ class SignedArchiveTests(unittest.TestCase):
                 verify_signed_archive(**kwargs)
             research.write_bytes(archive.read_bytes())
             manifest_path.write_bytes(payload + b" ")
-            with self.assertRaisesRegex(ValueError, "authentication"):
+            with self.assertRaisesRegex(ValueError, "signature invalid"):
                 verify_signed_archive(**kwargs)
             manifest_path.write_bytes(payload)
             with self.assertRaisesRegex(ValueError, "signature invalid"):

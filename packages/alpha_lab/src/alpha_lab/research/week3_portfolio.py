@@ -6,6 +6,7 @@ gap handling. Intrabar OHLC stop fills are modelled, never verified executable.
 from __future__ import annotations
 from decimal import Decimal
 from math import isfinite
+from alpha_lab.research.phase1_accounting import reconcile_simulation
 
 def simulate(bars: dict, targets: list, start: int, end: int, cost_bps: int) -> dict:
     symbols=tuple(sorted(bars))
@@ -111,7 +112,7 @@ def simulate(bars: dict, targets: list, start: int, end: int, cost_bps: int) -> 
     if abs(ledger-cash)>Decimal("0.00000001"):
         raise ValueError("Cash reconciliation failed")
     last=Decimal(nav_curve[-1])
-    return {"return_pct":float((last/Decimal("10000")-1)*100),
+    result={"return_pct":float((last/Decimal("10000")-1)*100),
             "max_drawdown_pct":float(max_dd*100),
             "closed_trades":closed,"total_fees":str(fees),
             "final_cash":str(cash),"final_nav":str(last),
@@ -120,3 +121,12 @@ def simulate(bars: dict, targets: list, start: int, end: int, cost_bps: int) -> 
             "risk_authority_independent":False,
             "real_executable_fills_verified":False,
             "live_trading":False,"promotion_authorised":False}
+    # Fail closed: reconstruct every executed order independently, including
+    # remaining positions marked at the final bar. Both exit-side slippage
+    # and liquidation fee are embedded in the original simulator NAV.
+    audit=reconcile_simulation(result,
+        {s:bars[s][end-1].close for s in symbols},
+        liquidation_bps=1-(1-bps)**2)
+    result["independent_position_nav_reconciliation"]="PASS"
+    result["independent_audit_order_count"]=audit["order_count"]
+    return result

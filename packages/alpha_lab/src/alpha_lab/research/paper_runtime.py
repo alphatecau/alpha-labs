@@ -17,8 +17,9 @@ class PaperRuntime:
         self.ledger = PaperLedger(starting_cash)
         self.recovery_verified = False
         self._seen_ids = set()
+        self._journal_head = "0" * 64
         try:
-            self.journal.verify()
+            self._journal_head = self.journal.verify()
             for (payload,) in self.journal.connection.execute("SELECT payload FROM events ORDER BY seq"):
                 event = json.loads(payload)
                 request_id = event.get("request_id")
@@ -90,7 +91,12 @@ class PaperRuntime:
         fill = candidate.fill(symbol=symbol,side=side,quantity=quantity,
             reference_mid=reference_mid,executed_price=executed_price,fee=fee)
         event = {"type":"FILL","request_id":request_id,**fill}
-        self.journal.append(event)
+        try:
+            self._journal_head = self.journal.append(event, expected_previous_hash=self._journal_head)
+        except Exception:
+            self.ledger.halt()
+            self.recovery_verified = False
+            raise
         self.ledger = candidate
         self._seen_ids.add(request_id)
         return fill

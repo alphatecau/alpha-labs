@@ -15,6 +15,7 @@ from pathlib import Path
 ASSETS = ("BTCUSDT", "ETHUSDT", "SOLUSDT")
 COSTS = (10, 20, 40)
 SEED = 20261108
+FROZEN_ARTIFACT_SHA256 = "5f6007bd36125e047879b8cc7c4d162938a53b2ce120b95199cee92b0b165986"
 
 def _folds(nav):
     n = len(nav)
@@ -52,6 +53,8 @@ def _block_interval(nav, seed, repetitions=2000, block=14):
 
 def audit(archive):
     payload = Path(archive).read_bytes()
+    if hashlib.sha256(payload).hexdigest() != FROZEN_ARTIFACT_SHA256:
+        raise ValueError("Frozen artifact digest mismatch")
     out = {"schema": "alpha-labs.week2.frozen-artifact-audit.v1",
            "artifact_sha256": hashlib.sha256(payload).hexdigest(),
            "source": "historical-breakout-research workflow run 42471018274",

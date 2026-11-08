@@ -41,16 +41,16 @@ def test_forged_or_invalid_execution_rejected():
 
 def test_naked_short_and_negative_cash_rejected():
     sell = {"symbol": "BTC", "side": "SELL", "quantity": "1", "price": "100", "fee": "0", "cash_delta": "100"}
-    with unittest.TestCase().assertRaises(ValueError, match="Naked"):
+    with unittest.TestCase().assertRaisesRegex(ValueError, "Naked"):
         reconstruct([sell], {"BTC": "100"})
     buy = {"symbol": "BTC", "side": "BUY", "quantity": "101", "price": "100", "fee": "0", "cash_delta": "-10100"}
-    with unittest.TestCase().assertRaises(ValueError, match="Negative cash"):
+    with unittest.TestCase().assertRaisesRegex(ValueError, "Negative cash"):
         reconstruct([buy], {"BTC": "100"})
 
 
 def test_forged_simulator_nav_rejected():
     simulation = {"orders": _orders(), "final_cash": "9858.5", "final_nav": "9999", "total_fees": "1.5"}
-    with unittest.TestCase().assertRaises(ValueError, match="Final NAV mismatch"):
+    with unittest.TestCase().assertRaisesRegex(ValueError, "Final NAV mismatch"):
         reconcile_simulation(simulation, {"BTC": "110"}, liquidation_bps="0.01")
 
 
@@ -71,14 +71,14 @@ def test_tampered_experiment_registry_rejected_and_promotion_denied():
     assert record["record"]["promotion_authorised"] is False
     assert record["record"]["trading_enabled"] is False
     record["record"]["status"] = "PASS_ENGINEERING"
-    with unittest.TestCase().assertRaises(ValueError, match="Tampered"):
+    with unittest.TestCase().assertRaisesRegex(ValueError, "Tampered"):
         verify_registry([record])
 
 
 def test_same_time_and_future_signal_rejected():
     execution = datetime(2026, 11, 9, 12, tzinfo=timezone.utc)
     for signal in (execution, execution + timedelta(seconds=1)):
-        with unittest.TestCase().assertRaises(ValueError, match="Lookahead"):
+        with unittest.TestCase().assertRaisesRegex(ValueError, "Lookahead"):
             verify_signal_availability(signal, execution)
 
 

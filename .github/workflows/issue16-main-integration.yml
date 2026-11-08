@@ -1,0 +1,41 @@
+name: Issue 16 main integration adversarial checks
+on:
+  push:
+    branches:
+      - research/issue16-main-integration-20261109
+  pull_request:
+    paths:
+      - tests/unit/test_issue16_independent_adversarial.py
+      - packages/alpha_lab/src/alpha_lab/research/phase1_accounting.py
+      - packages/alpha_lab/src/alpha_lab/research/phase1_evidence.py
+      - packages/alpha_lab/src/alpha_lab/research/selection_gate.py
+      - .github/workflows/issue16-main-integration.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-oracles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: packages/alpha_lab/src
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'pytest>=8,<10'
+      - name: Run independent synthetic oracle and adversarial tests without skips
+        run: python -m pytest -q -ra --strict-markers --strict-config -o addopts='' tests/unit/test_issue16_independent_adversarial.py
+      - name: Verify test count and skip-free execution
+        run: |
+          python - <<'PY'
+          import subprocess,sys
+          p=subprocess.run([sys.executable,'-m','pytest','-q','-rs','-o','addopts=','tests/unit/test_issue16_independent_adversarial.py'],capture_output=True,text=True)
+          print(p.stdout)
+          print(p.stderr)
+          if p.returncode or 'skipped' in p.stdout.lower() or 'skipped' in p.stderr.lower():
+              raise SystemExit('FAIL: tests failed or skipped')
+          print('PASS: no skipped tests reported')
+          PY

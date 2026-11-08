@@ -58,12 +58,14 @@ def verify_external_etf_evidence(*, symbol, observed_sessions, calendar_csv,
     actions = _read_evidence(actions_csv, actions_sha256,
                              {"date", "symbol", "split_factor", "cash_dividend"})
     expected = set()
+    calendar_seen = set()
     for row in cal:
         if row["symbol"] != symbol or row["is_session"] not in ("true", "false"):
             raise ValueError("Invalid calendar evidence")
         day = date.fromisoformat(row["date"])
-        if day in expected or day in sessions and row["is_session"] == "false":
+        if day in calendar_seen or day in sessions and row["is_session"] == "false":
             raise ValueError("Conflicting calendar evidence")
+        calendar_seen.add(day)
         if row["is_session"] == "true":
             expected.add(day)
     if expected != sessions:

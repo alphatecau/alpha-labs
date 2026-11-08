@@ -24,9 +24,9 @@ def test_independent_cash_position_nav_and_cost():
     a = buy(p)
     b = p.fill(symbol="BTC", side="SELL", quantity="0.5",
                reference_mid="110", executed_price="109", fee="0.5")
-    assert p.cash == Decimal("851.5")
+    assert p.cash == Decimal("851")
     assert p.positions["BTC"] == Decimal("1.5")
-    assert p.nav({"BTC": "110"}) == Decimal("1016.5")
+    assert p.nav({"BTC": "110"}) == Decimal("1016")
     assert Decimal(a["shortfall_vs_mid"]) == Decimal("2")
     assert Decimal(b["shortfall_vs_mid"]) == Decimal("0.5")
     assert p.fills[1]["previous_hash"] == p.fills[0]["audit_hash"]

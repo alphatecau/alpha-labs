@@ -64,3 +64,23 @@ PYTHONPATH=packages/alpha_lab/src python -m unittest discover -s tests/unit -p '
 ```
 CI status for the adapter commit must be verified separately from the earlier
 successful PR workflow.
+
+
+## MiroFish loopback transport — restricted test boundary
+`alpha_lab.mirofish_transport.MiroFishLoopbackTransport` implements a
+loopback-only HTTP POST transport. It rejects DNS hostnames, public IPs, HTTPS
+endpoints, embedded credentials, redirects (any non-200), unexpected content
+types, oversized responses and invalid JSON. Tests use an in-process local
+mock server only. No genuine MiroFish backend has been launched or contacted.
+
+**Compatibility is not verified.** The upstream README confirms a backend
+on localhost port 5001 but does not establish a synchronous simulation endpoint
+with this adapter's JSON schema. Confirm the actual upstream route, async job
+lifecycle, request and response schemas against a pinned upstream commit before
+attempting a live backend test. If incompatible, write an explicit translation
+worker; do not point the transport at an arbitrary MiroFish endpoint.
+
+This code restricts its own network destination but **does not create an OS
+sandbox**. Real execution requires an isolated container/VM, blocked external
+egress except approved LLM/Zep endpoints, credentials scoped to the worker,
+resource quotas, timeout enforcement, and no exchange or broker credentials.

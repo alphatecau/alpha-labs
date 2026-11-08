@@ -16,6 +16,8 @@ def aggregate_crypto_utc_daily(bars):
     for offset in range(0,len(bars),24):
         day=bars[offset:offset+24]
         midnight=day[0].time
+        if days and midnight != bars[offset-24].time + timedelta(hours=24):
+            raise ValueError("Gap between consecutive UTC daily candles")
         if midnight.tzinfo is None or midnight.utcoffset()!=timedelta(0) or midnight.hour!=0:
             raise ValueError("Daily UTC boundary mismatch")
         for j,b in enumerate(day):

@@ -84,3 +84,29 @@ This code restricts its own network destination but **does not create an OS
 sandbox**. Real execution requires an isolated container/VM, blocked external
 egress except approved LLM/Zep endpoints, credentials scoped to the worker,
 resource quotas, timeout enforcement, and no exchange or broker credentials.
+
+
+## Upstream API inspection and asynchronous contract
+Reviewed upstream `666ghj/MiroFish` source file
+`backend/app/api/simulation.py` (blob `aae76788d06b20dca1ec90d635cb29040733ac07`).
+The actual API uses `POST /api/simulation/create` (existing project ID),
+`POST /api/simulation/prepare` (returns task ID),
+`POST /api/simulation/prepare/status` (poll via task ID),
+`POST /api/simulation/start` (prepared simulation, max_rounds),
+`GET /api/simulation/<id>/run-status`, and
+`POST /api/report/generate` plus
+`POST /api/report/generate/status` for report tasks.
+
+The new `mirofish_async.py` client exposes these as explicit calls. The
+`mirofish_sandbox_http.py` transport permits only IPv4 loopback destinations
+and bounded JSON requests. `test_mirofish_async.py` exercises the lifecycle
+against a local mock HTTP server; **mock success is not a genuine MiroFish run**.
+
+Before real end-to-end execution: provision an isolated container with pinned
+upstream source, Python 3.11/3.12, Node 18+, uv, limited LLM and Zep API
+credentials, blocked broker/exchange access, strict egress allowlisting,
+CPU/memory/time budgets, and a seeded test project with completed graph build.
+No Docker/Podman runtime was available in the current execution environment;
+therefore a genuine container run was not performed. The earlier synchronous
+`mirofish_transport.py` remains a test boundary only and is not the actual
+upstream API integration.

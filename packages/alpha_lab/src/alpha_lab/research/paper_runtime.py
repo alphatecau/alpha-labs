@@ -5,12 +5,14 @@ No HTTP server, broker, external orders, background scheduler or credential acce
 from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 import json
+import threading
 from alpha_lab.research.paper_simulator import PaperLedger, number
 from alpha_lab.research.paper_journal import PaperJournal
 from alpha_lab.research.paper_risk import authorise_simulated_order
 
 class PaperRuntime:
     def __init__(self, path, *, starting_cash="10000"):
+        self._execution_lock = threading.RLock()
         self.journal = PaperJournal(path)
         self.ledger = PaperLedger(starting_cash)
         self.recovery_verified = False
@@ -43,6 +45,19 @@ class PaperRuntime:
                 quote_timestamp, now, marks, proposed_loss, aggregate_open_risk,
                 gross_notional, peak_nav, day_start_nav, operator_approved=False,
                 request_id=None, authoritative_risk_verified=False):
+        with self._execution_lock:
+            return self._execute_locked(symbol=symbol,side=side,quantity=quantity,
+                reference_mid=reference_mid,executed_price=executed_price,fee=fee,
+                quote_timestamp=quote_timestamp,now=now,marks=marks,
+                proposed_loss=proposed_loss,aggregate_open_risk=aggregate_open_risk,
+                gross_notional=gross_notional,peak_nav=peak_nav,day_start_nav=day_start_nav,
+                operator_approved=operator_approved,request_id=request_id,
+                authoritative_risk_verified=authoritative_risk_verified)
+
+    def _execute_locked(self, *, symbol, side, quantity, reference_mid, executed_price, fee,
+                quote_timestamp, now, marks, proposed_loss, aggregate_open_risk,
+                gross_notional, peak_nav, day_start_nav, operator_approved,
+                request_id, authoritative_risk_verified):
         if not self.recovery_verified or self.ledger.halted or operator_approved is not True:
             raise PermissionError("HALT: operator approval and recovered ledger required")
         if authoritative_risk_verified is not True:

@@ -7,7 +7,7 @@ import json
 from math import isfinite
 import re
 from alpha_lab.strategy_evidence import evaluate_oos
-from alpha_lab.research.fold_bootstrap import fold_aware_bootstrap
+from alpha_lab.research.fold_bootstrap import fold_aware_bootstrap, block_size_sensitivity
 
 def _canonical_sha(document: dict) -> str:
     unsigned = {k: v for k, v in document.items() if k != "evidence_sha256"}
@@ -131,6 +131,10 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tes
             report["fold_aware_bootstrap_block_size"] = diagnostic.block_size
             report["fold_aware_bootstrap_draws"] = diagnostic.draws
             report["fold_aware_bootstrap_boundary_crossings"] = diagnostic.boundary_crossings
+            sensitivity = block_size_sensitivity(tuple(per_fold_period_returns))
+            report["bootstrap_block_sensitivity"] = sensitivity
+            if not sensitivity["all_lower_bounds_positive"]:
+                report["reasons"].append("BLOCK_SIZE_SENSITIVITY_NOT_ROBUST")
             if diagnostic.lower_confidence_bound <= 0:
                 report["reasons"].append("NONPOSITIVE_FOLD_AWARE_LOWER_BOUND")
         except ValueError as bootstrap_error:

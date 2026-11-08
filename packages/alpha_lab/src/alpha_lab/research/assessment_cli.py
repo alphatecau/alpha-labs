@@ -39,6 +39,9 @@ def run_assessment(files: list[str | Path], output: str | Path, *,
     })
     report["source_price_independently_authenticated"] = False
     report["strategy_profitable_verified"] = False
+    report["archive_provenance_independently_authenticated"] = False
+    report["historical_capture_independently_attested"] = False
+    report["provenance_gate_status"] = "NOT_INTEGRATED_OR_NOT_INDEPENDENTLY_VERIFIED"
     report["promotion_authorised"] = False
     payload = json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n"
     target.parent.mkdir(parents=True, exist_ok=True)

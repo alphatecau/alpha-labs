@@ -1,6 +1,12 @@
 """Adversarial checks for the offline-only paper simulator."""
 from decimal import Decimal
-import pytest
+import unittest
+from contextlib import contextmanager
+
+@contextmanager
+def raises(error, match=None):
+    with unittest.TestCase().assertRaisesRegex(error, match or '.*'):
+        yield
 from alpha_lab.research.paper_simulator import PaperLedger
 
 def buy(ledger, **changes):
@@ -11,9 +17,9 @@ def buy(ledger, **changes):
 
 def test_halt_default_and_explicit_approval():
     p = PaperLedger()
-    with pytest.raises(PermissionError, match="HALT"):
+    with raises(PermissionError, match="HALT"):
         buy(p)
-    with pytest.raises(PermissionError, match="approval"):
+    with raises(PermissionError, match="approval"):
         p.enable_simulation()
     p.enable_simulation(operator_approved=True)
     assert buy(p)["simulated"] is True
@@ -31,27 +37,31 @@ def test_independent_cash_position_nav_and_cost():
     assert Decimal(b["shortfall_vs_mid"]) == Decimal("0.5")
     assert p.fills[1]["previous_hash"] == p.fills[0]["audit_hash"]
 
-@pytest.mark.parametrize("mutation", [
+MUTATIONS = [
     {"quantity": "NaN"}, {"quantity": "-1"}, {"fee": "-1"},
     {"side": "SHORT"}, {"executed_price": "Infinity"},
     {"quantity": "1000"}, {"simulated_only": False},
     {"observed_quote": False},
-])
-def test_adversarial_rejections_without_fill(mutation):
+]
+def test_adversarial_rejections_without_fill():
+    for mutation in MUTATIONS:
+        _reject_mutation(mutation)
+
+def _reject_mutation(mutation):
     p = PaperLedger("1000")
     p.enable_simulation(operator_approved=True)
-    with pytest.raises((ValueError, PermissionError)):
+    with raises((ValueError, PermissionError)):
         buy(p, **mutation)
     assert p.fills == [] and p.cash == Decimal("1000")
 
 def test_naked_short_and_missing_marks():
     p = PaperLedger("1000")
     p.enable_simulation(operator_approved=True)
-    with pytest.raises(ValueError, match="naked short"):
+    with raises(ValueError, match="naked short"):
         p.fill(symbol="BTC", side="SELL", quantity="1",
                reference_mid="100", executed_price="100", fee="0")
     buy(p)
-    with pytest.raises(ValueError, match="HALT"):
+    with raises(ValueError, match="HALT"):
         p.nav({})
     assert p.halted
 
@@ -59,5 +69,5 @@ def test_manual_halt_blocks_additional_orders():
     p = PaperLedger()
     p.enable_simulation(operator_approved=True)
     p.halt()
-    with pytest.raises(PermissionError):
+    with raises(PermissionError):
         buy(p)

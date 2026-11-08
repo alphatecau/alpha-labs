@@ -58,7 +58,7 @@ class SignedArchiveTests(unittest.TestCase):
             manifest_path.write_bytes(payload)
             with self.assertRaisesRegex(ValueError, "signature invalid"):
                 verify_signed_archive(**dict(kwargs, trusted_ed25519_public_key=b"0" * 32))
-            with self.assertRaisesRegex(ValueError, "identifier"):
+            with self.assertRaisesRegex(ValueError, "authentication failed"):
                 verify_signed_archive(**dict(kwargs, expected_archive_id="wrong"))
             with self.assertRaisesRegex(ValueError, "historical decision"):
                 verify_signed_archive(**dict(kwargs, decision_time=datetime(2025, 1, 2, tzinfo=timezone.utc)))

@@ -9,6 +9,7 @@ import subprocess
 from pathlib import Path
 
 from alpha_lab.research.breakout_evaluation import evaluate_breakout_csv
+from alpha_lab.data.adapters.binance_archive import verify_dataset
 
 LOCKS={
  "BTCUSDT":("c11dd11b0d2c7fb0b962a43efdf64c23f68197043ef8c72e36c9ce82c880b3c0",
@@ -46,12 +47,22 @@ def main():
     for symbol,(csv_digest,manifest_digest) in LOCKS.items():
         path=args.data_root/"curated"/"binance-vision"/f"{symbol}-1h-2026-01_to_2026-10.csv"
         manifest=path.with_suffix(".manifest.json")
-        if sha256(path)!=csv_digest or sha256(manifest)!=manifest_digest:
-            raise ValueError(f"FROZEN DATA CHANGED: {symbol}")
+        if sha256(path)!=csv_digest:
+            raise ValueError(f"FROZEN CSV CHANGED: {symbol}")
+        provenance=verify_dataset(path,manifest)
+        if (provenance["csv_sha256"]!=csv_digest
+            or provenance["symbol"]!=symbol
+            or provenance["first_month"]!="2026-01"
+            or provenance["last_month"]!="2026-10"
+            or provenance["candle_count"]!=7296):
+            raise ValueError(f"FROZEN PROVENANCE CHANGED: {symbol}")
+        # The original manifest digest is an immutable acquisition receipt.
+        # A newly generated manifest includes a different retrieved_at_utc.
         verified.append((symbol,path,manifest))
     # All source and dataset hashes verified BEFORE first evaluation.
     args.output_root.mkdir(parents=True,exist_ok=False)
     results=[]
+    execution_manifest_hashes={symbol:sha256(manifest) for symbol,path,manifest in verified}
     for symbol,path,manifest in verified:
         for cost in COSTS:
             name=f"{symbol}-{cost}bps-each-side.json"
@@ -78,6 +89,9 @@ def main():
       "frozen_protocol":"docs/research/WEEK2_FINAL_PRE_EVALUATION_FREEZE_20261108.md",
       "data_period":"2026-01..2026-10",
       "dataset_hashes":{k:{"csv_sha256":v[0],"manifest_sha256":v[1]} for k,v in LOCKS.items()},
+      "execution_manifest_hashes":execution_manifest_hashes,
+      "manifest_integrity_amendment":"docs/research/WEEK2_FINAL_INTEGRITY_AMENDMENT_20261108.md",
+      "original_manifest_hashes_are_acquisition_receipts_not_recomputed_locks":True,
       "strategy_selected_before_this_evaluation":True,
       "independently_sealed_holdout":False,
       "selection_bias_fully_corrected":False,

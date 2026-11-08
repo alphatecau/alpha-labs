@@ -30,5 +30,21 @@ class AssessmentCliTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 run_assessment([source], source, additional_cost_per_period=0.001)
 
+
+    def test_report_contains_input_checksum_and_assumptions(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root/"fold.json"
+            source.write_text('{"schema":"unsupported","trading_enabled":false}')
+            result = run_assessment([source], root/"report.json",
+                                    additional_cost_per_period=0.0002,
+                                    tested_strategies=4)
+            self.assertEqual(result["input_files"][0]["sha256"],
+                             hashlib.sha256(source.read_bytes()).hexdigest())
+            self.assertEqual(result["tested_strategies_declared"], 4)
+            self.assertFalse(result["promotion_authorised"])
+            self.assertFalse(result["strategy_profitable_verified"])
+
 if __name__ == "__main__":
     unittest.main()

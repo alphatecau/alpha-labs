@@ -36,5 +36,41 @@ class LiquidationBpsRegressionTests(unittest.TestCase):
             reconcile_simulation(simulation, {"BTC": "110"}, liquidation_bps="25")
 
 
+    def test_independent_oracle_sell_and_partial_position(self):
+        orders = self.orders + [{
+            "symbol": "BTC", "side": "SELL", "quantity": "0.5",
+            "price": "120", "fee": "0.3", "cash_delta": "59.7",
+        }]
+        audit = reconstruct(orders, {"BTC": "110"}, starting_cash="1000", liquidation_bps="25")
+        # cash=858.7, remaining 1.5 BTC valued at 164.5875
+        self.assertEqual(Decimal(audit["cash"]), Decimal("858.7"))
+        self.assertEqual(Decimal(audit["positions"]["BTC"]), Decimal("1.5"))
+        self.assertEqual(Decimal(audit["fees"]), Decimal("1.3"))
+        self.assertEqual(Decimal(audit["final_liquidation_nav"]), Decimal("1023.2875"))
+
+    def test_reject_tampered_order_cash_delta(self):
+        altered = [dict(self.orders[0], cash_delta="-200")]
+        with self.assertRaisesRegex(ValueError, "cash delta"):
+            reconstruct(altered, {"BTC": "110"}, starting_cash="1000")
+
+    def test_reject_naked_sale(self):
+        orders = [{"symbol": "BTC", "side": "SELL", "quantity": "1",
+                   "price": "100", "fee": "0", "cash_delta": "100"}]
+        with self.assertRaisesRegex(ValueError, "Naked sale"):
+            reconstruct(orders, {"BTC": "100"}, starting_cash="1000")
+
+    def test_reject_negative_cash(self):
+        with self.assertRaisesRegex(ValueError, "Negative cash"):
+            reconstruct(self.orders, {"BTC": "110"}, starting_cash="100")
+
+    def test_reject_missing_closing_mark(self):
+        with self.assertRaisesRegex(ValueError, "Unknown symbol"):
+            reconstruct(self.orders, {}, starting_cash="1000")
+
+    def test_reject_nonfinite_closing_mark(self):
+        with self.assertRaisesRegex(ValueError, "Nonfinite"):
+            reconstruct(self.orders, {"BTC": "Infinity"}, starting_cash="1000")
+
+
 if __name__ == "__main__":
     unittest.main()

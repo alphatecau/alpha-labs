@@ -4,6 +4,8 @@ on:
     branches: [research/phase1-evidence-engine-20261108]
     paths:
       - '.github/workflows/phase1-evidence-ci.yml'
+      - 'packages/alpha_lab/src/alpha_lab/research/phase1_*.py'
+      - 'tests/unit/test_phase1_*.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,7 +24,7 @@ jobs:
       - name: Run complete offline unit suite including adversarial evidence tests
         run: python -m unittest discover -s tests/unit -p 'test_*.py' -v
       - name: Compile Phase 1 evidence modules
-        run: python -m py_compile packages/alpha_lab/src/alpha_lab/research/phase1_accounting.py packages/alpha_lab/src/alpha_lab/research/phase1_evidence.py
+        run: python -m py_compile packages/alpha_lab/src/alpha_lab/research/phase1_accounting.py packages/alpha_lab/src/alpha_lab/research/phase1_evidence.py packages/alpha_lab/src/alpha_lab/research/phase1_benchmarks.py
       - name: Assert no live trading or broker integration introduced in Phase 1 modules
         run: |
           python - <<'PY'

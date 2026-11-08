@@ -6,6 +6,7 @@ and fixed-cost historical fills are not executable quotes.
 from __future__ import annotations
 
 from decimal import Decimal, InvalidOperation
+from alpha_lab.research.promotion_authority import decide_strategy_promotion
 
 EXPECTED_STATUS = "HYPOTHESIS_SCREEN_ONLY_NOT_VALIDATED_ALPHA"
 
@@ -59,8 +60,11 @@ def summarise_offline_research(report: dict) -> dict:
             "outperforms_passive": strategy > passive,
             "survives_double_costs_with_positive_return": stress > 0,
         }
+    promotion = decide_strategy_promotion(assessment=report)
     return {
         "status": "EVIDENCE_INSUFFICIENT_RESEARCH_ONLY",
+        "promotion_authorised": promotion["promotion_authorised"],
+        "live_trading_authorised": promotion["live_trading_authorised"],
         "trading_enabled": False,
         "dataset_sha256": ds["sha256"],
         "configuration_sha256": report["configuration_sha256"],

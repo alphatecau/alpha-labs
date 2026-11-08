@@ -41,5 +41,28 @@ class EvidenceAssessmentTests(unittest.TestCase):
         result = assess_evidence([self.first], additional_cost_per_period=-0.01)
         self.assertTrue(any("INVALID_COST_STRESS" in x for x in result["reasons"]))
 
+
+    def test_reordered_folds_fail_closed(self):
+        result = assess_evidence([self.second, self.first], additional_cost_per_period=0.0001)
+        self.assertTrue(any("NONCHRONOLOGICAL_TIMESTAMP" in x or "OVERLAPPING" in x for x in result["reasons"]))
+
+    def test_forged_verification_claim_rejected(self):
+        from alpha_lab.research.evidence_assessment import _canonical_sha
+        forged = copy.deepcopy(self.first)
+        forged["holdout_independently_sealed"] = True
+        forged["evidence_sha256"] = _canonical_sha(forged)
+        result = assess_evidence([forged], additional_cost_per_period=0.0001)
+        self.assertTrue(any("UNSUPPORTED_VERIFICATION_CLAIM" in x for x in result["reasons"]))
+
+    def test_duplicate_fold_id_rejected(self):
+        from alpha_lab.research.evidence_assessment import _canonical_sha
+        duplicate = copy.deepcopy(self.second)
+        duplicate["fold_id"] = "one"
+        for row in duplicate["periods"]:
+            row["fold_id"] = "one"
+        duplicate["evidence_sha256"] = _canonical_sha(duplicate)
+        result = assess_evidence([self.first, duplicate], additional_cost_per_period=0.0001)
+        self.assertTrue(any("DUPLICATE_OR_INVALID_FOLD_ID" in x for x in result["reasons"]))
+
 if __name__ == "__main__":
     unittest.main()

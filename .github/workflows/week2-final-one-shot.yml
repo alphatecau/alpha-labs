@@ -1,0 +1,52 @@
+name: Alpha Labs Week 2 FINAL one-shot evaluation (research only)
+on:
+  push:
+    branches: [research/strategy-evidence-gates-v1]
+    paths: ['.github/workflows/week2-final-one-shot.yml']
+permissions:
+  contents: read
+concurrency:
+  group: alpha-labs-week2-final-one-shot
+  cancel-in-progress: false
+jobs:
+  one-shot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      PYTHONPATH: packages/alpha_lab/src
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify complete offline unit suite before accessing later-period data
+        run: python -m unittest discover -s tests/unit -p 'test_*.py' -v
+      - name: Fetch and verify frozen later-period source archives
+        run: |
+          python scripts/multi_year_research.py fetch --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2026-01 --through-month 2026-10
+          python scripts/multi_year_research.py verify --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2026-01 --through-month 2026-10
+      - name: Evaluate frozen nine comparisons exactly once, no tuning
+        run: |
+          python scripts/week2_final_one_shot.py --data-root datasets --output-root week2-final-evidence
+      - name: Verify non-promotion decision and complete reconciliation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('week2-final-evidence/FINAL_DECISION.json').read_text())
+          assert d['engineering_result']=='PASS'
+          assert d['strategy_result']=='INCONCLUSIVE'
+          assert len(d['results'])==9
+          assert all(x['reconciliation']=='PASS' for x in d['results'])
+          assert d['live_trading'] is False and d['promotion_authorised'] is False
+          assert d['independently_sealed_holdout'] is False
+          print('PASS: 9 frozen one-shot evaluations; NO strategy promotion')
+          PY
+      - name: Publish evidence only; no market archives or execution credentials
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpha-labs-week2-final-one-shot-evidence
+          path: week2-final-evidence/
+          retention-days: 30
+          if-no-files-found: error

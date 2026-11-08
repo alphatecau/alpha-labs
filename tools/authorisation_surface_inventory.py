@@ -8,7 +8,6 @@ from __future__ import annotations
 import argparse
 import ast
 import json
-import re
 from pathlib import Path
 
 KEYWORDS = (
@@ -45,9 +44,10 @@ def inventory(root: Path) -> dict:
                         "line": node.lineno, "keywords": matched,
                     })
     js_findings = []
-    js_patterns = (r"promotion_authorised", r"live_trading_authorised",
-                   r"trading_enabled", r"\\bfetch\\s*\\(",
-                   r"\\baddEventListener\\s*\\(", r"/api/v[0-9]+/")
+    js_patterns = (
+        "promotion_authorised", "live_trading_authorised",
+        "trading_enabled", "fetch(", "addEventListener(", "/api/v",
+    )
     for dirname in SCAN_DIRS:
         base = root / dirname
         if not base.is_dir():
@@ -60,7 +60,7 @@ def inventory(root: Path) -> dict:
                 errors.append({"path": relative, "error": type(exc).__name__})
                 continue
             for lineno, line in enumerate(source.splitlines(), 1):
-                matched = [pattern for pattern in js_patterns if re.search(pattern, line)]
+                matched = [pattern for pattern in js_patterns if pattern in line]
                 if matched:
                     js_findings.append({"path": relative, "line": lineno, "patterns": matched})
     return {

@@ -20,7 +20,7 @@ class RuntimeTests(unittest.TestCase):
                 executed_price="100",fee="0",quote_timestamp=now,now=now,
                 marks={},proposed_loss="1",aggregate_open_risk="0",
                 gross_notional="0",peak_nav="1000",day_start_nav="1000",
-                operator_approved=True)
+                operator_approved=True,request_id="order-001",authoritative_risk_verified=True)
             r.execute(**args)
             self.assertEqual(str(r.ledger.cash),"900")
             r.close()
@@ -29,12 +29,19 @@ class RuntimeTests(unittest.TestCase):
             self.assertEqual(str(restored.ledger.cash),"900")
             self.assertEqual(restored.ledger.sequence,1)
             restored.enable(operator_approved=True)
-            args.update(marks={"BTC":"100"},quantity="0.1",now=now+timedelta(minutes=2))
+            args.update(marks={"BTC":"100"},quantity="0.1",now=now+timedelta(minutes=2),request_id="order-002")
             with self.assertRaisesRegex(PermissionError,"HALT"):
                 restored.execute(**args)
             self.assertTrue(restored.ledger.halted)
             self.assertEqual(restored.ledger.sequence,1)
             restored.close()
+            reopened=PaperRuntime(path,starting_cash="1000")
+            reopened.enable(operator_approved=True)
+            args.update(now=now,request_id="order-001")
+            with self.assertRaisesRegex(PermissionError,"duplicate request"):
+                reopened.execute(**args)
+            self.assertEqual(reopened.ledger.sequence,1)
+            reopened.close()
 
 if __name__=="__main__":
     unittest.main()

@@ -8,14 +8,10 @@ from tempfile import TemporaryDirectory
 
 from alpha_lab.research.phase1_signed_archive import verify_signed_archive
 
-try:
-    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-    from cryptography.hazmat.primitives import serialization
-except ImportError:
-    Ed25519PrivateKey = None
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives import serialization
 
 
-@unittest.skipIf(Ed25519PrivateKey is None, "cryptography unavailable; signed archive verification requires it")
 class SignedArchiveTests(unittest.TestCase):
     def test_signed_bytes_and_tampering(self):
         with TemporaryDirectory() as folder:

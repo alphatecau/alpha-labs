@@ -1,0 +1,74 @@
+name: Alpha Labs Week 2 chronological and forward-data evidence (research only)
+on:
+  push:
+    branches: [research/strategy-evidence-gates-v1]
+    paths: ['.github/workflows/week2-chronological.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  walk-forward-and-forward-seal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      PYTHONPATH: packages/alpha_lab/src
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Execute complete offline unit suite
+        run: python -m unittest discover -s tests/unit -p 'test_*.py' -v
+      - name: Fetch and checksum verify original historical archives
+        run: |
+          python scripts/multi_year_research.py fetch --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-04 --through-month 2025-12
+          python scripts/multi_year_research.py verify --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2023-04 --through-month 2025-12
+      - name: Re-run 5 chronological partitions with causal regimes and inference
+        run: |
+          python scripts/week2_chronological_replay.py --data-root datasets \
+            --from-month 2023-04 --through-month 2025-12 \
+            --output week2-output/chronological-evidence.json
+      - name: Acquire separate later-period archive WITHOUT evaluating its returns
+        run: |
+          python scripts/multi_year_research.py fetch --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2026-01 --through-month 2026-10
+          python scripts/multi_year_research.py verify --symbols BTCUSDT ETHUSDT SOLUSDT --from-month 2026-01 --through-month 2026-10
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          from alpha_lab.data.adapters.binance_archive import verify_dataset
+          rows=[]
+          for symbol in ('BTCUSDT','ETHUSDT','SOLUSDT'):
+              p=Path('datasets/curated/binance-vision')/f'{symbol}-1h-2026-01_to_2026-10.csv'
+              m=p.with_suffix('.manifest.json')
+              d=verify_dataset(p,m)
+              rows.append({'market':symbol,'source_csv_sha256':d['csv_sha256'],
+                           'manifest_sha256':hashlib.sha256(m.read_bytes()).hexdigest(),
+                           'candle_count':d['candle_count']})
+          out={'schema':'alpha-labs.later-period-acquisition.v1',
+               'period':'2026-01..2026-10','strategy_evaluated_on_later_period':False,
+               'holdout_independently_sealed':False,
+               'selection_preceded_acquisition':True,
+               'trading_enabled':False,'datasets':rows,
+               'warning':'This is historical later-period data, not a prospectively independently sealed holdout.'}
+          Path('week2-output/later-period-dataset-manifest.json').write_text(json.dumps(out,indent=2)+'\n')
+          PY
+      - name: Fail closed on trading and promotion claims
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('week2-output/chronological-evidence.json'))
+          f=json.load(open('week2-output/later-period-dataset-manifest.json'))
+          assert r['live_trading'] is False and r['promotion_authorised'] is False
+          assert r['selection_aware_inference']['statistical_validation']=='NOT_ESTABLISHED'
+          assert len(r['reports'])==3
+          assert len(f['datasets'])==3 and f['strategy_evaluated_on_later_period'] is False
+          print('PASS: research-only walk-forward diagnostics and later-period archive manifests')
+          PY
+      - name: Upload only evidence JSON (no source market archives)
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpha-labs-week2-chronological-evidence
+          path: week2-output/
+          retention-days: 14
+          if-no-files-found: error

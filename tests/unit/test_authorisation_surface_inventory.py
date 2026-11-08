@@ -20,6 +20,18 @@ class AuthorisationInventoryTests(unittest.TestCase):
             self.assertFalse(result["promotion_authorised"])
             self.assertEqual(result["findings"][0]["function"], "endpoint")
 
+    def test_javascript_authorisation_surface_is_inventoried(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "apps").mkdir()
+            (root / "apps" / "research.js").write_text(
+                "fetch('/api/v1/research/test'); const approved = data.promotion_authorised;\n",
+                encoding="utf-8",
+            )
+            result = inventory(root)
+            self.assertTrue(result["javascript_surface_findings"])
+            self.assertFalse(result["javascript_ast_verified"])
+
     def test_syntax_errors_are_reported_not_silently_ignored(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

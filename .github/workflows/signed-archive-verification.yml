@@ -32,4 +32,7 @@ jobs:
       - name: Require signed archive tests to execute
         env:
           PYTHONPATH: packages/alpha_lab/src
-        run: python -m unittest discover -s tests/unit -p test_phase1_signed_archive.py -v
+        run: |
+          python -c 'import cryptography; print("cryptography", cryptography.__version__)'
+          python -m unittest discover -s tests/unit -p test_phase1_signed_archive.py -v
+          python -c 'import importlib.util,unittest; spec=importlib.util.spec_from_file_location("signed_tests","tests/unit/test_phase1_signed_archive.py"); mod=importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); result=unittest.TestResult(); unittest.defaultTestLoader.loadTestsFromModule(mod).run(result); assert result.testsRun >= 1 and not result.skipped and result.wasSuccessful(), "Signed archive tests did not execute successfully"'

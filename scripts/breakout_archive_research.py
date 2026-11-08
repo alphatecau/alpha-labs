@@ -48,9 +48,11 @@ def main() -> None:
                 manifest_path=manifest, start=args.start_index, end=args.end_index,
                 fee_bps=str(fee), slippage_bps=str(slip))
             print(f"{symbol} {fee}/{slip} bps: {report['status']}; "
-                  f"candidate_return={report['candidate']['return_pct']:.4f}%; "
+                  f"legacy_candidate_return={report['candidate']['return_pct']:.4f}%; "
+                  f"risk_candidate_return={report['risk_constrained_candidate']['return_pct']:.4f}%; "
+                  f"risk_reconciliation={report['risk_constrained_reconciliation']['status']}; "
                   f"passive_return={report['passive_comparator']['return_pct']:.4f}%; "
-                  "risk_enforcement=UNVERIFIED; no profitable-edge claim")
+                  "portfolio_cross_asset_risk=UNVERIFIED; no profitable-edge claim")
     print("RESEARCH ONLY: no sealed holdout, no executable quotes, no risk authorisation")
 
 if __name__ == "__main__":

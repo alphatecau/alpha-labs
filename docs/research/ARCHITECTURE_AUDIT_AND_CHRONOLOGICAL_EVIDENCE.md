@@ -22,3 +22,20 @@ Audit basis: main branch at `9d705bd` plus draft PR #15. No production or tradin
 ## Next engineering gate
 
 Review CI, compare reconstructed NAV against the long-history NAV path on shared fixtures, wire explicit CLI output to a non-overwriting file, enforce a stable schema, then independently replay the previously rejected BTC/ETH/SOL experiments. Do not merge without review. No strategy may be called validated or profitable.
+
+
+## Reproducible CLI (research only)
+
+Run from an installed checkout:
+
+```sh
+python -m alpha_lab.research.evidence_cli historical-hourly.csv \
+  --output evidence-fold-001.json \
+  --start 720 --end 888 --fold-id fold-001 \
+  --quote USDT --provenance user-supplied-unverified \
+  --code-revision YOUR_COMMIT_SHA
+```
+
+Indexes refer to rows in the source dataset (zero-based, end exclusive). Source must pass the strict hourly CSV parser. Output is exclusively created and cannot overwrite an existing file or the input CSV. Repeating the same input, arguments and code should produce the same `evidence_sha256`. The checksum is a consistency marker, **not** an independent signature or proof of market authenticity.
+
+The CLI does not automatically validate a manifest or independently sealed holdout. The user-provided provenance and revision are declarations. This evidence is explicitly **not** eligible for automatic strategy promotion. Real-data replay and parity against independent accounting remain separate gates.

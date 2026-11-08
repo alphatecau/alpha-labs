@@ -15,6 +15,7 @@ from alpha_lab.research.breakout_candidate import breakout_signals
 from alpha_lab.research.breakout_risk_replay import replay_breakout_risk
 from alpha_lab.research.breakout_reconcile import reconcile_risk_replay
 from alpha_lab.research.causal_regimes import causal_regime_labels
+from alpha_lab.research.selection_gate import selection_aware_gate
 from alpha_lab.backtest.costs import CostModel
 from decimal import Decimal
 
@@ -97,6 +98,8 @@ def main():
         name=f"{symbol}-1h-{args.from_month}_to_{args.through_month}"
         csv=args.data_root/"curated"/"binance-vision"/f"{name}.csv"
         reports.append(audit_market(csv,csv.with_suffix(".manifest.json"),symbol))
+    comparisons=[entry for report in reports for entry in report["evaluation"]]
+    inference=selection_aware_gate(comparisons)
     body={"schema":"alpha-labs.week2.chronological-replay.v1",
           "source_period":f"{args.from_month}..{args.through_month}",
           "fresh_partition_replays":True,
@@ -111,6 +114,7 @@ def main():
                          "Cross-asset risk authority is not implemented",
                          "Nine cost/asset comparisons and prior candidate selection invalidate naive p-values",
                          "Regime attribution counts entry events, not regime-conditioned P&L"],
+          "selection_aware_inference":inference,
           "reports":reports}
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(body,indent=2,sort_keys=True,allow_nan=False)+"\n")

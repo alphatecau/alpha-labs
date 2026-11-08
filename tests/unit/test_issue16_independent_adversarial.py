@@ -5,7 +5,7 @@ archive provenance, production readiness or strategy profitability.
 """
 from decimal import Decimal
 
-import pytest
+import unittest
 
 from alpha_lab.research.phase1_accounting import reconstruct, reconcile_simulation
 from alpha_lab.research.phase1_evidence import (
@@ -31,29 +31,26 @@ def test_independent_decimal_partial_sale_cash_and_liquidation_nav():
     assert Decimal(result["final_liquidation_nav"]) == Decimal("1021.85")
 
 
-@pytest.mark.parametrize("mutation", [
-    {"cash_delta": "-200"}, {"fee": "-1"}, {"quantity": "NaN"},
-    {"quantity": "Infinity"}, {"side": "SHORT"},
-])
-def test_forged_or_invalid_execution_rejected(mutation):
-    orders = _orders()
-    orders[0] = {**orders[0], **mutation}
-    with pytest.raises((ValueError, KeyError)):
-        reconstruct(orders, {"BTC": "110"}, starting_cash="1000")
+def test_forged_or_invalid_execution_rejected():
+    for mutation in ({"cash_delta": "-200"}, {"fee": "-1"}, {"quantity": "NaN"}, {"quantity": "Infinity"}, {"side": "SHORT"}):
+        orders = _orders()
+        orders[0] = {**orders[0], **mutation}
+        with unittest.TestCase().assertRaises((ValueError, KeyError)):
+            reconstruct(orders, {"BTC": "110"}, starting_cash="1000")
 
 
 def test_naked_short_and_negative_cash_rejected():
     sell = {"symbol": "BTC", "side": "SELL", "quantity": "1", "price": "100", "fee": "0", "cash_delta": "100"}
-    with pytest.raises(ValueError, match="Naked"):
+    with unittest.TestCase().assertRaises(ValueError, match="Naked"):
         reconstruct([sell], {"BTC": "100"})
     buy = {"symbol": "BTC", "side": "BUY", "quantity": "101", "price": "100", "fee": "0", "cash_delta": "-10100"}
-    with pytest.raises(ValueError, match="Negative cash"):
+    with unittest.TestCase().assertRaises(ValueError, match="Negative cash"):
         reconstruct([buy], {"BTC": "100"})
 
 
 def test_forged_simulator_nav_rejected():
-    simulation = {"orders": _orders(), "final_cash": "858.5", "final_nav": "9999", "total_fees": "1.5"}
-    with pytest.raises(ValueError, match="Final NAV mismatch"):
+    simulation = {"orders": _orders(), "final_cash": "9858.5", "final_nav": "9999", "total_fees": "1.5"}
+    with unittest.TestCase().assertRaises(ValueError, match="Final NAV mismatch"):
         reconcile_simulation(simulation, {"BTC": "110"}, liquidation_bps="0.01")
 
 
@@ -74,14 +71,14 @@ def test_tampered_experiment_registry_rejected_and_promotion_denied():
     assert record["record"]["promotion_authorised"] is False
     assert record["record"]["trading_enabled"] is False
     record["record"]["status"] = "PASS_ENGINEERING"
-    with pytest.raises(ValueError, match="Tampered"):
+    with unittest.TestCase().assertRaises(ValueError, match="Tampered"):
         verify_registry([record])
 
 
 def test_same_time_and_future_signal_rejected():
     execution = datetime(2026, 11, 9, 12, tzinfo=timezone.utc)
     for signal in (execution, execution + timedelta(seconds=1)):
-        with pytest.raises(ValueError, match="Lookahead"):
+        with unittest.TestCase().assertRaises(ValueError, match="Lookahead"):
             verify_signal_availability(signal, execution)
 
 

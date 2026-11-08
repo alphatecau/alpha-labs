@@ -25,7 +25,7 @@ class RiskReplayTests(unittest.TestCase):
         costs=CostModel()
         report=replay_breakout_risk(bars,[False]*len(bars),840,900,costs=costs)
         self.assertEqual(report["executed_orders"],0)
-        self.assertEqual(report["final_liquidatable_value"],"10000")
+        self.assertEqual(Decimal(report["final_liquidatable_value"]), Decimal("10000"))
         self.assertEqual(reconcile_risk_replay(bars,840,900,report,costs)["status"],"PASS")
 
     def test_entry_risk_and_intrabar_stop(self):

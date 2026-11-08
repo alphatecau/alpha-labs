@@ -13,11 +13,16 @@ def _canonical_sha(document: dict) -> str:
     return sha256(json.dumps(unsigned, sort_keys=True, separators=(",", ":"),
                              allow_nan=False).encode()).hexdigest()
 
-def assess_evidence(folds: list[dict], *, additional_cost_per_period: float) -> dict:
+def assess_evidence(folds: list[dict], *, additional_cost_per_period: float, tested_strategies: int = 1) -> dict:
     """Review only: historical folds are not independent sealed OOS evidence."""
     report = {"status": "INSUFFICIENT_EVIDENCE", "trading_enabled": False,
               "holdout_independently_sealed": False, "reasons": [],
               "fold_count": len(folds), "observation_count": 0}
+    if not isinstance(tested_strategies, int) or isinstance(tested_strategies, bool) or tested_strategies < 1:
+        report["reasons"].append("INVALID_MULTIPLE_TEST_COUNT")
+        return report
+    report["tested_strategies_declared"] = tested_strategies
+    report["multiple_comparison_adjustment_applied"] = False
     if not folds:
         report["reasons"].append("NO_EVIDENCE")
         return report
@@ -95,6 +100,8 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float) -> 
                               fold_net_returns=tuple(fold_returns),
                               additional_cost_per_period=additional_cost_per_period)
         report["screen_status"] = screen.status
+        if tested_strategies > 1:
+            report["reasons"].append("MULTIPLE_COMPARISON_CORRECTION_NOT_APPLIED")
         report["screen_reasons"] = list(screen.reasons)
         report["lower_confidence_bound"] = screen.lower_confidence_bound
         report["max_drawdown"] = screen.max_drawdown

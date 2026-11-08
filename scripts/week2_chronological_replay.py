@@ -59,11 +59,10 @@ def audit_market(source,manifest,symbol):
                 raise ValueError("Independent accounting reconciliation failed")
             # Entry-time regime attribution: prior close only.
             by_regime={}
+            index_by_time={bars[i].time.isoformat():i for i in range(start,end)}
             for order in result["orders"]:
                 if order["kind"]!="BUY":
                     continue
-                # timestamp-to-index map is created once per fold
-                index_by_time={bars[i].time.isoformat():i for i in range(start,end)}
                 idx=index_by_time[order["time"]]
                 regime=labels[idx]
                 by_regime[regime]=by_regime.get(regime,0)+1

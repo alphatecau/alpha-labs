@@ -49,7 +49,7 @@ def test_naked_short_and_negative_cash_rejected():
 
 
 def test_forged_simulator_nav_rejected():
-    simulation = {"orders": _orders(), "final_cash": "858.5", "final_nav": "9999", "total_fees": "1.5"}
+    simulation = {"orders": _orders(), "final_cash": "9858.5", "final_nav": "9999", "total_fees": "1.5"}
     with unittest.TestCase().assertRaisesRegex(ValueError, "Final NAV mismatch"):
         reconcile_simulation(simulation, {"BTC": "110"}, liquidation_bps="0.01")
 

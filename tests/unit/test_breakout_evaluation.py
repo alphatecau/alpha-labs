@@ -22,6 +22,9 @@ class BreakoutEvaluationTests(unittest.TestCase):
                                            provenance="synthetic-test-fixture",
                                            start=840, end=1200)
             self.assertFalse(report["trading_enabled"])
+            self.assertFalse(report["source_archive_manifest_verified"])
+            self.assertTrue(report["synthetic_fixture"])
+            self.assertFalse(report["risk_policy_enforced_by_replay"])
             self.assertFalse(report["profitability_verified"])
             self.assertFalse(report["promotion_authorised"])
             self.assertEqual(report["status"], "RESEARCH_ONLY_UNVERIFIED")
@@ -36,6 +39,17 @@ class BreakoutEvaluationTests(unittest.TestCase):
                                              fee_bps="40", slippage_bps="40")
             self.assertLessEqual(Decimal(stressed["candidate"]["final_liquidatable_value"]),
                                  Decimal(report["candidate"]["final_liquidatable_value"]))
+
+    def test_real_market_label_without_manifest_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "Verified Binance archive manifest required"):
+            evaluate_breakout_csv("missing.csv", "output.json",
+                                  provenance="binance-vision-spot-monthly-verified-archive-digest",
+                                  start=840, end=1200)
+
+    def test_arbitrary_provenance_without_manifest_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "Verified Binance archive manifest required"):
+            evaluate_breakout_csv("missing.csv", "output.json",
+                                  provenance="trusted-market-data", start=840, end=1200)
 
     def test_rejects_unlabelled_source(self):
         with self.assertRaisesRegex(ValueError, "provenance"):

@@ -5,6 +5,7 @@ from datetime import datetime
 from hashlib import sha256
 import json
 from math import isfinite
+import re
 from alpha_lab.strategy_evidence import evaluate_oos
 
 def _canonical_sha(document: dict) -> str:
@@ -38,6 +39,13 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float) -> 
                 raise ValueError("EVIDENCE_CHECKSUM_MISMATCH")
             identity = (fold.get("dataset_sha256"), fold.get("quote_currency"),
                         fold.get("interval_minutes"), fold.get("code_revision_declared"))
+            digest = fold.get("dataset_sha256")
+            if not isinstance(digest, str) or re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+                raise ValueError("INVALID_SOURCE_CHECKSUM")
+            if fold.get("interval_minutes") != 60:
+                raise ValueError("UNSUPPORTED_CANDLE_INTERVAL")
+            if fold.get("data_provenance_declared") in (None, ""):
+                raise ValueError("MISSING_PROVENANCE_DECLARATION")
             if source is None:
                 source = identity
             elif source != identity:
@@ -52,7 +60,7 @@ def assess_evidence(folds: list[dict], *, additional_cost_per_period: float) -> 
             if not rows or not isinstance(rows, list):
                 raise ValueError("EMPTY_FOLD")
             start, end = fold["start_index"], fold["end_exclusive_index"]
-            if len(rows) != end - start or (prior_end is not None and start < prior_end):
+            if not isinstance(start, int) or isinstance(start, bool) or not isinstance(end, int) or isinstance(end, bool) or len(rows) != end - start or (prior_end is not None and start < prior_end):
                 raise ValueError("OVERLAPPING_OR_INCONSISTENT_FOLDS")
             prior_end = end
             initial = Decimal(fold["capital"])

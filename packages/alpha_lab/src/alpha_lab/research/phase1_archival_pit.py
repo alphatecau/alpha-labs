@@ -19,10 +19,11 @@ def verify_archival_availability(*, decision_time, publication_time,
                                  source_id, content_sha256, archived_content_sha256,
                                  archive_provider, archive_record_id,
                                  publication_lag_seconds=0):
-    """Validate supplied archive chronology and exact content equality.
+    """Validate supplied archive chronology and agreement of supplied digests.
 
-    Archive identity, capture timestamps and original publication assertions
-    are not independently authenticated here. Never set an artificial old
+    The caller supplies both hashes; this function does not read or hash file
+    bytes. Archive identity, capture timestamps and original publication
+    assertions are not independently authenticated here. Never set an artificial old
     retrieval timestamp for a newly downloaded file.
     """
     decision = _utc(decision_time, "decision_time")

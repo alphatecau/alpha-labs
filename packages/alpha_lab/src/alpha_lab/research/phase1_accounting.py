@@ -19,7 +19,7 @@ def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bp
     cash=D(starting_cash)
     if cash<=0:raise ValueError("Invalid initial cash")
     bps=D(liquidation_bps)
-    if not 0<=bps<1:raise ValueError("Invalid liquidation rate")
+    if not 0<=bps<10000:raise ValueError("Invalid liquidation rate in basis points")
     positions={s:Decimal(0) for s in closing_prices}
     fee_total=Decimal(0)
     gross_notional=Decimal(0)
@@ -47,7 +47,7 @@ def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bp
     for s,qty in positions.items():
         close=D(closing_prices[s])
         if close<=0:raise ValueError("Invalid closing mark")
-        nav+=qty*close*(1-bps)
+        nav+=qty*close*(1-bps/Decimal(10000))
     if nav<=0:raise ValueError("Invalid final NAV")
     return {"cash":str(cash),"positions":{s:str(q) for s,q in positions.items()},
             "fees":str(fee_total),"gross_executed_notional":str(gross_notional),

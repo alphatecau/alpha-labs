@@ -59,6 +59,26 @@ class RiskReplayTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"NAV reconciliation failed"):
             reconcile_risk_replay(bars,840,900,report,CostModel())
 
+    def test_tampered_fee_fails_reconciliation(self):
+        bars=bars_fixture()
+        signals=[False]*len(bars)
+        signals[843:]=[True]*(len(bars)-843)
+        report=replay_breakout_risk(bars,signals,844,860)
+        self.assertTrue(report["orders"])
+        report["orders"][0]["fee"]="999"
+        with self.assertRaisesRegex(ValueError,"Fee reconciliation failed"):
+            reconcile_risk_replay(bars,844,860,report,CostModel())
+
+    def test_no_entry_after_signal_exit_in_same_hour(self):
+        bars=bars_fixture()
+        signals=[False]*len(bars)
+        signals[843:850]=[True]*7
+        report=replay_breakout_risk(bars,signals,844,860)
+        times=[o["time"] for o in report["orders"]]
+        for stamp in set(times):
+            kinds=[o["kind"] for o in report["orders"] if o["time"]==stamp]
+            self.assertFalse(kinds == ["SELL","BUY"])
+
     def test_missing_hour_fails_closed(self):
         bars=bars_fixture()
         with self.assertRaisesRegex(ValueError,"Missing hourly candle"):

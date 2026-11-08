@@ -9,6 +9,8 @@ from alpha_lab.backtest.engine import replay
 from alpha_lab.backtest.costs import CostModel
 from alpha_lab.research.breakout_candidate import breakout_signals
 from alpha_lab.data.adapters.binance_archive import verify_dataset
+from alpha_lab.research.breakout_risk_replay import replay_breakout_risk
+from alpha_lab.research.breakout_reconcile import reconcile_risk_replay
 
 def evaluate_breakout_csv(source: str | Path, output: str | Path, *,
                           provenance: str, start: int, end: int,
@@ -43,6 +45,11 @@ def evaluate_breakout_csv(source: str | Path, output: str | Path, *,
     signals = breakout_signals(data.bars)
     model = CostModel(fee_bps=fees, adverse_slippage_bps=slippage)
     candidate = replay(data.bars, signals, start, end, costs=model)
+    risk_candidate = replay_breakout_risk(data.bars, signals, start, end, costs=model)
+    reconciliation = reconcile_risk_replay(data.bars, start, end, risk_candidate, model)
+    if reconciliation["status"] != "PASS":
+        raise ValueError("Risk replay reconciliation failed")
+    risk_candidate["independent_reconciliation_performed"] = True
     passive = replay(data.bars, signals, start, end, costs=model, passive=True)
     result = {
         "schema": "alpha-labs.breakout-candidate-offline.v1",
@@ -52,6 +59,8 @@ def evaluate_breakout_csv(source: str | Path, output: str | Path, *,
         "synthetic_fixture": synthetic,
         "independent_price_authentication_performed": False,
         "risk_policy_enforced_by_replay": False,
+        "isolated_risk_replay_limits_modelled": True,
+        "intrabar_sequence_and_executable_quotes_unverified": True,
         "strategy_candidate_status": "NOT_ELIGIBLE_FOR_PROMOTION",
         "quote_currency": data.quote_currency,
         "window_start": start,
@@ -59,6 +68,10 @@ def evaluate_breakout_csv(source: str | Path, output: str | Path, *,
         "fee_bps_each_side_assumed": str(fees),
         "slippage_bps_each_side_assumed": str(slippage),
         "candidate": asdict(candidate),
+        "risk_constrained_candidate": risk_candidate,
+        "risk_constrained_reconciliation": reconciliation,
+        "risk_constrained_excess_return_percentage_points":
+            risk_candidate["return_pct"] - passive.return_pct,
         "passive_comparator": asdict(passive),
         "candidate_excess_return_percentage_points": candidate.return_pct-passive.return_pct,
         "modelled_fills_only": True,

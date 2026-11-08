@@ -4,6 +4,7 @@ Legacy aggregate-only reports cannot be fed into a bootstrap screen as if they
 contained chronological per-period OOS observations. This is deliberate.
 """
 from alpha_lab.strategy_evidence import evaluate_oos, ValidationConfig
+from alpha_lab.research.promotion_authority import decide_strategy_promotion
 
 def screen_research_report(report: dict, *, config: ValidationConfig = ValidationConfig()) -> dict:
     if not isinstance(report, dict) or report.get("trading_enabled") is not False:
@@ -16,6 +17,8 @@ def screen_research_report(report: dict, *, config: ValidationConfig = Validatio
         return {
             "status": "INSUFFICIENT_EVIDENCE",
             "trading_enabled": False,
+            "promotion_authorised": False,
+            "live_trading_authorised": False,
             "missing_fields": missing,
             "reason": "Existing aggregate summaries do not prove chronological OOS observations",
         }
@@ -38,7 +41,10 @@ def screen_research_report(report: dict, *, config: ValidationConfig = Validatio
         additional_cost_per_period=report["additional_cost_per_period"],
         config=config,
     )
+    authority = decide_strategy_promotion(assessment=report)
     return {"status": result.status, "trading_enabled": False,
+            "promotion_authorised": authority["promotion_authorised"],
+            "live_trading_authorised": authority["live_trading_authorised"],
             "reasons": result.reasons, "observations": result.observations,
             "lower_confidence_bound": result.lower_confidence_bound,
             "max_drawdown": result.max_drawdown}

@@ -8,7 +8,7 @@ from pathlib import Path
 from alpha_lab.research.evidence_assessment import assess_evidence
 
 def run_assessment(files: list[str | Path], output: str | Path, *,
-                   additional_cost_per_period: float) -> dict:
+                   additional_cost_per_period: float, tested_strategies: int = 1) -> dict:
     target = Path(output)
     sources = [Path(x) for x in files]
     if not sources:
@@ -19,7 +19,7 @@ def run_assessment(files: list[str | Path], output: str | Path, *,
         raise FileExistsError("Refusing to overwrite assessment")
     raw = [p.read_bytes() for p in sources]
     folds = [json.loads(payload) for payload in raw]
-    report = assess_evidence(folds, additional_cost_per_period=additional_cost_per_period)
+    report = assess_evidence(folds, additional_cost_per_period=additional_cost_per_period, tested_strategies=tested_strategies)
     report["evidence_file_count"] = len(sources)
     report["research_only"] = True
     report["schema"] = "alpha-labs.offline-assessment.v1"
@@ -51,9 +51,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("evidence", nargs="+")
     parser.add_argument("--output", required=True)
     parser.add_argument("--additional-cost-per-period", required=True, type=float)
+    parser.add_argument("--tested-strategies", type=int, default=1,
+                        help="Number of strategies examined; does not apply multiplicity correction")
     args = parser.parse_args(argv)
     report = run_assessment(args.evidence, args.output,
-                            additional_cost_per_period=args.additional_cost_per_period)
+                            additional_cost_per_period=args.additional_cost_per_period,
+                            tested_strategies=args.tested_strategies)
     print(report["status"] + ": " + ", ".join(report["reasons"]))
     return 0
 

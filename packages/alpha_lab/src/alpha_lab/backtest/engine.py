@@ -37,6 +37,10 @@ def replay(bars: tuple[Bar,...], signals: list[bool], start: int, end: int, *,
             finite_decimal(value, nonnegative=True)
         if j and bar.time <= bars[j-1].time:
             raise ValueError('unordered or duplicate candle timestamps')
+    intervals = [(bars[j].time - bars[j-1].time).total_seconds() for j in range(1, len(bars))]
+    if not intervals or min(intervals) < 60 or min(intervals) % 60:
+        raise ValueError('cannot establish positive whole-minute candle interval')
+    inferred_interval_minutes = int(min(intervals) // 60)
     if not (1<=start<end<=len(bars)) or len(signals)!=len(bars): raise ValueError('invalid range or signals')
     if not (Decimal('0')<max_allocation<=Decimal('1')) or starting_balance<=0:
         raise ValueError('invalid capital controls')
@@ -46,12 +50,9 @@ def replay(bars: tuple[Bar,...], signals: list[bool], start: int, end: int, *,
         # A decision based on the previous close is eligible at the next open
         # only if that previous interval has fully closed.
         if i > 0:
-            elapsed = bars[i].time - bars[i-1].time
-            if elapsed.total_seconds() <= 0:
-                raise ValueError('nonpositive candle interval')
-            # Do not mistake exchange holidays/weekends for incomplete bars.
-            # This checks observed close-to-next-open elapsed time, not an exchange calendar.
-            require_final_candle(bars[i-1].time, int(elapsed.total_seconds() // 60), bars[i].time)
+            # Infer the shortest observed bar interval; longer gaps may be holidays.
+            # Explicit exchange-calendar settlement remains a separate requirement.
+            require_final_candle(bars[i-1].time, inferred_interval_minutes, bars[i].time)
         price=bars[i].open
         # Close-bar signal is available only at the following candle open.
         should_hold = (i==start or qty>0) if passive else signals[i-1]

@@ -32,3 +32,28 @@ explicitly correct.
 Design contract only. No provider selected, no OIDC middleware installed,
 no secrets changed, no Render service created. HMAC test verifier remains
 research-only. Live trading remains disabled. Release gate: NO-GO.
+
+## Provider selection — dedicated Alpha Labs identity
+
+**Decision:** Establish a separate managed Auth0 tenant/application and API
+for Alpha Labs, independent of Q3HASH and AiTec Australia. No tenant or
+credentials have been created by this commit.
+
+- Register a dedicated confidential server-side integration and an API
+  audience for the paper-status service; configure the exact issuer and
+  RS256 JWKS validation. Do not use browser-held client secrets.
+- Use the provider's hosted login and standards-compliant authorization-code
+  flow with PKCE where the website platform supports it. Confirm GPT Sites
+  authentication integration capabilities before implementing browser login.
+- Backend must verify access-token issuer, audience, signature, expiry and
+  subject on every request; derive ownership exclusively from verified claims
+  and persistent grants. Reject ID tokens used as API bearer tokens.
+- Add dedicated staging and production application registrations, explicit
+  redirect/logout URI allowlists, MFA policy and administrative recovery.
+- Avoid enabling open public signup until identity, abuse controls and
+  onboarding are tested. Keep paper execution and broker integration disabled.
+- Provision the tenant and secrets manually or with separate explicit
+  authorisation. Never store Auth0 secrets in GitHub, Render blueprints or Sites.
+
+**Status:** provider selected; actual Auth0 tenant, OIDC middleware, JWKS
+rotation and HTTPS end-to-end tests not yet implemented or verified.

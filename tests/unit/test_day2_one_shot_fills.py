@@ -1,5 +1,6 @@
 """One-shot fill stream consistency for independent P&L reconstruction."""
 import unittest
+from decimal import Decimal
 from alpha_lab.research.pnl_reporting import report_pnl
 
 
@@ -15,7 +16,7 @@ class OneShotFillTests(unittest.TestCase):
         expected = report_pnl(fills, {"BTC": "110"}, **kwargs)
         observed = report_pnl((fill for fill in fills), {"BTC": "110"}, **kwargs)
         self.assertEqual(observed, expected)
-        self.assertEqual(observed["final_liquidation_nav"], "1023.2875")
+        self.assertEqual(Decimal(observed["final_liquidation_nav"]), Decimal("1023.2875"))
 
     def test_duplicate_id_generator_fails(self):
         fill = {"fill_id": "duplicate", "symbol": "BTC", "side": "BUY",

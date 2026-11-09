@@ -43,7 +43,11 @@ class PaperIdentityVerifier:
         if len(parts) != 2:
             raise PermissionError("Invalid identity token")
         payload_segment, signature_segment = parts
-        expected = hmac.new(self._key, payload_segment.encode("ascii"), hashlib.sha256).digest()
+        try:
+            encoded_payload = payload_segment.encode("ascii")
+        except UnicodeEncodeError as exc:
+            raise PermissionError("Invalid identity token encoding") from exc
+        expected = hmac.new(self._key, encoded_payload, hashlib.sha256).digest()
         try:
             signature = _decode(signature_segment)
             raw = _decode(payload_segment)

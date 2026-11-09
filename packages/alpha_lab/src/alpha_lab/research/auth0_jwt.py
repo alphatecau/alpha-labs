@@ -37,6 +37,7 @@ def _object(part):
 
 class Auth0JWTVerifier:
     """Validate access JWTs against explicitly pinned Auth0 RSA public keys."""
+    _auth0_verified_bearer = True
 
     def __init__(self, *, issuer, audience, jwks):
         if not isinstance(issuer, str) or not re.fullmatch(r"https://[A-Za-z0-9.-]+/", issuer):

@@ -49,7 +49,7 @@ class BrowserOIDCTests(unittest.TestCase):
     def request(self, path, method="GET", cookie="", query="", origin=""):
         result = {}
         env = {"PATH_INFO": path, "REQUEST_METHOD": method, "HTTP_COOKIE": cookie,
-               "QUERY_STRING": query, "HTTP_ORIGIN": origin}
+               "QUERY_STRING": query, "HTTP_ORIGIN": origin, "wsgi.url_scheme": "https"}
         def start(status, headers):
             result["status"], result["headers"] = status, dict(headers)
             result["cookies"] = [value for key, value in headers if key.lower() == "set-cookie"]

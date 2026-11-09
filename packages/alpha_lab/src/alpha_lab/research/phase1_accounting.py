@@ -15,7 +15,7 @@ def D(value):
         raise ValueError("Nonfinite ledger value")
     return x
 
-def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bps="0"):
+def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bps="0", require_fill_ids=False):
     cash=D(starting_cash)
     if cash<=0:raise ValueError("Invalid initial cash")
     bps=D(liquidation_bps)
@@ -27,6 +27,8 @@ def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bp
     for index,order in enumerate(orders):
         if "fee_currency" in order:
             raise ValueError("Fee currency unsupported by single-currency ledger")
+        if require_fill_ids and "fill_id" not in order:
+            raise ValueError("Missing required fill identifier")
         if "fill_id" in order:
             fill_id=order["fill_id"]
             if not isinstance(fill_id,str) or not fill_id.strip():

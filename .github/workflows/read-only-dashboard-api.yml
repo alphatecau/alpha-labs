@@ -4,6 +4,9 @@ on:
     paths:
       - 'deployment/research_readonly_*.py'
       - 'deployment/research_rls_isolated.sql'
+      - 'deployment/research_rls_transaction_fixture.sql'
+      - 'deployment/research_dashboard_bff.py'
+      - 'tests/unit/test_research_dashboard_bff.py'
       - 'deployment/oidc_verifier.py'
       - 'deployment/trusted_site_relay.py'
       - 'tests/unit/test_readonly_research_api.py'
@@ -48,3 +51,4 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq postgresql-client
           psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d alpha_rls_test -f deployment/research_rls_isolated.sql
+          psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d alpha_rls_test -f deployment/research_rls_transaction_fixture.sql

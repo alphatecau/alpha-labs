@@ -7,6 +7,8 @@ from datetime import datetime, timezone
 
 from alpha_lab.research.paper_identity import issue_test_token
 from alpha_lab.research.paper_staging_app import build_app
+from alpha_lab.research.paper_account_service import VerifiedPrincipal
+from alpha_lab.research.paper_ownership import PaperOwnershipRegistry
 
 
 class StagingHTTPContractTests(unittest.TestCase):
@@ -72,6 +74,25 @@ class StagingHTTPContractTests(unittest.TestCase):
         # Header spoofing must not alter the principal derived from the token.
         self.assertEqual(self.call(token=self.token(sub="other"),
                          extra={"HTTP_X_USER_ID": "owner"})["status"], "404 Not Found")
+
+
+    def test_revocation_denies_http_and_survives_restart(self):
+        owner = VerifiedPrincipal("owner", "staging-test")
+        self.assertEqual(self.call(token=self.token())["status"], "200 OK")
+        self.app.accounts.ownership.revoke(owner, "primary")
+        self.assertEqual(self.call(token=self.token())["status"], "404 Not Found")
+        self.app.accounts.close()
+        self.app = build_app(self.config)
+        self.app.now = lambda: self.now
+        self.assertEqual(self.call(token=self.token())["status"], "404 Not Found")
+
+    def test_account_owner_cannot_be_spoofed_via_request_headers(self):
+        outsider = self.token(sub="outsider")
+        self.assertEqual(self.call(token=outsider,
+                         extra={"HTTP_X_USER_ID": "owner",
+                                "HTTP_X_FORWARDED_USER": "owner",
+                                "HTTP_X_AUTHENTICATED_SUBJECT": "owner"})["status"],
+                         "404 Not Found")
 
 
 if __name__ == "__main__":

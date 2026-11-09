@@ -9,13 +9,16 @@ from http.cookies import SimpleCookie
 from alpha_lab.research.oidc_durable_store import DurableOIDCStore
 from alpha_lab.research.oidc_postgres_store import PostgresOIDCStore
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
+from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
 
 
 class SessionPaperStatusWSGI:
-    def __init__(self, *, sessions, accounts):
+    def __init__(self, *, sessions, accounts, ownership):
         if not isinstance(sessions, (DurableOIDCStore, PostgresOIDCStore)):
             raise ValueError("Durable verified session store required")
-        self.sessions, self.accounts = sessions, accounts
+        if not isinstance(ownership, PaperOwnershipRegistry):
+            raise ValueError("Verified ownership registry required")
+        self.sessions, self.accounts, self.ownership = sessions, accounts, ownership
 
     def __call__(self, env, start_response):
         def reply(status, body):
@@ -45,6 +48,7 @@ class SessionPaperStatusWSGI:
         except (KeyError, ValueError, TypeError, PermissionError):
             return reply("401 Unauthorized", {"error": "authentication_required"})
         try:
+            self.ownership.require(principal, "primary")
             status = self.accounts.status(principal, "primary")
         except PermissionError:
             return reply("404 Not Found", {"error": "account_not_available"})

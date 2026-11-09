@@ -74,6 +74,10 @@ class OIDCBrowserWSGI:
             return jar[name].value if name in jar else None
 
         path, method = env.get("PATH_INFO"), env.get("REQUEST_METHOD")
+        if env.get("wsgi.url_scheme") != "https":
+            return respond("403 Forbidden", {"error": "https_required"})
+        if path == "/auth/login" and env.get("QUERY_STRING"):
+            return respond("400 Bad Request", {"error": "query_not_supported"})
         if path == "/auth/login" and method == "GET":
             state, nonce, verifier = self.store.begin()
             challenge = _b64(hashlib.sha256(verifier.encode()).digest())
@@ -96,7 +100,7 @@ class OIDCBrowserWSGI:
                 if not 1 <= len(code) <= 4096:
                     raise PermissionError("Invalid authorization code")
                 binding = get_cookie("__Host-alpha_oidc")
-                if not binding or binding.split(".", 1)[0] != state:
+                if not binding or not secrets.compare_digest(binding.split(".", 1)[0], state):
                     raise PermissionError("Unbound callback")
                 nonce = binding.split(".", 1)[1]
                 verifier = self.store.consume(state, nonce)

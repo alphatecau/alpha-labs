@@ -50,3 +50,29 @@ legacy `PaperLedger` usage elsewhere, nor provide a security boundary against
 arbitrary Python code in the same process (the guard is mutable and inspectable).
 Production must isolate sessions in an authenticated service and remove or
 restrict legacy public call sites. No production safety claim is made.
+
+## Repository code-search audit extension
+
+Default-branch GitHub code search for `PaperLedger`, `enable_simulation`,
+`paper_simulator` and `/api/paper` found the legacy simulator, durable
+`paper_runtime.py`, risk policy, unit tests and safety workflow. No matching
+`/api/paper` route was returned. Search is default-branch indexed and cannot
+prove absence of other dynamic imports or unindexed call sites.
+
+**Material finding:** `PaperRuntime.enable(operator_approved=True)` directly
+calls `PaperLedger.enable_simulation`, and `PaperRuntime.execute` performs
+risk-checked simulated fills. This is a second authority entry point.
+
+**Research mitigation:** `guarded_paper_runtime.py` now provides an
+opt-in authority-checked façade around durable journal replay, enable and
+execute. It fails closed on default HALT, live-copy mode, and missing operator
+approval. Existing `PaperRuntime` remains directly callable for legacy tests;
+therefore bypass closure is **partial**, not complete.
+
+**Website readiness:** BLOCKED. The façade does not authenticate users,
+isolate tenants, own session state on a trusted server, or prevent a trusted
+Python caller from reaching its private-in-convention `_runtime` attribute.
+Do not expose either legacy runtime or guarded façade directly to arbitrary
+client input. Integration requires an authenticated server-side service,
+per-user persistent ownership, server-side risk/approval policies and negative
+end-to-end tests. No broker integrations or live execution exist here.

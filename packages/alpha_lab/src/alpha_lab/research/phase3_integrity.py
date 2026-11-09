@@ -107,3 +107,77 @@ def reconcile_long_only_orders(starting_cash, orders, last_price, costs, expecte
     return {"cash": cash, "quantity": quantity, "realised_pnl": realised,
             "unrealised_liquidation_pnl": costs.sell_proceeds(quantity, mark) - entry_cost,
             "total_modelled_fees": fees, "nav": nav}
+
+
+def require_venue_bar_open(bar_time, sessions, *, venue):
+    """Reject any bar opening outside explicit exchange sessions; fail closed for equities."""
+    if venue != "equity":
+        raise ValueError("unsupported venue for session-based execution")
+    instant = utc_instant(bar_time)
+    if not any(utc_instant(s.opens) <= instant < utc_instant(s.closes)
+               for s in validate_sessions(sessions)):
+        raise ValueError("execution outside verified exchange session")
+    return instant
+
+
+def reconstruct_replay_economics(bars, orders, starting_cash, costs, expected_nav, *, last_close):
+    """Independently reconstruct recorded next-open long-only execution economics."""
+    from decimal import Decimal
+    bar_by_time = {utc_instant(b.time): b for b in bars}
+    if len(bar_by_time) != len(bars):
+        raise ValueError("duplicate bar times")
+    cash = finite_decimal(starting_cash, nonnegative=True)
+    qty = Decimal("0")
+    entry = Decimal("0")
+    realised = Decimal("0")
+    fees = Decimal("0")
+    last_order_time = None
+    for order in orders:
+        when = utc_instant(datetime.fromisoformat(order["time"]))
+        if when not in bar_by_time or (last_order_time is not None and when <= last_order_time):
+            raise ValueError("unknown or unordered execution bar")
+        last_order_time = when
+        open_price = finite_decimal(bar_by_time[when].open, nonnegative=True)
+        quantity = finite_decimal(order.get("quantity"), nonnegative=True)
+        if quantity <= 0 or open_price <= 0:
+            raise ValueError("invalid quantity or source price")
+        kind = order.get("kind")
+        if kind == "BUY":
+            if qty:
+                raise ValueError("duplicate entry")
+            execution_price = costs.buy_price(open_price)
+            fee = quantity * execution_price * costs.fee_bps / Decimal("10000")
+            outlay = quantity * execution_price + fee
+            if outlay > cash:
+                raise ValueError("insufficient cash")
+            if finite_decimal(order.get("quote_outlay")) != outlay:
+                raise ValueError("buy outlay mismatch")
+            cash -= outlay
+            qty = quantity
+            entry = outlay
+        elif kind == "SELL":
+            if quantity != qty:
+                raise ValueError("sell quantity mismatch")
+            execution_price = costs.sell_price(open_price)
+            fee = quantity * execution_price * costs.fee_bps / Decimal("10000")
+            proceeds = quantity * execution_price - fee
+            if finite_decimal(order.get("quote_received")) != proceeds:
+                raise ValueError("sell proceeds mismatch")
+            cash += proceeds
+            realised += proceeds - entry
+            qty = Decimal("0")
+            entry = Decimal("0")
+        else:
+            raise ValueError("invalid order side")
+        if finite_decimal(order.get("price")) != execution_price:
+            raise ValueError("execution price mismatch")
+        if finite_decimal(order.get("fee")) != fee:
+            raise ValueError("execution fee mismatch")
+        fees += fee
+    close = finite_decimal(last_close, nonnegative=True)
+    nav = cash + costs.sell_proceeds(qty, close)
+    if nav != finite_decimal(expected_nav):
+        raise ValueError("reconstructed NAV mismatch")
+    return {"cash":cash,"quantity":qty,"realised_pnl":realised,
+            "unrealised_liquidation_pnl":costs.sell_proceeds(qty,close)-entry,
+            "fees":fees,"nav":nav}

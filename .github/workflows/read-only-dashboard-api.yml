@@ -16,6 +16,7 @@ on:
       - 'deployment/staging_authenticated_assembly.py'
       - 'deployment/auth0_trusted_jwks.py'
       - 'deployment/postgres_pkce_state_store.py'
+      - 'tests/integration/test_auth_postgres_durable.py'
       - 'tests/unit/test_auth0_trusted_discovery.py'
       - 'tests/unit/test_staging_authenticated_assembly.py'
       - 'deployment/postgres_opaque_sessions.py'
@@ -98,6 +99,12 @@ jobs:
           ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
           PYTHONPATH: packages/alpha_lab/src:.
         run: python -m unittest discover -s tests/integration -p 'test_bff_postgres_chain.py' -v
+
+      - name: Verify durable PostgreSQL OAuth state and session revocation
+        env:
+          ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
+          PYTHONPATH: packages/alpha_lab/src:.
+        run: python -m unittest discover -s tests/integration -p 'test_auth_postgres_durable.py' -v
 
       - name: Verify tenant-role arbitrary SQL isolation
         env:

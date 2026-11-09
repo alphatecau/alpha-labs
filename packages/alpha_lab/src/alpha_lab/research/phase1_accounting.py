@@ -13,6 +13,12 @@ def D(value):
         raise ValueError("Invalid numeric ledger value") from exc
     if not x.is_finite():
         raise ValueError("Nonfinite ledger value")
+    if isinstance(value, bool):
+        raise ValueError("Boolean is not an accounting number")
+    if len(x.as_tuple().digits) > 28:
+        raise ValueError("Excessive decimal precision")
+    if x != 0 and abs(x.adjusted()) > 18:
+        raise ValueError("Accounting magnitude out of bounds")
     return x
 
 def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bps="0", require_fill_ids=False):

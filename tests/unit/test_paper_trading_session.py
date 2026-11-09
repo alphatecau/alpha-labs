@@ -31,6 +31,20 @@ class PaperTradingSessionTests(unittest.TestCase):
         self.assertTrue(session.status()["paper_halted"])
         self.assertFalse(session.status()["live_copy"]["can_execute"])
 
+    def test_managed_ledger_denies_direct_bypass(self):
+        session = PaperTradingSession(TradingAuthority(emergency_halt=False))
+        with self.assertRaises(PermissionError):
+            session.ledger.enable_simulation(operator_approved=True)
+        session.start_paper(operator_approved=True)
+        with self.assertRaises(PermissionError):
+            session.ledger.fill(symbol="BTC", side="BUY", quantity="1",
+                                reference_mid="100", executed_price="100", fee="0")
+        with self.assertRaises(PermissionError):
+            session.simulate_fill(symbol="BTC", side="BUY", quantity="1",
+                                  reference_mid="100", executed_price="100",
+                                  fee="0", simulated_only=False)
+        self.assertTrue(session.ledger.halted)
+
     def test_halt_change_blocks_fill(self):
         session = PaperTradingSession(TradingAuthority(emergency_halt=False))
         session.start_paper(operator_approved=True)

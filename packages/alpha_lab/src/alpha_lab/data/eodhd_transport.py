@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import os
 from urllib.parse import urlencode, urlsplit
+from datetime import date
 from urllib.request import HTTPError, HTTPRedirectHandler, Request, build_opener
 from urllib.error import URLError
 
@@ -42,6 +43,13 @@ def https_transport(path: str, params: dict[str, str], *, opener=None) -> Provid
         raise TransportError("Invalid request parameters")
     if params.get("fmt") != "json" or not all(isinstance(v, str) for v in params.values()):
         raise TransportError("Invalid request parameters")
+    try:
+        start = date.fromisoformat(params["from"])
+        end = date.fromisoformat(params["to"])
+    except (ValueError, KeyError):
+        raise TransportError("Invalid date parameters") from None
+    if start > end or not params["api_token"]:
+        raise TransportError("Invalid request parameters")
     url = "https://" + HOST + path + "?" + urlencode(params)
     parsed = urlsplit(url)
     if parsed.scheme != "https" or parsed.hostname != HOST or parsed.port is not None:
@@ -51,6 +59,10 @@ def https_transport(path: str, params: dict[str, str], *, opener=None) -> Provid
     try:
         with client.open(req, timeout=TIMEOUT_SECONDS) as response:
             status = response.status
+            if hasattr(response, "geturl"):
+                actual = urlsplit(response.geturl())
+                if (actual.scheme, actual.hostname, actual.path, actual.query) != (parsed.scheme, parsed.hostname, parsed.path, parsed.query):
+                    raise TransportError("Unexpected redirect target")
             if status != 200:
                 return ProviderReply(status, "")
             data = response.read(MAX_RESPONSE_BYTES + 1)

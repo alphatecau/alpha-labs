@@ -13,6 +13,7 @@ from urllib.request import Request, urlopen
 
 from alpha_lab.research.auth0_jwt import Auth0JWTVerifier
 from alpha_lab.research.oidc_durable_store import DurableOIDCStore
+from alpha_lab.research.oidc_postgres_store import PostgresOIDCStore
 
 
 def _b64(data):
@@ -34,7 +35,7 @@ class OIDCBrowserWSGI:
             raise ValueError("HTTPS callback required")
         if not all(isinstance(x, str) and x for x in (client_id, client_secret)):
             raise ValueError("Confidential client credentials required")
-        if not isinstance(store, DurableOIDCStore) or not isinstance(verifier, Auth0JWTVerifier) or verifier.issuer != issuer or verifier.audience != client_id:
+        if not isinstance(store, (DurableOIDCStore, PostgresOIDCStore)) or not isinstance(verifier, Auth0JWTVerifier) or verifier.issuer != issuer or verifier.audience != client_id:
             raise ValueError("Verified OIDC identity and durable store required")
         self.issuer, self.client_id, self.client_secret = issuer, client_id, client_secret
         self.redirect_uri, self.store, self.verifier = redirect_uri, store, verifier

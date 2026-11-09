@@ -27,7 +27,7 @@ class TwoUserBridgeTests(unittest.TestCase):
         self.verify = SessionOwnershipVerifier(sessions=self.sessions, ownership=self.owners, limiter=self.limiter)
         self.secret = "test-only-secret-" + "x" * 48
         self.reader = SyntheticReader()
-        self.api = ResearchReadOnlyAPI(reader=self.reader, secret=self.secret, clock=lambda: 1000)
+        self.api = ResearchReadOnlyAPI(reader=self.reader, secret=self.secret)
 
         def backend(path, headers):
             response = {}

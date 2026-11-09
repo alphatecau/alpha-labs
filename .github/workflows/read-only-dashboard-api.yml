@@ -14,6 +14,8 @@ on:
       - 'deployment/auth0_session_controller.py'
       - 'deployment/staging_authenticated_bff.py'
       - 'deployment/staging_authenticated_assembly.py'
+      - 'deployment/authenticated_staging_bootstrap.py'
+      - 'tests/unit/test_authenticated_staging_bootstrap.py'
       - 'deployment/auth0_trusted_jwks.py'
       - 'deployment/auth0_refreshing_verifier.py'
       - 'tests/unit/test_auth0_refreshing_verifier.py'
@@ -85,6 +87,7 @@ jobs:
           python -m unittest discover -s tests/unit -p 'test_auth0_confidential_exchange.py' -v
           python -m unittest discover -s tests/unit -p 'test_staging_authenticated_bff.py' -v
           python -m unittest discover -s tests/unit -p 'test_staging_authenticated_assembly.py' -v
+          python -m unittest discover -s tests/unit -p 'test_authenticated_staging_bootstrap.py' -v
           python -m unittest discover -s tests/unit -p 'test_staging_boundary_adversarial.py' -v
           python -m unittest discover -s tests/unit -p 'test_staging_bff_http_boundaries.py' -v
           python -m unittest discover -s tests/unit -p 'test_auth0_trusted_discovery.py' -v

@@ -21,7 +21,7 @@ class RealPostgresSecurityTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dsn = os.environ["ALPHA_TEST_POSTGRES_DSN"]
-        cls.connect = lambda: psycopg.connect(cls.dsn)
+        cls.connect = staticmethod(lambda: psycopg.connect(cls.dsn))
         with cls.connect() as conn:
             conn.execute(SCHEMA)
 

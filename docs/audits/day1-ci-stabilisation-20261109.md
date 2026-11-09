@@ -68,3 +68,12 @@ Latest repository commit returned by GitHub commit search: `2cb66a8ddfc2d2b64246
 - Touched the paper simulator workflow only with an explanatory comment to trigger its existing PR-path-filtered adversarial pytest gate; no runtime trading code changes.
 - Immediate PR workflow lookup returned **no runs** for either the head or integration SHA. This is an observation at lookup time, not proof that GitHub will never schedule checks. No new CI PASS claimed.
 - Acceptance still **PENDING / NO-GO** until dedicated signed-archive, paper-simulator, generic research and website checks are observed with matching candidate SHA and passing logs.
+
+## Dedicated security CI PASS — 2026-11-09
+- PR #52 head `9c37ea55d69137953231ce467d4f8b5577611dea`; all four jobs checked out exact PR integration SHA `045938dabc46746e19095ec21dfe364dec2b18b2` (job logs verified).
+- Signed archive: https://github.com/alphatecau/alpha-labs/actions/runs/42553278932 (job 128953351250), **PASS**. Installed cryptography **46.0.7**; full Python suite **212 tests, OK, zero skips**, enforced by no-skips assertion; dedicated signed archive and combined-promotion tests passed.
+- Paper simulator: https://github.com/alphatecau/alpha-labs/actions/runs/42553278891 (job 128953351226), **PASS, 5 tests**.
+- Generic research: https://github.com/alphatecau/alpha-labs/actions/runs/42553278902 (job 128953351278), **PASS, 212 tests, 3 skips** due to intentionally absent cryptography in generic runner; all three covered with zero skips in the dedicated security job.
+- Website: https://github.com/alphatecau/alpha-labs/actions/runs/42553278876 (job 128953351260), **PASS, 36 tests, zero skips**.
+- Day 1 scoped CI acceptance: **PASS for the tested PR #52 integration tree** (all four required observed workflows green, cryptography-enabled no-skips suite). This does not attest to unobserved workflows, real market-data correctness, live-trading safety, or a different future main SHA. Preserve no-merge/deploy/credentials/trading restriction.
+- Nonblocking maintenance: GitHub Actions warns about Node 20 deprecation in checkout/setup actions.

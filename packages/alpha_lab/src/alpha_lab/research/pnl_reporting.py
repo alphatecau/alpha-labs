@@ -8,9 +8,10 @@ from decimal import Decimal
 from alpha_lab.research.phase1_accounting import D, reconstruct
 
 
-def report_pnl(orders, closing_prices, *, starting_cash="10000", liquidation_bps="0"):
+def report_pnl(orders, closing_prices, *, starting_cash="10000", liquidation_bps="0", require_fill_ids=False):
     audit = reconstruct(orders, closing_prices, starting_cash=starting_cash,
-                        liquidation_bps=liquidation_bps)
+                        liquidation_bps=liquidation_bps,
+                        require_fill_ids=require_fill_ids)
     inventory = {symbol: {"qty": Decimal(0), "gross_basis": Decimal(0),
                           "fee_basis": Decimal(0)} for symbol in closing_prices}
     realised_gross = Decimal(0)

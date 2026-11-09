@@ -10,15 +10,18 @@ from alpha_lab.research.oidc_durable_store import DurableOIDCStore
 from alpha_lab.research.oidc_postgres_store import PostgresOIDCStore
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
+from alpha_lab.research.identity_rate_limit import SQLiteIdentityLimiter
 
 
 class SessionPaperStatusWSGI:
-    def __init__(self, *, sessions, accounts, ownership):
+    def __init__(self, *, sessions, accounts, ownership, limiter):
         if not isinstance(sessions, (DurableOIDCStore, PostgresOIDCStore)):
             raise ValueError("Durable verified session store required")
         if not isinstance(ownership, PaperOwnershipRegistry):
             raise ValueError("Verified ownership registry required")
-        self.sessions, self.accounts, self.ownership = sessions, accounts, ownership
+        if not isinstance(limiter, SQLiteIdentityLimiter):
+            raise ValueError("Shared identity limiter required")
+        self.sessions, self.accounts, self.ownership, self.limiter = sessions, accounts, ownership, limiter
 
     def __call__(self, env, start_response):
         def reply(status, body):
@@ -48,6 +51,10 @@ class SessionPaperStatusWSGI:
         except (KeyError, ValueError, TypeError, PermissionError):
             return reply("401 Unauthorized", {"error": "authentication_required"})
         try:
+            try:
+                self.limiter.allow(principal.issuer, principal.subject)
+            except PermissionError:
+                return reply("429 Too Many Requests", {"error": "rate_limited"})
             self.ownership.require(principal, "primary")
             status = self.accounts.status(principal, "primary")
         except PermissionError:

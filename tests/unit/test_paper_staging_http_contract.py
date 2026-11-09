@@ -82,9 +82,9 @@ class StagingHTTPContractTests(unittest.TestCase):
         self.app.accounts.ownership.revoke(owner, "primary")
         self.assertEqual(self.call(token=self.token())["status"], "404 Not Found")
         self.app.accounts.close()
-        self.app = build_app(self.config)
-        self.app.now = lambda: self.now
-        self.assertEqual(self.call(token=self.token())["status"], "404 Not Found")
+        # Revoked owner must also prevent a new staging process from starting.
+        with self.assertRaises(PermissionError):
+            build_app(self.config)
 
     def test_account_owner_cannot_be_spoofed_via_request_headers(self):
         outsider = self.token(sub="outsider")

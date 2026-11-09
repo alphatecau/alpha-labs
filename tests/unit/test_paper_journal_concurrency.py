@@ -17,6 +17,17 @@ class JournalConcurrencyTests(unittest.TestCase):
             self.assertEqual(a.verify(),first)
             a.close()
             b.close()
+    def test_missing_first_sequence_blocks_recovery(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=str(Path(tmp)/"events.sqlite3")
+            a=PaperJournal(path)
+            a.append({"type":"TEST"})
+            a.connection.execute("UPDATE events SET seq=2 WHERE seq=1")
+            a.connection.commit()
+            with self.assertRaisesRegex(ValueError,"HALT"):
+                a.verify()
+            a.close()
+
     def test_corrupted_event_blocks_append(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=str(Path(tmp)/"events.sqlite3")

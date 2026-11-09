@@ -61,6 +61,10 @@ class PaperRuntime:
                 request_id, authoritative_risk_verified):
         if not self.recovery_verified or self.ledger.halted or operator_approved is not True:
             raise PermissionError("HALT: operator approval and recovered ledger required")
+        # Caller-supplied authority is not evidence of independent risk validation.
+        # Execution stays disabled until trusted server-owned risk inputs exist.
+        self.ledger.halt()
+        raise PermissionError("HALT: trusted server-owned risk authority not implemented")
         if authoritative_risk_verified is not True:
             self.ledger.halt()
             raise PermissionError("HALT: independently authoritative risk inputs unavailable")

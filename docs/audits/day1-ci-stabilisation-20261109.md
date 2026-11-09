@@ -60,3 +60,11 @@ Latest repository commit returned by GitHub commit search: `2cb66a8ddfc2d2b64246
 - Existing `.github/workflows/paper-simulator-safety.yml` also uses path-filtered PR triggers, so PR #50 is not proof of that separate safety workflow.
 - Current-main base SHA is independently confirmed by PR metadata, but no complete, no-skips security test matrix has been observed on the exact PR #50 integration SHA.
 - **Decision:** standard CI PASS; full mandatory security verification **BLOCKED/UNVERIFIED**. Do not merge, deploy, change credentials or enable trading. The remaining action is to run dedicated security CI on the exact candidate or an equivalent pinned tree and inspect job logs; then certify only the tests actually run.
+
+## Dedicated security CI candidate — 2026-11-09
+- Created separate branch `audit/day1-dedicated-security-ci-20261109` from main SHA `2cb66a8ddfc2d2b64246ab9441d0a26a364f7360`.
+- Draft PR #52: https://github.com/alphatecau/alpha-labs/pull/52, head `9c37ea55d69137953231ce467d4f8b5577611dea`, PR integration SHA `045938dabc46746e19095ec21dfe364dec2b18b2`.
+- Added crypto-enabled full unit discovery with an explicit >=200 test threshold, zero-skips assertion and success requirement to the dedicated signed archive workflow; preserved existing targeted signed archive checks.
+- Touched the paper simulator workflow only with an explanatory comment to trigger its existing PR-path-filtered adversarial pytest gate; no runtime trading code changes.
+- Immediate PR workflow lookup returned **no runs** for either the head or integration SHA. This is an observation at lookup time, not proof that GitHub will never schedule checks. No new CI PASS claimed.
+- Acceptance still **PENDING / NO-GO** until dedicated signed-archive, paper-simulator, generic research and website checks are observed with matching candidate SHA and passing logs.

@@ -7,14 +7,14 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation
 
 def D(value):
+    if isinstance(value, bool):
+        raise ValueError("Boolean is not an accounting number")
     try:
         x=Decimal(str(value))
     except (InvalidOperation,TypeError,ValueError) as exc:
         raise ValueError("Invalid numeric ledger value") from exc
     if not x.is_finite():
         raise ValueError("Nonfinite ledger value")
-    if isinstance(value, bool):
-        raise ValueError("Boolean is not an accounting number")
     if len(x.as_tuple().digits) > 28:
         raise ValueError("Excessive decimal precision")
     if x != 0 and abs(x.adjusted()) > 18:

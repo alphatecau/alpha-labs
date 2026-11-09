@@ -6,6 +6,8 @@ on:
       - 'deployment/research_rls_isolated.sql'
       - 'deployment/research_rls_transaction_fixture.sql'
       - 'deployment/research_dashboard_bff.py'
+      - 'deployment/transaction_scoped_research_reader.py'
+      - 'tests/integration/test_bff_postgres_chain.py'
       - 'tests/unit/test_research_dashboard_bff.py'
       - 'deployment/oidc_verifier.py'
       - 'deployment/trusted_site_relay.py'
@@ -38,7 +40,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install cryptography for OIDC tests
-        run: python -m pip install 'cryptography>=44,<47'
+        run: python -m pip install 'cryptography>=44,<47' 'psycopg[binary]>=3.2,<4'
       - name: Run read-only API, relay and OIDC tests
         run: |
           python -m unittest discover -s tests/unit -p 'test_readonly_research_api.py' -v
@@ -52,3 +54,9 @@ jobs:
           sudo apt-get install -y -qq postgresql-client
           psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d alpha_rls_test -f deployment/research_rls_isolated.sql
           psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d alpha_rls_test -f deployment/research_rls_transaction_fixture.sql
+
+      - name: Run BFF-to-PostgreSQL two-account acceptance
+        env:
+          ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
+          PYTHONPATH: packages/alpha_lab/src:.
+        run: python -m unittest discover -s tests/integration -p 'test_bff_postgres_chain.py' -v

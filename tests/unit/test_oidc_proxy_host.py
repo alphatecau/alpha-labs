@@ -4,7 +4,7 @@ import unittest
 CRYPTO = importlib.util.find_spec("cryptography") is not None
 if CRYPTO:
     from alpha_lab.research.oidc_browser_wsgi import OIDCBrowserWSGI
-    from tests.unit.test_oidc_browser_wsgi import BrowserOIDCTests
+    from test_oidc_browser_wsgi import BrowserOIDCTests
 
 
 @unittest.skipUnless(CRYPTO, "Requires crypto-enabled CI")

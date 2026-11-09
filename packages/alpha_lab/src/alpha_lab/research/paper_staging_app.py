@@ -10,6 +10,7 @@ from pathlib import Path
 from alpha_lab.research.paper_account_service import PaperAccountService, VerifiedPrincipal
 from alpha_lab.research.paper_identity import PaperIdentityVerifier
 from alpha_lab.research.paper_status_wsgi import PaperStatusWSGI
+from alpha_lab.research.paper_ownership import PaperOwnershipRegistry, OwnedPaperStatus
 
 
 def build_app(config):
@@ -31,14 +32,21 @@ def build_app(config):
         key=key, issuer=config["ALPHA_PAPER_ISSUER"],
         audience=config["ALPHA_PAPER_AUDIENCE"])
     accounts = PaperAccountService(root)
+    ownership = None
     try:
+        ownership = PaperOwnershipRegistry(root / "paper_owners.sqlite3")
         owner = VerifiedPrincipal(config["ALPHA_PAPER_OWNER_SUBJECT"],
                                   config["ALPHA_PAPER_ISSUER"])
+        ownership.provision(owner, "primary")
+        if not ownership.authorised(owner, "primary"):
+            raise PermissionError("Owner account revoked; refusing startup")
         accounts.open_account(owner, "primary")
     except Exception:
         accounts.close()
+        if ownership is not None:
+            ownership.close()
         raise
-    return PaperStatusWSGI(verifier=verifier, accounts=accounts)
+    return PaperStatusWSGI(verifier=verifier, accounts=OwnedPaperStatus(accounts, ownership))
 
 
 def create_app():

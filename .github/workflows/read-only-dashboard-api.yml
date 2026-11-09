@@ -8,6 +8,9 @@ on:
       - 'deployment/research_role_isolation_fixture.sql'
       - 'deployment/account_role_research_reader.py'
       - 'deployment/fixed_origin_research_transport.py'
+      - 'deployment/auth0_login_flow.py'
+      - 'deployment/tenant_credential_broker.py'
+      - 'tests/unit/test_auth0_broker_preparation.py'
       - 'tests/unit/test_fixed_origin_research_transport.py'
       - 'tests/integration/test_account_role_isolation.py'
       - 'deployment/research_dashboard_bff.py'
@@ -52,6 +55,7 @@ jobs:
           python -m unittest discover -s tests/unit -p 'test_trusted_site_relay.py' -v
           python -m unittest discover -s tests/unit -p 'test_oidc_verifier.py' -v
           python -m unittest discover -s tests/unit -p 'test_fixed_origin_research_transport.py' -v
+          python -m unittest discover -s tests/unit -p 'test_auth0_broker_preparation.py' -v
       - name: Run isolated PostgreSQL RLS and privilege assertions
         env:
           PGPASSWORD: ci-only

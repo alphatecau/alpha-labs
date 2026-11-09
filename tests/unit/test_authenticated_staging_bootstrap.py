@@ -48,5 +48,60 @@ class BootstrapTests(unittest.TestCase):
         self.assertIn(b'"trading":"disabled"', body)
 
 
+    def test_missing_confidential_secret_fails_closed(self):
+        class Ownership:
+            def require(self, principal, scope):
+                return None
+        env = dict(self.env)
+        env.pop("AUTH0_CLIENT_SECRET")
+        with self.assertRaises(ValueError):
+            build_authenticated_application(
+                environ=env, ownership=Ownership(), principal_factory=lambda **k: k,
+                state_connect=self.connect, session_connect=self.connect,
+                tenant_connect=self.connect, verifier_factory=lambda *a: lambda token: None)
+
+    def test_untrusted_verifier_fails_closed(self):
+        class Ownership:
+            def require(self, principal, scope):
+                return None
+        with self.assertRaises(ValueError):
+            build_authenticated_application(
+                environ=self.env, ownership=Ownership(), principal_factory=lambda **k: k,
+                state_connect=self.connect, session_connect=self.connect,
+                tenant_connect=self.connect, verifier_factory=lambda *a: None)
+
+    def test_invalid_principal_factory_fails_before_verifier(self):
+        class Ownership:
+            def require(self, principal, scope):
+                return None
+        with self.assertRaises(ValueError):
+            build_authenticated_application(
+                environ=self.env, ownership=Ownership(), principal_factory=None,
+                state_connect=self.connect, session_connect=self.connect,
+                tenant_connect=self.connect,
+                verifier_factory=lambda *a: self.fail("unexpected verifier fetch"))
+
+    def test_authenticated_routes_not_public_without_session(self):
+        class Ownership:
+            def require(self, principal, scope):
+                return None
+        app = build_authenticated_application(
+            environ=self.env, ownership=Ownership(), principal_factory=lambda **k: k,
+            state_connect=self.connect, session_connect=self.connect,
+            tenant_connect=self.connect, verifier_factory=lambda *a: lambda token: None)
+        for path in ("/api/v1/research/runs", "/api/v1/research/summary"):
+            with self.subTest(path=path):
+                status = []
+                app({"PATH_INFO": path, "REQUEST_METHOD": "GET"},
+                    lambda code, headers: status.append(code))
+                self.assertEqual(status, ["401 Unauthorized"])
+        for path in ("/api/v1/trade", "/api/v1/orders", "/api/v1/execute"):
+            with self.subTest(path=path):
+                status = []
+                app({"PATH_INFO": path, "REQUEST_METHOD": "POST"},
+                    lambda code, headers: status.append(code))
+                self.assertEqual(status, ["404 Not Found"])
+
+
 if __name__ == "__main__":
     unittest.main()

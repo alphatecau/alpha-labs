@@ -30,3 +30,19 @@ transactional idempotency.
 ## Release decision
 **NO-GO**. No authenticated HTTP API, browser integration or deployment has
 been completed. Passing unit tests will not imply production readiness.
+
+## Research-only signed identity verification
+
+Added `paper_identity.py` with a deterministic HMAC-SHA256 verifier for
+short-lived, server-issued test tokens. It verifies signature, exact claim
+shape, issuer, audience, subject, issued-at, expiry and a 15-minute maximum
+lifetime. Tests cover forged signatures, expired/not-yet-valid tokens,
+wrong issuer/audience, weak keys and malformed subjects. The test token
+issuer is **not** an HTTP login service.
+
+Do not expose `issue_test_token` to website users. No secret is committed;
+production keys must be injected server-side and rotated. This verifier has
+no revocation list, session store, multi-key rotation or browser protections.
+`VerifiedPrincipal` can still be constructed by trusted Python code, so
+actual enforcement requires an HTTP boundary that invokes verification on
+every request and never accepts principal objects from client input.

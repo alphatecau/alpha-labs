@@ -46,3 +46,20 @@ no revocation list, session store, multi-key rotation or browser protections.
 `VerifiedPrincipal` can still be constructed by trusted Python code, so
 actual enforcement requires an HTTP boundary that invokes verification on
 every request and never accepts principal objects from client input.
+
+## Read-only WSGI status boundary (research implementation)
+
+Added `paper_status_wsgi.py` with one GET-only endpoint:
+`/api/research/paper/status`. It checks a server-signed short-lived bearer
+token, derives the authenticated principal from verified claims, looks up the
+server-owned `primary` paper account, returns HALT/readiness status and
+always reports live-copy disabled. No write, enable, execute or broker route
+exists. Negative tests cover absent/forged credentials, wrong-account access,
+query tampering and unsupported write methods.
+
+**Not deployed or production-ready.** The WSGI adapter does not provide HTTPS,
+production identity federation, key rotation/revocation, rate limiting,
+shared persistent account ownership, process-safe concurrency or external
+security review. The sample HMAC verifier is for offline research only.
+The website must not be connected until a trusted ingress and identity
+provider are configured and tested. No secrets may be included in the site.

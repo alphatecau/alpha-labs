@@ -69,4 +69,5 @@ DO $$ BEGIN
 END $$;
 
 DROP TABLE public.alpha_tx_fixture;
+REVOKE USAGE ON SCHEMA public FROM alpha_tx_reader;
 DROP ROLE alpha_tx_reader;

@@ -13,17 +13,22 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 class Auth0SessionController:
-    def __init__(self, flow, verify_token, sessions, ownership, principal_factory, exchange=None):
+    def __init__(self, flow, verify_token, sessions, ownership, principal_factory, exchange=None, client_secret=None):
         self.flow, self.verify_token = flow, verify_token
         self.sessions, self.ownership = sessions, ownership
         self.principal_factory = principal_factory
         self.exchange = exchange or self._exchange
+        if client_secret is not None and (not isinstance(client_secret, str) or len(client_secret) < 16):
+            raise ValueError("invalid confidential client secret")
+        self._client_secret = client_secret
 
     def _exchange(self, code, verifier):
-        data = urllib.parse.urlencode({
-            "grant_type": "authorization_code", "client_id": self.flow.client_id,
-            "code": code, "code_verifier": verifier,
-            "redirect_uri": self.flow.redirect_uri}).encode()
+        params = {"grant_type": "authorization_code", "client_id": self.flow.client_id,
+                  "code": code, "code_verifier": verifier,
+                  "redirect_uri": self.flow.redirect_uri}
+        if self._client_secret is not None:
+            params["client_secret"] = self._client_secret
+        data = urllib.parse.urlencode(params).encode()
         req = urllib.request.Request(
             self.flow.issuer + "/oauth/token", data=data, method="POST",
             headers={"Content-Type": "application/x-www-form-urlencoded",

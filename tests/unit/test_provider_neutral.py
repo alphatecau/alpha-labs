@@ -59,6 +59,35 @@ class ProviderNeutralTests(unittest.TestCase):
                 self.load()
             self.rows[5][index] = original
 
+    def test_rejects_manifest_metadata_tampering(self):
+        from dataclasses import replace
+        result = self.load()
+        for field, value in (("instrument", "BTCUSDT"), ("source_class", "exchange-public"),
+                             ("retrieved_at_utc", "2025-01-06T00:00:00+00:00")):
+            altered = dict(result.manifest)
+            altered[field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                verify_offline_dataset(self.path, replace(result, manifest=altered))
+
+    def test_rejects_inflated_price_and_trading_claims(self):
+        from dataclasses import replace
+        result = self.load()
+        with self.assertRaises(ValueError):
+            verify_offline_dataset(self.path, replace(result, verified_prices=True))
+        with self.assertRaises(ValueError):
+            verify_offline_dataset(self.path, replace(result, trading_enabled=True))
+        altered = dict(result.manifest)
+        altered["price_source_authenticated"] = True
+        with self.assertRaises(ValueError):
+            verify_offline_dataset(self.path, replace(result, manifest=altered))
+
+    def test_rejects_changed_canonical_observations(self):
+        from dataclasses import replace
+        result = self.load()
+        altered = replace(result, bars=result.bars[:-1])
+        with self.assertRaises(ValueError):
+            verify_offline_dataset(self.path, altered)
+
     def test_rejects_duplicate_gap_and_future_retrieval(self):
         original = self.rows[8][0]
         for stamp in (self.rows[7][0], "2025-01-01T09:30:00+00:00"):

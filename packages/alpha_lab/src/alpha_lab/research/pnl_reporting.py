@@ -9,6 +9,7 @@ from alpha_lab.research.phase1_accounting import D, reconstruct
 
 
 def report_pnl(orders, closing_prices, *, starting_cash="10000", liquidation_bps="0", require_fill_ids=False):
+    orders = tuple(orders)  # Snapshot one-shot iterables for both accounting passes.
     audit = reconstruct(orders, closing_prices, starting_cash=starting_cash,
                         liquidation_bps=liquidation_bps,
                         require_fill_ids=require_fill_ids)

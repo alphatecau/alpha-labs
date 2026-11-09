@@ -4,12 +4,10 @@ Builds an authenticated WSGI application using a trusted OIDC verifier and
 separate restricted PostgreSQL session and tenant roles. No credentials in code.
 """
 import os
-import psycopg
 from deployment.auth0_login_flow import Auth0LoginFlow
 from deployment.auth0_session_controller import Auth0SessionController
 from deployment.auth0_staging_settings import staging_auth0_settings
 from deployment.postgres_opaque_sessions import PostgresOpaqueSessions
-from deployment.sqlite_pkce_state_store import SQLitePKCEStateStore
 from deployment.staging_authenticated_bff import StagingResearchBFF
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.tenant_credential_broker import TenantCredentialBroker

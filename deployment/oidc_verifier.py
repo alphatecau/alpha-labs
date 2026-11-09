@@ -18,7 +18,7 @@ def decode_part(part):
 
 class OIDCVerifier:
     def __init__(self, *, issuer, audience, jwks, clock=None):
-        if not isinstance(issuer,str) or not issuer.startswith("https://") or issuer.endswith("/"):
+        if not isinstance(issuer,str) or not issuer.startswith("https://"):
             raise ValueError("HTTPS issuer required")
         if not isinstance(audience,str) or not audience:
             raise ValueError("audience required")

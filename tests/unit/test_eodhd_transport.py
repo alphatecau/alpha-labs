@@ -1,5 +1,7 @@
 """No-network EODHD transport security tests."""
 import io
+import os
+from unittest.mock import patch
 import unittest
 from urllib.error import HTTPError, URLError
 from urllib.request import Request
@@ -35,6 +37,18 @@ class FakeOpener:
 
 
 class TransportTests(unittest.TestCase):
+    def setUp(self):
+        self.network_gate = patch.dict(os.environ, {"ALPHA_EODHD_NETWORK_ENABLED": "true"})
+        self.network_gate.start()
+        self.addCleanup(self.network_gate.stop)
+
+    def test_network_disabled_by_default(self):
+        fake = FakeOpener()
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaises(TransportError):
+                https_transport("/api/eod/SPY.US", PARAMS, opener=fake)
+        self.assertEqual(fake.requests, [])
+
     def test_fixed_host_https_and_timeout(self):
         fake = FakeOpener()
         result = https_transport("/api/eod/SPY.US", PARAMS, opener=fake)

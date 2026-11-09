@@ -7,12 +7,13 @@ import json
 from http.cookies import SimpleCookie
 
 from alpha_lab.research.oidc_durable_store import DurableOIDCStore
+from alpha_lab.research.oidc_postgres_store import PostgresOIDCStore
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 
 
 class SessionPaperStatusWSGI:
     def __init__(self, *, sessions, accounts):
-        if not isinstance(sessions, DurableOIDCStore):
+        if not isinstance(sessions, (DurableOIDCStore, PostgresOIDCStore)):
             raise ValueError("Durable verified session store required")
         self.sessions, self.accounts = sessions, accounts
 

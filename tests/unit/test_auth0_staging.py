@@ -5,10 +5,13 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
-from cryptography.hazmat.primitives import hashes
-from alpha_lab.research.auth0_jwt import Auth0JWTVerifier
-from alpha_lab.research.auth0_staging_app import build_auth0_app
+import importlib.util
+CRYPTO_AVAILABLE = importlib.util.find_spec('cryptography') is not None
+if CRYPTO_AVAILABLE:
+    from cryptography.hazmat.primitives.asymmetric import rsa, padding
+    from cryptography.hazmat.primitives import hashes
+    from alpha_lab.research.auth0_jwt import Auth0JWTVerifier
+    from alpha_lab.research.auth0_staging_app import build_auth0_app
 
 
 def b64(raw):
@@ -22,6 +25,7 @@ def jwt(private, claims, header=None):
     return h + "." + p + "." + b64(sig)
 
 
+@unittest.skipUnless(CRYPTO_AVAILABLE, 'Auth0 security tests run in dedicated cryptography-enabled CI job')
 class Auth0StagingTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

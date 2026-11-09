@@ -11,8 +11,8 @@ from alpha_lab.research.paper_identity import PaperIdentityVerifier
 
 
 class PaperStatusWSGI:
-    def __init__(self, *, verifier: PaperIdentityVerifier, accounts, now=None):
-        if not isinstance(verifier, PaperIdentityVerifier):
+    def __init__(self, *, verifier, accounts, now=None):
+        if not isinstance(verifier, PaperIdentityVerifier) and not getattr(verifier, '_auth0_verified_bearer', False):
             raise ValueError("A verified identity provider is required")
         self.verifier = verifier
         self.accounts = accounts

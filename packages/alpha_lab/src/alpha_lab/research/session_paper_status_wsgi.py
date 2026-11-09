@@ -11,15 +11,16 @@ from alpha_lab.research.oidc_postgres_store import PostgresOIDCStore
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
 from alpha_lab.research.identity_rate_limit import SQLiteIdentityLimiter
+from alpha_lab.research.postgres_paper_security import PostgresPaperOwnership, PostgresIdentityLimiter
 
 
 class SessionPaperStatusWSGI:
     def __init__(self, *, sessions, accounts, ownership, limiter):
         if not isinstance(sessions, (DurableOIDCStore, PostgresOIDCStore)):
             raise ValueError("Durable verified session store required")
-        if not isinstance(ownership, PaperOwnershipRegistry):
+        if not isinstance(ownership, (PaperOwnershipRegistry, PostgresPaperOwnership)):
             raise ValueError("Verified ownership registry required")
-        if not isinstance(limiter, SQLiteIdentityLimiter):
+        if not isinstance(limiter, (SQLiteIdentityLimiter, PostgresIdentityLimiter)):
             raise ValueError("Shared identity limiter required")
         self.sessions, self.accounts, self.ownership, self.limiter = sessions, accounts, ownership, limiter
 

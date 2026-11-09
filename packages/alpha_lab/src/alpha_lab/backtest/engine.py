@@ -3,6 +3,7 @@ from dataclasses import dataclass, asdict
 from decimal import Decimal
 from .costs import CostModel
 from alpha_lab.data.csv_import import Bar
+from alpha_lab.research.point_in_time_guards import finite_decimal, require_final_candle, utc_instant
 
 @dataclass(frozen=True)
 class RunResult:
@@ -25,12 +26,32 @@ def _render(cash, qty, price, costs):
 def replay(bars: tuple[Bar,...], signals: list[bool], start: int, end: int, *,
            starting_balance=Decimal('10000'), max_allocation=Decimal('0.20'),
            costs=CostModel(), passive=False) -> RunResult:
+    starting_balance = finite_decimal(starting_balance, nonnegative=True)
+    max_allocation = finite_decimal(max_allocation, nonnegative=True)
+    if starting_balance == 0:
+        raise ValueError('starting balance must be positive')
+    # Validate all candles and signal timestamps before accepting any simulated order.
+    for j, bar in enumerate(bars):
+        utc_instant(bar.time)
+        for value in (bar.open, bar.high, bar.low, bar.close, bar.volume):
+            finite_decimal(value, nonnegative=True)
+        if j and bar.time <= bars[j-1].time:
+            raise ValueError('unordered or duplicate candle timestamps')
     if not (1<=start<end<=len(bars)) or len(signals)!=len(bars): raise ValueError('invalid range or signals')
     if not (Decimal('0')<max_allocation<=Decimal('1')) or starting_balance<=0:
         raise ValueError('invalid capital controls')
     cash=Decimal(starting_balance);qty=Decimal(0);peak=Decimal(starting_balance);dd=Decimal(0)
     orders=[];total_fees=Decimal(0);completed=0;open_entry=None
     for i in range(start,end):
+        # A decision based on the previous close is eligible at the next open
+        # only if that previous interval has fully closed.
+        if i > 0:
+            elapsed = bars[i].time - bars[i-1].time
+            if elapsed.total_seconds() <= 0:
+                raise ValueError('nonpositive candle interval')
+            # Do not mistake exchange holidays/weekends for incomplete bars.
+            # This checks observed close-to-next-open elapsed time, not an exchange calendar.
+            require_final_candle(bars[i-1].time, int(elapsed.total_seconds() // 60), bars[i].time)
         price=bars[i].open
         # Close-bar signal is available only at the following candle open.
         should_hold = (i==start or qty>0) if passive else signals[i-1]

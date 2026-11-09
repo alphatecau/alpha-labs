@@ -71,3 +71,9 @@ class OwnedPaperStatus:
         if not self.ownership.authorised(principal, account):
             raise PermissionError("Account not owned or revoked")
         return self.accounts.status(principal, account)
+
+    def close(self):
+        try:
+            self.accounts.close()
+        finally:
+            self.ownership.close()

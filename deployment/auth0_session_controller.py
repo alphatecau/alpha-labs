@@ -55,7 +55,7 @@ class Auth0SessionController:
         token = self.exchange(code, record["verifier"])
         identity = self.verify_token(token)
         if (identity.get("verified") is not True or
-                identity.get("issuer") != self.flow.issuer or
+                identity.get("issuer", "").rstrip("/") != self.flow.issuer or
                 not isinstance(identity.get("subject"), str) or
                 not isinstance(identity.get("nonce"), str) or
                 not hmac.compare_digest(identity["nonce"], record["nonce"])):

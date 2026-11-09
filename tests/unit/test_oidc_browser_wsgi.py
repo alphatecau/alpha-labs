@@ -52,6 +52,7 @@ class BrowserOIDCTests(unittest.TestCase):
                "QUERY_STRING": query, "HTTP_ORIGIN": origin}
         def start(status, headers):
             result["status"], result["headers"] = status, dict(headers)
+            result["cookies"] = [value for key, value in headers if key.lower() == "set-cookie"]
         result["body"] = b"".join(self.app(env, start))
         return result
 
@@ -66,7 +67,7 @@ class BrowserOIDCTests(unittest.TestCase):
         self.claim_nonce = nonce
         callback = self.request("/auth/callback", cookie=cookie, query="code=example&state=" + state)
         self.assertTrue(callback["status"].startswith("303"))
-        sid_cookie = callback["headers"]["Set-Cookie"].split(";", 1)[0]
+        sid_cookie = next(value.split(";", 1)[0] for value in callback["cookies"] if value.startswith("__Host-alpha_session="))
         self.assertTrue(self.request("/auth/me", cookie=sid_cookie)["status"].startswith("200"))
         self.assertTrue(self.request("/auth/callback", cookie=cookie, query="code=example&state=" + state)["status"].startswith("401"))
         self.assertTrue(self.request("/auth/logout", method="POST", cookie=sid_cookie,

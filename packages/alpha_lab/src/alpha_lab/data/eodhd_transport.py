@@ -4,7 +4,7 @@ The transport is not wired to agents, scheduling, execution or the MCP server.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+import os
 from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPError, HTTPRedirectHandler, Request, build_opener
 from urllib.error import URLError
@@ -31,6 +31,8 @@ def https_transport(path: str, params: dict[str, str], *, opener=None) -> Provid
     This function is not called automatically. The caller must separately
     authorise research and supply a credential. Tests inject a fake opener.
     """
+    if os.environ.get("ALPHA_EODHD_NETWORK_ENABLED") != "true":
+        raise TransportError("EODHD network transport disabled")
     if not isinstance(path, str) or not path.startswith("/api/eod/"):
         raise TransportError("Unsupported provider endpoint")
     symbol = path.removeprefix("/api/eod/")

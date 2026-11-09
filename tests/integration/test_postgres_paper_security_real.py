@@ -10,6 +10,7 @@ except ImportError:
     psycopg = None
 
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
+from alpha_lab.research.postgres_security_migration import apply_schema, verify_schema, MIGRATION_ID
 from alpha_lab.research.postgres_paper_security import (
     PostgresPaperOwnership, PostgresIdentityLimiter, SCHEMA,
 )
@@ -61,6 +62,17 @@ class RealPostgresSecurityTests(unittest.TestCase):
         with self.connect() as conn:
             count = conn.execute("SELECT count FROM identity_rate_limit").fetchone()[0]
         self.assertEqual(count, workers)
+
+    def test_explicit_migration_is_idempotent_and_verifiable(self):
+        apply_schema(self.connect)
+        apply_schema(self.connect)
+        self.assertTrue(verify_schema(self.connect))
+        with self.connect() as conn:
+            count = conn.execute(
+                "SELECT COUNT(*) FROM alpha_schema_migrations WHERE id=%s",
+                (MIGRATION_ID,)
+            ).fetchone()[0]
+        self.assertEqual(count, 1)
 
     def test_same_subject_different_issuer_cannot_access_owner(self):
         registry = PostgresPaperOwnership(self.connect)

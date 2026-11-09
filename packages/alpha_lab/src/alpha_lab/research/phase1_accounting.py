@@ -23,7 +23,17 @@ def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bp
     positions={s:Decimal(0) for s in closing_prices}
     fee_total=Decimal(0)
     gross_notional=Decimal(0)
+    seen_fill_ids=set()
     for index,order in enumerate(orders):
+        if "fee_currency" in order:
+            raise ValueError("Fee currency unsupported by single-currency ledger")
+        if "fill_id" in order:
+            fill_id=order["fill_id"]
+            if not isinstance(fill_id,str) or not fill_id.strip():
+                raise ValueError("Invalid fill identifier")
+            if fill_id in seen_fill_ids:
+                raise ValueError("Duplicate fill identifier")
+            seen_fill_ids.add(fill_id)
         symbol=order["symbol"]
         if symbol not in positions:raise ValueError("Unknown symbol")
         side=order["side"]

@@ -29,3 +29,14 @@ Latest repository commit returned by GitHub commit search: `2cb66a8ddfc2d2b64246
 
 ## Gate
 **BLOCKED / UNVERIFIED**. Historic failures are confirmed, but current candidate CI and full tests are not established.
+
+## Follow-up verification — 2026-11-09
+- Run 42465262149 checked out `research/strategy-evidence-gates-v1` at `1afceec5f326850ccb957d0df1d468d2b2aff179` (confirmed from job log).
+- Run 42465255398 checked out the same branch at `b4dc55a541b979abd23781804bb01bce1bdef09b` (confirmed from job log).
+- Historical test located at `tests/unit/test_breakout_risk_replay.py` on `1afceec5...`; its literal string assertion was the observed failure.
+- Created isolated fix branch `fix/day1-breakout-decimal-assertion-20261109` from the failing commit and changed only the assertion to `self.assertEqual(Decimal(report["final_liquidatable_value"]), Decimal("10000"))`.
+- Patch commit: `b877d92c3faabaaf9fb24888195c9dc9f8eddeff`; read-back confirmed modified file.
+- Draft fix PR: https://github.com/alphatecau/alpha-labs/pull/51 (targets the historical research branch, not main).
+- Fix PR base SHA at creation: `979a305d848f8ec68ec3a460c36fec943421009e`, different from failing SHA. Review intervening branch history and mergeability before any merge.
+- Commit-associated PR workflow lookup and combined status lookup for patch SHA returned empty; **no current passing CI attestation**. No full suite executed here. Existing historical failures are not evidence of a current-main failure.
+- Remaining gate: independently run the patch branch's complete test matrix, verify required checks and skips, compare with current main, and document results. NO-GO until complete.

@@ -29,3 +29,11 @@
 
 **NO-GO for public or production deployment.** Continue offline research only.
 No live-copy trading, credentials or broker connection.
+
+## Additional negative tests
+
+The HTTP contract suite now tests that owner revocation immediately denies
+status access and remains denied after the staging factory reopens the SQLite
+registry. It also rejects spoofed owner headers for non-owner signed tokens.
+These tests do not establish real identity-provider security or production
+multi-process database safety. CI outcome must be checked separately.

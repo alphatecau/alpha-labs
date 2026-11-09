@@ -25,3 +25,14 @@ review and owner authorisation. No public paper trading or broker execution.
   verified. Do not expose execute/enable routes or any broker connectivity.
 
 **Gate: NO-GO** until all outstanding controls are verified.
+
+## Security regression coverage — follow-up
+
+Added end-to-end WSGI contract tests that instantiate the real staging
+factory and local durable account store. The tests cover valid owner status,
+missing credentials, forged identity via a valid but non-owner token,
+wrong audience, expired credentials, malformed Unicode bearer tokens,
+spoofed user headers, query tampering and unsupported enable/execute/live-copy
+routes. The verifier now rejects non-ASCII payload segments fail-closed.
+These are offline deterministic tests; they do not exercise Render TLS,
+external identity provider, multi-process database concurrency or the GPT Site.

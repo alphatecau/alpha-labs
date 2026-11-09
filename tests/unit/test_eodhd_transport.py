@@ -77,6 +77,22 @@ class TransportTests(unittest.TestCase):
                 https_transport("/api/eod/SPY.US", PARAMS, opener=FakeOpener(error=error))
             self.assertNotIn(PARAMS["api_token"], str(ctx.exception))
 
+    def test_invalid_dates_fail_before_transport(self):
+        fake = FakeOpener()
+        for overrides in ({"from": "invalid"}, {"from": "2025-02-01", "to": "2025-01-01"}):
+            with self.subTest(overrides=overrides):
+                with self.assertRaises(TransportError):
+                    https_transport("/api/eod/SPY.US", {**PARAMS, **overrides}, opener=fake)
+        self.assertEqual(fake.requests, [])
+
+    def test_redirect_target_drift_is_rejected(self):
+        class RedirectedResponse(FakeResponse):
+            def geturl(self):
+                return "https://attacker.example/steal"
+        with self.assertRaises(TransportError):
+            https_transport("/api/eod/SPY.US", PARAMS,
+                            opener=FakeOpener(RedirectedResponse()))
+
     def test_http_errors_redacted(self):
         error = HTTPError("https://eodhd.com/?api_token=DO_NOT_LOG_THIS_TOKEN", 429,
                           "secret", {}, None)

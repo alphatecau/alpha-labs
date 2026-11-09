@@ -14,6 +14,8 @@ on:
       - 'tests/unit/test_auth0_session_adversarial.py'
       - 'deployment/tenant_credential_broker.py'
       - 'deployment/mounted_tenant_secret_provider.py'
+      - 'deployment/render_environment_tenant_secrets.py'
+      - 'tests/unit/test_render_environment_tenant_secrets.py'
       - 'tests/unit/test_mounted_tenant_secret_provider.py'
       - 'tests/integration/test_pg_credential_rotation.py'
       - 'tests/unit/test_auth0_broker_preparation.py'
@@ -64,6 +66,7 @@ jobs:
           python -m unittest discover -s tests/unit -p 'test_auth0_broker_preparation.py' -v
           python -m unittest discover -s tests/unit -p 'test_auth0_session_adversarial.py' -v
           python -m unittest discover -s tests/unit -p 'test_mounted_tenant_secret_provider.py' -v
+          python -m unittest discover -s tests/unit -p 'test_render_environment_tenant_secrets.py' -v
       - name: Run isolated PostgreSQL RLS and privilege assertions
         env:
           PGPASSWORD: ci-only

@@ -62,8 +62,8 @@ class BFFBoundaryTests(unittest.TestCase):
         return response["status"], json.loads(data), response["headers"]
 
     def test_two_user_isolation_and_browser_owner_spoof(self):
-        a = self.request(self.cookies[0], extra={"HTTP_X_OWNER_ID": "bob"})[1]["data"]["data"][0]
-        b = self.request(self.cookies[1])[1]["data"]["data"][0]
+        a = self.request(self.cookies[0], extra={"HTTP_X_OWNER_ID": "bob"})[1]["data"][0]
+        b = self.request(self.cookies[1])[1]["data"][0]
         self.assertNotEqual(a["owner"], b["owner"])
         self.assertNotEqual(a["run_id"], b["run_id"])
 

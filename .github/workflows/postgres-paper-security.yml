@@ -4,9 +4,12 @@ on:
   push:
     branches:
       - 'research/postgres-real-integration-ci-*'
+      - 'research/authenticated-readonly-pg-staging-*'
   pull_request:
     paths:
       - 'packages/alpha_lab/src/alpha_lab/research/postgres_paper_security.py'
+      - 'packages/alpha_lab/src/alpha_lab/research/postgres_oidc_migration.py'
+      - 'packages/alpha_lab/src/alpha_lab/research/oidc_postgres_store.py'
       - 'tests/integration/test_postgres_paper_security_real.py'
       - '.github/workflows/postgres-paper-security.yml'
   workflow_dispatch:

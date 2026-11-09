@@ -10,6 +10,8 @@ except ImportError:
     psycopg = None
 
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
+from alpha_lab.research.oidc_postgres_store import PostgresOIDCStore
+from alpha_lab.research.postgres_oidc_migration import apply_oidc_schema, verify_oidc_schema
 from alpha_lab.research.postgres_security_migration import apply_schema, verify_schema, MIGRATION_ID
 from alpha_lab.research.postgres_paper_security import (
     PostgresPaperOwnership, PostgresIdentityLimiter, SCHEMA,
@@ -30,6 +32,25 @@ class RealPostgresSecurityTests(unittest.TestCase):
         with self.connect() as conn:
             conn.execute("TRUNCATE TABLE paper_ownership, identity_rate_limit")
         self.owner = VerifiedPrincipal(subject="integration_owner", issuer="https://test-issuer.example/")
+
+    def test_postgres_oidc_sessions_survive_workers_and_revoke(self):
+        apply_oidc_schema(self.connect)
+        apply_oidc_schema(self.connect)
+        self.assertTrue(verify_oidc_schema(self.connect))
+        with self.connect() as conn:
+            conn.execute("TRUNCATE TABLE oidc_pending, oidc_sessions")
+        first = PostgresOIDCStore(self.connect)
+        second = PostgresOIDCStore(self.connect)
+        state, nonce, verifier = first.begin()
+        self.assertEqual(second.consume(state, nonce), verifier)
+        with self.assertRaises(PermissionError):
+            first.consume(state, nonce)
+        sid = first.create("auth0_test", "https://test-issuer.example/")
+        self.assertEqual(second.authenticate(sid),
+                         ("auth0_test", "https://test-issuer.example/"))
+        second.revoke(sid)
+        with self.assertRaises(PermissionError):
+            first.authenticate(sid)
 
     def test_persisted_ownership_isolation_and_revocation(self):
         first = PostgresPaperOwnership(self.connect)

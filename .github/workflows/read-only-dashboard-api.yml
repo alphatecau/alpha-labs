@@ -1,0 +1,20 @@
+name: Alpha Labs authenticated read-only API tests
+on:
+  pull_request:
+    paths:
+      - 'deployment/research_readonly_*.py'
+      - 'tests/unit/test_readonly_research_api.py'
+      - '.github/workflows/read-only-dashboard-api.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  security-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run fail-closed API security tests
+        run: python -m unittest discover -s tests/unit -p 'test_readonly_research_api.py' -v

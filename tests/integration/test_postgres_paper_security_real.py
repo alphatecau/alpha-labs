@@ -62,6 +62,23 @@ class RealPostgresSecurityTests(unittest.TestCase):
             count = conn.execute("SELECT count FROM identity_rate_limit").fetchone()[0]
         self.assertEqual(count, workers)
 
+    def test_same_subject_different_issuer_cannot_access_owner(self):
+        registry = PostgresPaperOwnership(self.connect)
+        registry.provision(self.owner, "primary")
+        forged_issuer = VerifiedPrincipal(subject=self.owner.subject, issuer="https://other-issuer.example/")
+        with self.assertRaises(PermissionError):
+            registry.require(forged_issuer, "primary")
+
+    def test_shared_limit_across_independent_limiter_instances(self):
+        now = lambda: 120
+        first = PostgresIdentityLimiter(self.connect, limit=3, window=60, clock=now)
+        second = PostgresIdentityLimiter(self.connect, limit=3, window=60, clock=now)
+        self.assertTrue(first.allow(self.owner.issuer, self.owner.subject))
+        self.assertTrue(second.allow(self.owner.issuer, self.owner.subject))
+        self.assertTrue(first.allow(self.owner.issuer, self.owner.subject))
+        with self.assertRaises(PermissionError):
+            second.allow(self.owner.issuer, self.owner.subject)
+
     def test_fail_closed_when_database_unavailable(self):
         def unavailable():
             raise OSError("database unavailable")

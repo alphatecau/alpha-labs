@@ -83,3 +83,17 @@ def validate_manifest(raw_bytes, expected_sha256, provenance):
     if len(expected_sha256) != 64 or actual != expected_sha256.lower():
         raise ValueError("source checksum mismatch")
     return actual
+
+
+def register_run_id(registry, run_id, evidence_sha256):
+    """Fail closed on duplicate run identifiers, including exact duplicate submissions."""
+    if not isinstance(registry, dict):
+        raise ValueError("run registry must be a mapping")
+    if not isinstance(run_id, str) or not run_id.strip():
+        raise ValueError("nonempty run id required")
+    if not isinstance(evidence_sha256, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", evidence_sha256):
+        raise ValueError("SHA256 evidence identifier required")
+    if run_id in registry:
+        raise ValueError("duplicate run id")
+    registry[run_id] = evidence_sha256.lower()
+    return run_id

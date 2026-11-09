@@ -50,7 +50,10 @@ class PaperTradingSession:
         self.ledger.halt()
 
     def status(self, marks=None):
-        decision = authorise_simulation(self.authority)
+        try:
+            decision = authorise_simulation(self.authority)
+        except PermissionError:
+            decision = {"decision": "HALT"}
         if decision["decision"] != "PAPER_ONLY":
             self.ledger.halt()
         result = {"mode": Mode.PAPER.value, "real_money": False,

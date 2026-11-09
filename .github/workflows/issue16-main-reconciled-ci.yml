@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install pytest for standalone Issue 16 oracle functions
-        run: python -m pip install 'pytest>=8,<10'
+        run: python -m pip install 'pytest>=8,<10' 'cryptography>=43,<47'
       - name: Run existing independent Issue 16 oracles on main-based code
         run: python -m pytest -q -ra -o addopts='' tests/unit/test_issue16_independent_adversarial.py
       - name: Run all offline research unit tests and reject skips

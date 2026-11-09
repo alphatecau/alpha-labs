@@ -5,6 +5,9 @@ on:
       - 'deployment/research_readonly_*.py'
       - 'deployment/research_rls_isolated.sql'
       - 'deployment/research_rls_transaction_fixture.sql'
+      - 'deployment/research_role_isolation_fixture.sql'
+      - 'deployment/account_role_research_reader.py'
+      - 'tests/integration/test_account_role_isolation.py'
       - 'deployment/research_dashboard_bff.py'
       - 'deployment/transaction_scoped_research_reader.py'
       - 'tests/integration/test_bff_postgres_chain.py'
@@ -54,9 +57,16 @@ jobs:
           sudo apt-get install -y -qq postgresql-client
           psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d alpha_rls_test -f deployment/research_rls_isolated.sql
           psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d alpha_rls_test -f deployment/research_rls_transaction_fixture.sql
+          psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d alpha_rls_test -f deployment/research_role_isolation_fixture.sql
 
       - name: Run BFF-to-PostgreSQL two-account acceptance
         env:
           ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
           PYTHONPATH: packages/alpha_lab/src:.
         run: python -m unittest discover -s tests/integration -p 'test_bff_postgres_chain.py' -v
+
+      - name: Verify tenant-role arbitrary SQL isolation
+        env:
+          ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
+          PYTHONPATH: packages/alpha_lab/src:.
+        run: python -m unittest discover -s tests/integration -p 'test_account_role_isolation.py' -v

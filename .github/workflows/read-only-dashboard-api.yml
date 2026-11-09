@@ -13,6 +13,8 @@ on:
       - 'tests/unit/test_auth0_staging_settings.py'
       - 'deployment/auth0_session_controller.py'
       - 'deployment/staging_authenticated_bff.py'
+      - 'deployment/staging_authenticated_assembly.py'
+      - 'tests/unit/test_staging_authenticated_assembly.py'
       - 'deployment/postgres_opaque_sessions.py'
       - 'tests/unit/test_staging_authenticated_bff.py'
       - 'tests/unit/test_auth0_confidential_exchange.py'
@@ -74,6 +76,7 @@ jobs:
           python -m unittest discover -s tests/unit -p 'test_auth0_staging_settings.py' -v
           python -m unittest discover -s tests/unit -p 'test_auth0_confidential_exchange.py' -v
           python -m unittest discover -s tests/unit -p 'test_staging_authenticated_bff.py' -v
+          python -m unittest discover -s tests/unit -p 'test_staging_authenticated_assembly.py' -v
           python -m unittest discover -s tests/unit -p 'test_mounted_tenant_secret_provider.py' -v
           python -m unittest discover -s tests/unit -p 'test_render_environment_tenant_secrets.py' -v
       - name: Run isolated PostgreSQL RLS and privilege assertions

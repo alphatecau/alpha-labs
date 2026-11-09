@@ -56,6 +56,7 @@ class OIDCBrowserWSGI:
         self.issuer, self.client_id, self.client_secret = issuer, client_id, client_secret
         self.redirect_uri, self.store, self.verifier = redirect_uri, store, verifier
         self.origin = _validated_origin(redirect_uri)
+        self.expected_host = urlsplit(self.origin).netloc
         self.exchange = exchange or self._exchange
         self.now = now
 
@@ -94,7 +95,9 @@ class OIDCBrowserWSGI:
             return jar[name].value if name in jar else None
 
         path, method = env.get("PATH_INFO"), env.get("REQUEST_METHOD")
-        if env.get("wsgi.url_scheme") != "https":
+        if (env.get("HTTP_HOST") != self.expected_host or env.get("wsgi.url_scheme") != "https"
+                or env.get("HTTP_X_FORWARDED_HOST") or env.get("HTTP_FORWARDED")
+                or env.get("HTTP_X_FORWARDED_PROTO")):
             return respond("403 Forbidden", {"error": "https_required"})
         if path == "/auth/login" and env.get("QUERY_STRING"):
             return respond("400 Bad Request", {"error": "query_not_supported"})

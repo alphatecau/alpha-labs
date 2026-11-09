@@ -40,3 +40,13 @@ This is a targeted source review, **not** a repository-wide call-site audit.
 
 **NO-GO for production deployment.** Continue offline paper research only.
 Do not merge, deploy, connect brokers or enable real-money orders.
+
+## Follow-up mitigation (research branch)
+
+Managed `PaperLedger` instances now reject direct `enable_simulation` and
+`fill` calls; the `PaperTradingSession` façade uses a private-in-convention
+guard and tests denial of direct calls. This does **not** close unrestricted
+legacy `PaperLedger` usage elsewhere, nor provide a security boundary against
+arbitrary Python code in the same process (the guard is mutable and inspectable).
+Production must isolate sessions in an authenticated service and remove or
+restrict legacy public call sites. No production safety claim is made.

@@ -16,12 +16,16 @@ from alpha_lab.research.paper_simulator import PaperLedger
 class PaperTradingSession:
     authority: TradingAuthority = field(default_factory=TradingAuthority)
     ledger: PaperLedger = field(default_factory=PaperLedger)
+    _guard: object = field(default_factory=object, init=False, repr=False)
 
     def __post_init__(self):
         if not isinstance(self.authority, TradingAuthority):
             raise ValueError("Invalid authority")
         if not isinstance(self.ledger, PaperLedger):
             raise ValueError("Invalid paper ledger")
+        if self.ledger._session_guard is not None:
+            raise ValueError("Ledger already belongs to a session")
+        self.ledger._session_guard = self._guard
         self.ledger.halt()
 
     def set_authority(self, authority: TradingAuthority):
@@ -36,7 +40,7 @@ class PaperTradingSession:
         if decision["decision"] != "PAPER_ONLY":
             self.ledger.halt()
             raise PermissionError("Paper session is halted")
-        self.ledger.enable_simulation(operator_approved=operator_approved)
+        self.ledger._session_enable(self._guard, operator_approved=operator_approved)
         return {"mode": Mode.PAPER.value, "execution": "SIMULATED", "real_money": False}
 
     def simulate_fill(self, **kwargs):
@@ -44,7 +48,10 @@ class PaperTradingSession:
         if decision["decision"] != "PAPER_ONLY":
             self.ledger.halt()
             raise PermissionError("Authority denied simulated fill")
-        return self.ledger.fill(**kwargs, simulated_only=True)
+        if "simulated_only" in kwargs:
+            self.ledger.halt()
+            raise PermissionError("Caller cannot override simulated-only mode")
+        return self.ledger._session_fill(self._guard, **kwargs, simulated_only=True)
 
     def halt(self):
         self.ledger.halt()

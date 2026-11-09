@@ -1,0 +1,7 @@
+# Daily session CSV adapter — research-only
+
+Introduces a separate offline CSV path with columns `session_date,open,high,low,close,volume` and explicit venue session dates. The existing hourly importer is unchanged. Calendar dates must be strictly increasing and their SHA-256 fingerprint must be passed independently by the caller; this detects accidental calendar substitution but is **not** independent verification of a venue calendar.
+
+The importer rejects absent, extra, duplicated, unordered sessions, invalid OHLCV, malformed dates, oversized files, unsupported currencies, mismatched calendar fingerprints, source tampering and data available after the decision. The source and calendar are user-supplied; all authenticity, publication timing, commercial-rights and price verification claims remain false. No provider, network, credentials or trading.
+
+**Limitations:** session-date midnight is a canonical date label, not a market close or provider publication timestamp. The user-supplied capture/availability chronology does not establish true point-in-time evidence. No official holiday calendar, half-day calendar, split/dividend handling, corporate actions, independent price validation or licence verification is provided. For production research, obtain authoritative calendar and immutable publication-time provenance. Run offline unit tests through the repository's existing research CI.

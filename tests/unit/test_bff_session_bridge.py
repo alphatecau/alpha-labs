@@ -23,7 +23,7 @@ class TwoUserBridgeTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.sessions = DurableOIDCStore(self.tmp.name + "/sessions.sqlite", now=lambda: 1000)
         self.owners = PaperOwnershipRegistry(self.tmp.name + "/owners.sqlite")
-        self.limiter = SQLiteIdentityLimiter(self.tmp.name + "/limits.sqlite", limit=20, window=60, clock=lambda: 1000)
+        self.limiter = SQLiteIdentityLimiter(self.tmp.name + "/limits.sqlite", limit=20, window=60, clock=__import__("time").time)
         self.verify = SessionOwnershipVerifier(sessions=self.sessions, ownership=self.owners, limiter=self.limiter)
         self.secret = "test-only-secret-" + "x" * 48
         self.reader = SyntheticReader()

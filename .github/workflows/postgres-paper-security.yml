@@ -11,6 +11,7 @@ on:
       - 'packages/alpha_lab/src/alpha_lab/research/postgres_oidc_migration.py'
       - 'packages/alpha_lab/src/alpha_lab/research/oidc_postgres_store.py'
       - 'tests/integration/test_postgres_paper_security_real.py'
+      - 'tests/integration/test_postgres_oidc_real.py'
       - '.github/workflows/postgres-paper-security.yml'
   workflow_dispatch:
 
@@ -47,3 +48,5 @@ jobs:
         run: python -m pip install 'psycopg[binary]>=3.2,<4'
       - name: Run real PostgreSQL security integration
         run: python -m unittest discover -s tests/integration -p 'test_postgres_paper_security_real.py' -v
+      - name: Run real PostgreSQL OIDC migration and concurrency integration
+        run: python -m unittest discover -s tests/integration -p 'test_postgres_oidc_real.py' -v

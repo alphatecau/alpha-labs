@@ -84,5 +84,6 @@ jobs:
         env:
           ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
           PYTHONPATH: packages/alpha_lab/src:.
-        run: python -m unittest discover -s tests/integration -p 'test_account_role_isolation.py' -v
+        run: |
+          python -m unittest discover -s tests/integration -p 'test_account_role_isolation.py' -v
           python -m unittest discover -s tests/integration -p 'test_pg_credential_rotation.py' -v

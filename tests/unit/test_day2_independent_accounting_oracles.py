@@ -34,10 +34,10 @@ class IndependentAccountingOracles(unittest.TestCase):
         self.assertEqual(Decimal(audit["fees"]), Decimal("0"))
 
     def test_simulation_reconciliation_and_tampering(self):
-        valid = {"orders": self.orders, "final_cash": "808.2",
-                 "final_nav": "1017.675", "total_fees": "1.8"}
+        valid = {"orders": self.orders, "final_cash": "9808.2",
+                 "final_nav": "10017.675", "total_fees": "1.8"}
         self.assertTrue(reconcile_simulation(valid, self.marks, liquidation_bps="25")["reconciled"])
-        for key, bad in (("final_cash", "808.3"), ("final_nav", "1017.676"),
+        for key, bad in (("final_cash", "9808.3"), ("final_nav", "10017.676"),
                          ("total_fees", "1.9")):
             with self.subTest(key=key), self.assertRaisesRegex(ValueError, "mismatch"):
                 reconcile_simulation({**valid, key: bad}, self.marks, liquidation_bps="25")

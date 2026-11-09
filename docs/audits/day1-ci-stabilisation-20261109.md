@@ -40,3 +40,13 @@ Latest repository commit returned by GitHub commit search: `2cb66a8ddfc2d2b64246
 - Fix PR base SHA at creation: `979a305d848f8ec68ec3a460c36fec943421009e`, different from failing SHA. Review intervening branch history and mergeability before any merge.
 - Commit-associated PR workflow lookup and combined status lookup for patch SHA returned empty; **no current passing CI attestation**. No full suite executed here. Existing historical failures are not evidence of a current-main failure.
 - Remaining gate: independently run the patch branch's complete test matrix, verify required checks and skips, compare with current main, and document results. NO-GO until complete.
+
+## PR #51 CI and branch reconciliation — 2026-11-09
+- Historical branch `research/strategy-evidence-gates-v1` is **24 commits ahead** of the failing `1afceec5...` revision. Compare confirms it already changed `tests/unit/test_breakout_risk_replay.py` to numeric `Decimal` equality. The standalone fix is therefore redundant against the current target branch; do not merge solely to repeat this change.
+- PR #51 head: `b877d92c3faabaaf9fb24888195c9dc9f8eddeff`. Its base at creation: `979a305d848f8ec68ec3a460c36fec943421009e`. Comparison: diverged, head 1 commit ahead and 24 behind the base.
+- GitHub PR-triggered research workflow: https://github.com/alphatecau/alpha-labs/actions/runs/42552003295, job 128949423885 **success**. Job log checkout SHA: `d05ab27055f209e304f6af4b486aeca7901afab9` (PR integration SHA), **186 tests** reported; synthetic research fixture step succeeded.
+- GitHub PR-triggered website workflow: https://github.com/alphatecau/alpha-labs/actions/runs/42552003259, job 128949423990 **success**. Same checkout SHA `d05ab27055f209e304f6af4b486aeca7901afab9`; **36 passed, 0 failed**.
+- These are verified standard PR workflow results, **not** a full security/cryptography/historical-data matrix, nor proof of green current `main`.
+- Historical breakout diagnostics workflow `.github/workflows/historical-breakout-research.yml` on target branch triggers only on push to `research/strategy-evidence-gates-v1` when that workflow file changes, or manual dispatch. It fetches external archives; it is not a routine PR check. No claim that this workflow was executed for PR #51.
+- Node 20 deprecation warnings persist on standard CI jobs; non-fatal but should be scheduled for maintenance.
+- Decision: historical assertion failure **resolved in target branch**; standard PR integration checks **PASS**; full Day 1 acceptance gate **PARTIAL / NOT CERTIFIED** until required coverage on pinned current-main or integration candidate is established. No merge, deployment, credential or trading changes.

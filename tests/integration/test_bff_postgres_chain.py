@@ -75,6 +75,7 @@ class FullChainPostgresTests(unittest.TestCase):
     def tearDown(self):
         if hasattr(self, "admin"):
             self.admin.execute("DROP TABLE IF EXISTS public.research_run_registry")
+            self.admin.execute("REVOKE USAGE ON SCHEMA public FROM alpha_chain_reader")
             self.admin.execute("DROP ROLE IF EXISTS alpha_chain_reader")
             self.admin.close()
         self.sessions.close()

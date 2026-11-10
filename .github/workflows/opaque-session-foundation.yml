@@ -1,0 +1,19 @@
+name: Opaque session security foundation
+on:
+  pull_request:
+    paths:
+      - 'deployment/postgres_opaque_sessions.py'
+      - 'tests/unit/test_opaque_session_foundation.py'
+      - '.github/workflows/opaque-session-foundation.yml'
+permissions:
+  contents: read
+jobs:
+  session-foundation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify opaque session lifecycle
+        run: PYTHONPATH=. python -m unittest discover -s tests/unit -p 'test_opaque_session_foundation.py' -v

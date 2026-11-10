@@ -35,6 +35,17 @@ class OIDCTests(unittest.TestCase):
   tok=self.token(sub="user-a")
   head,body,sig=tok.split(".")
   with self.assertRaises(PermissionError):self.verifier(head+"."+b64(json.dumps({"sub":"user-b"}).encode())+"."+sig)
+ def test_reject_wrong_azp_even_with_single_audience(self):
+  with self.assertRaises(PermissionError):self.verifier(self.token(azp="other-client"))
+ def test_reject_malformed_issuer_configuration(self):
+  for issuer in ("https://issuer.example@evil.example", "https://issuer.example/path", "https://issuer.example?x=1"):
+   with self.assertRaises(ValueError):OIDCVerifier(issuer=issuer,audience="alpha-client",jwks=self.jwks)
+ def test_reject_duplicate_claim_members(self):
+  head=b64(json.dumps({"alg":"RS256","kid":"key1"}).encode())
+  body=b64(b'{"iss":"https://issuer.example","aud":"alpha-client","sub":"user-a","sub":"user-b","iat":990,"exp":1100}')
+  data=(head+"."+body).encode()
+  token=head+"."+body+"."+b64(self.key.sign(data,padding.PKCS1v15(),hashes.SHA256()))
+  with self.assertRaises(PermissionError):self.verifier(token)
  def test_missing_key(self):
   verifier=OIDCVerifier(issuer="https://issuer.example",audience="alpha-client",jwks={"keys":[]},clock=lambda:1000)
   with self.assertRaises(PermissionError):verifier(self.token())

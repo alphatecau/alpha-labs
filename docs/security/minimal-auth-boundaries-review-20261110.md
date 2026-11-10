@@ -23,3 +23,15 @@ Source: stacked PR #84. This candidate does not claim to incorporate the entire 
 
 ## Non-goals
 No merge, deployment, secrets changes, database access, GPT Site modifications, paper trading or live trading.
+
+## Internal adversarial code review (not independent approval)
+Reviewed OIDC token parsing and trusted proxy boundary against the complete PR source and tests. Identified and patched three weaknesses in the OIDC verifier: ambiguous duplicate JSON members, accepting a conflicting `azp` for a single-audience token, and permissive issuer configuration. Regression tests were added. These findings do **not** establish an independent security sign-off.
+
+### Remaining review questions
+- Require an independent reviewer to inspect cryptographic key-selection, signature verification, clock skew, claim type handling, JWKS freshness/rotation and denial behaviour.
+- The verifier returns an unvalidated `nonce` for the OAuth callback layer to compare with its server-side state; **the verifier alone is not a complete OIDC login validation**.
+- The proxy adapter trusts WSGI `REMOTE_ADDR` only after an operator proves the actual socket-peer source. It must never be wired into Render based on guessed CIDRs or client-supplied forwarding headers.
+- Validate proxy Host/port normalisation and intermediary header-stripping with real deployment evidence. Current synthetic tests cannot certify Render topology.
+- Ensure there is no path from these primitives to active trading; neither component authorises execution.
+
+**Status:** internal review findings addressed in research branch; independent review and real environment acceptance pending. No merge or deploy approval.

@@ -19,8 +19,8 @@ class Auth0LoginFlow:
     def __init__(self, *, issuer, client_id, redirect_uri, state_store, clock=None):
         p = urllib.parse.urlsplit(issuer)
         r = urllib.parse.urlsplit(redirect_uri)
-        if (p.scheme != "https" or not p.hostname or p.query or p.fragment or p.path not in ("", "/")
-                or r.scheme != "https" or not r.hostname or r.fragment or
+        if (p.scheme != "https" or not p.hostname or p.query or p.fragment or p.username or p.password or p.path not in ("", "/")
+                or r.scheme != "https" or not r.hostname or r.fragment or r.username or r.password or r.query or
                 not isinstance(client_id, str) or not client_id or
                 not callable(getattr(state_store, "put", None)) or
                 not callable(getattr(state_store, "consume", None))):
@@ -50,6 +50,9 @@ class Auth0LoginFlow:
         record = self.store.consume(hashlib.sha256(state.encode()).hexdigest())
         if not isinstance(record, dict) or not 0 <= self.clock() - record.get("created_at", -1) <= 300:
             raise PermissionError("expired or reused login state")
+        if (not isinstance(record.get("nonce"), str) or not isinstance(record.get("verifier"), str)
+                or len(record["nonce"]) < 32 or len(record["verifier"]) < 43):
+            raise PermissionError("invalid stored PKCE state")
         claims = verifier(id_token)
         if (not isinstance(claims, dict) or claims.get("verified") is not True or
                 not isinstance(claims.get("nonce"), str) or

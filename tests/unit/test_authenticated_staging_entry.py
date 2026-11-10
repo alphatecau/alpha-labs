@@ -63,6 +63,25 @@ class EntryTests(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         create_application(**args)
 
+    def test_readiness_rejects_truthy_non_boolean_and_missing_proxy(self):
+        self.args["readiness_check"] = lambda: {"database": "ok"}
+        app = self.build()
+        self.assertEqual(self.call(app, "/readyz")[0], "503 Service Unavailable")
+        self.assertEqual(self.call(app, "/readyz", REMOTE_ADDR="")[0], "403 Forbidden")
+        self.assertEqual(self.call(app, "/readyz", HTTP_HOST="evil.example.test")[0], "403 Forbidden")
+
+    def test_readiness_never_bypasses_bootstrap(self):
+        with patch("deployment.authenticated_staging_entry.build_authenticated_application",
+                   side_effect=ValueError("missing tenant role")) as bootstrap:
+            with self.assertRaisesRegex(ValueError, "missing tenant role"):
+                create_application(**self.args)
+            bootstrap.assert_called_once()
+
+    def test_real_operator_bootstrap_rejects_missing_auth0_configuration(self):
+        # No mocks: the production bootstrap must reject incomplete configuration.
+        with self.assertRaises(ValueError):
+            create_application(**self.args)
+
     def test_bootstrap_failure_fails_startup(self):
         with patch("deployment.authenticated_staging_entry.build_authenticated_application",
                    side_effect=ValueError("missing secret")):

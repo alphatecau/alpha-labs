@@ -8,9 +8,6 @@ on:
       - 'tests/unit/test_staging_tenant_disposable_fixtures.py'
       - 'deployment/staging_dependency_readiness.py'
       - '.github/workflows/authenticated-staging-entry.yml'
-  push:
-    branches:
-      - 'research/authenticated-staging-entry-integration-*'
 jobs:
   entry:
     runs-on: ubuntu-latest

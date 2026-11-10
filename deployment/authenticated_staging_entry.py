@@ -26,9 +26,6 @@ def create_application(*, environ, ownership, principal_factory, state_connect,
         environ=environ, ownership=ownership, principal_factory=principal_factory,
         state_connect=state_connect, session_connect=session_connect,
         tenant_connect=tenant_connect, verifier_factory=verifier_factory)
-    # Constructing the wrapper validates the peer CIDRs and HTTPS origin.
-    guarded = VerifiedProxyIngress(app, environ["ALPHA_BFF_ORIGIN"],
-                                   trusted_peer_cidrs=trusted_peer_cidrs)
 
     def application(request, start_response):
         # The readiness endpoint is guarded by the same proxy boundary.

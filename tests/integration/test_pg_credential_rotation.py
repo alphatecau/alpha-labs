@@ -2,14 +2,14 @@
 import os
 import unittest
 import psycopg
+from disposable_pg_guard import require_disposable_ci_database
 
 
 @unittest.skipUnless(os.getenv("ALPHA_TEST_PG_DSN"), "isolated PostgreSQL only")
 class RotationAcceptance(unittest.TestCase):
     def test_role_password_rotation_and_revocation(self):
         dsn = os.environ["ALPHA_TEST_PG_DSN"]
-        if "alpha_rls_test" not in dsn:
-            raise RuntimeError("refusing non-disposable database")
+        require_disposable_ci_database(dsn)
         with psycopg.connect(dsn, autocommit=True) as admin:
             admin.execute("CREATE ROLE alpha_rotation_ci LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD 'synthetic-old'")
             try:

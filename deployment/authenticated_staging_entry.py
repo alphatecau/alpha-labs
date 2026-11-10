@@ -27,28 +27,25 @@ def create_application(*, environ, ownership, principal_factory, state_connect,
         state_connect=state_connect, session_connect=session_connect,
         tenant_connect=tenant_connect, verifier_factory=verifier_factory)
 
-    def application(request, start_response):
-        # The readiness endpoint is guarded by the same proxy boundary.
-        def route(env, respond):
-            path = env.get("PATH_INFO", "")
-            method = env.get("REQUEST_METHOD", "")
-            if path == "/livez" and method == "GET":
-                return _reply(respond, "200 OK", {"status": "alive", "authenticated_ready": False})
-            if path == "/readyz" and method == "GET":
-                try:
-                    ready = readiness_check()
-                    if ready is not True:
-                        raise RuntimeError("dependencies unavailable")
-                except Exception:
-                    return _reply(respond, "503 Service Unavailable",
-                                  {"status": "unavailable", "authenticated_ready": False})
-                return _reply(respond, "200 OK",
-                              {"status": "ready", "authenticated_ready": True})
-            return app(env, respond)
-        # Preserve VerifiedProxyIngress validation for every request.
-        return VerifiedProxyIngress(route, environ["ALPHA_BFF_ORIGIN"],
-                                    trusted_peer_cidrs=trusted_peer_cidrs)(request, start_response)
-    return application
+    def route(env, respond):
+        path = env.get("PATH_INFO", "")
+        method = env.get("REQUEST_METHOD", "")
+        if path == "/livez" and method == "GET":
+            return _reply(respond, "200 OK", {"status": "alive", "authenticated_ready": False})
+        if path == "/readyz" and method == "GET":
+            try:
+                if readiness_check() is not True:
+                    raise RuntimeError("dependencies unavailable")
+            except Exception:
+                return _reply(respond, "503 Service Unavailable",
+                              {"status": "unavailable", "authenticated_ready": False})
+            return _reply(respond, "200 OK",
+                          {"status": "ready", "authenticated_ready": True})
+        return app(env, respond)
+
+    # Validate proxy peer ranges at startup, never lazily on the first request.
+    return VerifiedProxyIngress(route, environ["ALPHA_BFF_ORIGIN"],
+                                trusted_peer_cidrs=trusted_peer_cidrs)
 
 
 def _reply(start_response, status, payload):

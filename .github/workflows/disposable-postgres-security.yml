@@ -8,9 +8,6 @@ on:
       - 'tests/integration/test_bff_postgres_chain.py'
       - 'tests/integration/test_disposable_pg_guard.py'
       - '.github/workflows/disposable-postgres-security.yml'
-  push:
-    branches:
-      - 'research/authenticated-staging-entry-integration-*'
 permissions:
   contents: read
 jobs:

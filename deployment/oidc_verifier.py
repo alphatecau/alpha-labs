@@ -8,6 +8,7 @@ import hashlib
 import json
 import re
 import time
+from urllib.parse import urlsplit
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import hashes
 
@@ -18,8 +19,12 @@ def decode_part(part):
 
 class OIDCVerifier:
     def __init__(self, *, issuer, audience, jwks, clock=None):
-        if not isinstance(issuer,str) or not issuer.startswith("https://"):
+        if not isinstance(issuer,str):
             raise ValueError("HTTPS issuer required")
+        parsed = urlsplit(issuer)
+        if (parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password
+                or parsed.query or parsed.fragment or parsed.path not in ("", "/")):
+            raise ValueError("canonical HTTPS issuer required")
         if not isinstance(audience,str) or not audience:
             raise ValueError("audience required")
         if not isinstance(jwks,dict) or not isinstance(jwks.get("keys"),list):
@@ -33,8 +38,15 @@ class OIDCVerifier:
                 raise ValueError()
             parts=credential.split(".")
             if len(parts)!=3: raise ValueError()
-            header=json.loads(decode_part(parts[0]))
-            claims=json.loads(decode_part(parts[1]))
+            def unique_pairs(pairs):
+                result = {}
+                for key, value in pairs:
+                    if key in result:
+                        raise ValueError("duplicate JSON member")
+                    result[key] = value
+                return result
+            header=json.loads(decode_part(parts[0]), object_pairs_hook=unique_pairs)
+            claims=json.loads(decode_part(parts[1]), object_pairs_hook=unique_pairs)
             if not isinstance(header,dict) or not isinstance(claims,dict):
                 raise ValueError()
             if header.get("alg")!="RS256" or header.get("typ") not in (None,"JWT") or not isinstance(header.get("kid"),str):
@@ -52,7 +64,9 @@ class OIDCVerifier:
             aud=claims.get("aud")
             if not (aud==self.audience or isinstance(aud,list) and self.audience in aud):
                 raise ValueError()
-            if isinstance(aud,list) and len(aud)>1 and claims.get("azp")!=self.audience:
+            if isinstance(aud,list) and (not aud or any(not isinstance(v,str) or not v for v in aud) or len(set(aud))!=len(aud)):
+                raise ValueError()
+            if ("azp" in claims and claims["azp"] != self.audience) or (isinstance(aud,list) and len(aud)>1 and claims.get("azp")!=self.audience):
                 raise ValueError()
             if type(claims.get("exp")) is not int or type(claims.get("iat")) is not int: raise ValueError()
             if not (now<claims["exp"]<=now+3600 and now-3600<=claims["iat"]<=now+30): raise ValueError()

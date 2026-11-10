@@ -1,0 +1,51 @@
+name: Disposable PostgreSQL 16 security acceptance
+on:
+  pull_request:
+    paths:
+      - 'tests/integration/disposable_pg_guard.py'
+      - 'tests/integration/test_account_role_isolation.py'
+      - 'tests/integration/test_pg_credential_rotation.py'
+      - 'tests/integration/test_bff_postgres_chain.py'
+      - 'tests/integration/test_disposable_pg_guard.py'
+      - '.github/workflows/disposable-postgres-security.yml'
+  push:
+    branches:
+      - 'research/authenticated-staging-entry-integration-*'
+permissions:
+  contents: read
+jobs:
+  isolated-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: disposable-ci-only
+          POSTGRES_DB: alpha_rls_test
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d alpha_rls_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      ALPHA_DISPOSABLE_PG_CI: "1"
+      ALPHA_TEST_PG_DSN: "host=127.0.0.1 port=5432 dbname=alpha_rls_test user=postgres password=disposable-ci-only"
+      PYTHONPATH: "packages/alpha_lab/src:tests/integration"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install . 'psycopg[binary]>=3.2,<4'
+      - name: Verify disposable-only guard
+        run: python -m unittest discover -s tests/integration -p 'test_disposable_pg_guard.py' -v
+      - name: Tenant-specific role and RLS isolation
+        run: python -m unittest discover -s tests/integration -p 'test_account_role_isolation.py' -v
+      - name: Disposable credential rotation
+        run: python -m unittest discover -s tests/integration -p 'test_pg_credential_rotation.py' -v
+      - name: BFF-to-PostgreSQL chain
+        run: python -m unittest discover -s tests/integration -p 'test_bff_postgres_chain.py' -v

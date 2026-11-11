@@ -40,5 +40,17 @@ class PersonalJournalAdversarialTests(unittest.TestCase):
             journal.close()
 
 
+    def test_deleted_middle_event_is_detected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / "events.sqlite3")
+            journal = PaperJournal(path)
+            for i in range(3):
+                journal.append({"type": "FILL", "simulated": True, "index": i})
+            journal.connection.execute("DELETE FROM events WHERE seq=2")
+            journal.connection.commit()
+            with self.assertRaisesRegex(ValueError, "journal sequence gap"):
+                journal.verify()
+            journal.close()
+
 if __name__ == "__main__":
     unittest.main()

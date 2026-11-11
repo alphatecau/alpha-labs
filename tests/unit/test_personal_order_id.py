@@ -52,6 +52,7 @@ class PersonalOrderIdTests(unittest.TestCase):
             self.assertEqual(r.ledger.sequence, 0)
             self.assertEqual(r.ledger.cash, Decimal("1000"))
             self.assertEqual(r.order_ids, set())
+            self.assertTrue(r.ledger.halted)
         finally:
             r.close()
 

@@ -15,8 +15,12 @@ class PaperJournal:
 
     def verify(self):
         previous = "0" * 64
+        expected_seq = 1
         for seq, prior, payload, digest in self.connection.execute(
                 "SELECT seq,previous_hash,payload,digest FROM events ORDER BY seq"):
+            if seq != expected_seq:
+                raise ValueError("journal sequence gap: HALT")
+            expected_seq += 1
             expected = sha256((previous + payload).encode()).hexdigest()
             if prior != previous or digest != expected:
                 raise ValueError("journal integrity failure: HALT")

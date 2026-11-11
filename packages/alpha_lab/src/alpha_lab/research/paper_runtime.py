@@ -16,7 +16,7 @@ class PaperRuntime:
         self.recovery_verified = False
         self.order_ids = set()
         try:
-            self.journal.verify()
+            self.journal_head = self.journal.verify()
             for (payload,) in self.journal.connection.execute("SELECT payload FROM events ORDER BY seq"):
                 event = json.loads(payload)
                 if event.get("type") != "FILL" or event.get("simulated") is not True:
@@ -78,10 +78,12 @@ class PaperRuntime:
         if order_id is not None:
             event["order_id"] = order_id
         try:
-            self.journal.append(event)
+            new_head = self.journal.append(event, expected_seq=self.ledger.sequence,
+                                           expected_head=self.journal_head)
         except Exception:
             self.ledger.halt()
             raise
+        self.journal_head = new_head
         self.ledger = candidate
         if order_id is not None:
             self.order_ids.add(order_id)

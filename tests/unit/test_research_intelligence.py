@@ -18,6 +18,16 @@ class ResearchIntelligenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             classify_regime([100] * 20 + [float("nan")])
 
+    def test_generator_input(self):
+        result = classify_regime((100 for _ in range(21)))
+        self.assertEqual(result.regime, "SIDEWAYS")
+
+    def test_invalid_thresholds(self):
+        with self.assertRaises(ValueError):
+            classify_regime([100] * 21, volatility_threshold=0)
+        with self.assertRaises(ValueError):
+            classify_regime([100] * 21, crash_threshold=-2)
+
     def test_cost_sensitivity_rejects(self):
         result = stress_costs([0.005] * 40)
         self.assertEqual(result.verdict, "REJECT")

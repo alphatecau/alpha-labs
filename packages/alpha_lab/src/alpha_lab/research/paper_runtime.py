@@ -7,16 +7,23 @@ from decimal import Decimal
 import json
 from alpha_lab.research.paper_simulator import PaperLedger, number
 from alpha_lab.research.paper_journal import PaperJournal
+from alpha_lab.research.paper_checkpoint import verify_sealed_checkpoint
 from alpha_lab.research.paper_risk import authorise_simulated_order
 
 class PaperRuntime:
-    def __init__(self, path, *, starting_cash="10000"):
+    def __init__(self, path, *, starting_cash="10000", trusted_checkpoint=None, checkpoint_secret=None):
         self.journal = PaperJournal(path)
         self.ledger = PaperLedger(starting_cash)
         self.recovery_verified = False
         self.order_ids = set()
         try:
-            self.journal_head = self.journal.verify()
+            if (trusted_checkpoint is None) != (checkpoint_secret is None):
+                raise ValueError("checkpoint and independent key must both be supplied: HALT")
+            if trusted_checkpoint is not None:
+                self.journal_head = verify_sealed_checkpoint(
+                    self.journal, trusted_checkpoint, secret=checkpoint_secret)
+            else:
+                self.journal_head = self.journal.verify()
             for (payload,) in self.journal.connection.execute("SELECT payload FROM events ORDER BY seq"):
                 event = json.loads(payload)
                 if event.get("type") != "FILL" or event.get("simulated") is not True:

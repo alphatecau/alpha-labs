@@ -1,0 +1,58 @@
+name: Engineering team verification (manual, research-only)
+on:
+  workflow_dispatch:
+    inputs:
+      target_ref:
+        description: Research branch or commit to verify (never deploy)
+        required: true
+        default: main
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Reject unsafe ref
+        env:
+          TARGET_REF: ${{ inputs.target_ref }}
+        run: |
+          case "$TARGET_REF" in
+            main|research/*) ;;
+            *) echo "Only main or research/* refs are allowed"; exit 1 ;;
+          esac
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_ref }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test-only dependency
+        run: python -m pip install 'cryptography>=44,<47'
+      - name: Run research unit tests
+        run: make research-test
+      - name: Run website tests
+        run: make sites-test
+      - name: Run synthetic fixture smoke test
+        run: make research-demo
+      - name: Produce evidence summary
+        if: always()
+        env:
+          TARGET_REF: ${{ inputs.target_ref }}
+        run: |
+          echo "# Engineering verification" > engineering-verification.md
+          echo "Target ref: $TARGET_REF" >> engineering-verification.md
+          git rev-parse HEAD >> engineering-verification.md
+          date -u +%Y-%m-%dT%H:%M:%SZ >> engineering-verification.md
+          echo "Research-only; no trading or deployment" >> engineering-verification.md
+          echo "Job outcome: ${{ job.status }}" >> engineering-verification.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: engineering-verification
+          path: engineering-verification.md
+          retention-days: 14

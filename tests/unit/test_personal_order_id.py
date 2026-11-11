@@ -42,6 +42,34 @@ class PersonalOrderIdTests(unittest.TestCase):
         finally:
             recovered.close()
 
+    def test_two_runtime_instances_cannot_commit_stale_or_duplicate_orders(self):
+        first = PaperRuntime(self.path, starting_cash="1000")
+        second = PaperRuntime(self.path, starting_cash="1000")
+        try:
+            first.enable(operator_approved=True)
+            second.enable(operator_approved=True)
+            first.execute(**self.kw)
+            with self.assertRaisesRegex(ValueError, "duplicate simulated order ID"):
+                second.execute(**self.kw)
+            self.assertTrue(second.ledger.halted)
+            self.assertEqual(second.ledger.sequence, 0)
+            self.assertEqual(second.ledger.cash, Decimal("1000"))
+            second.enable(operator_approved=True)
+            with self.assertRaisesRegex(ValueError, "stale journal state"):
+                second.execute(**(self.kw | {"order_id": "research-order-002"}))
+            self.assertTrue(second.ledger.halted)
+            self.assertEqual(second.ledger.sequence, 0)
+            self.assertEqual(first.ledger.sequence, 1)
+        finally:
+            first.close()
+            second.close()
+        recovered = PaperRuntime(self.path, starting_cash="1000")
+        try:
+            self.assertEqual(recovered.ledger.sequence, 1)
+            self.assertEqual(recovered.ledger.cash, Decimal("900"))
+        finally:
+            recovered.close()
+
     def test_append_failure_cannot_change_authoritative_ledger(self):
         r = PaperRuntime(self.path, starting_cash="1000")
         try:

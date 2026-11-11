@@ -64,5 +64,31 @@ class PersonalJournalAdversarialTests(unittest.TestCase):
             self.assertNotEqual(journal.verify(), trusted_head)
             journal.close()
 
+    def test_trusted_checkpoint_detects_tail_deletion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / "events.sqlite3")
+            journal = PaperJournal(path)
+            journal.append({"type": "FILL", "simulated": True, "index": 1})
+            journal.append({"type": "FILL", "simulated": True, "index": 2})
+            trusted_head = journal.verify()
+            self.assertEqual(journal.verify_checkpoint(
+                trusted_sequence=2, trusted_head=trusted_head), trusted_head)
+            journal.connection.execute("DELETE FROM events WHERE seq=2")
+            journal.connection.commit()
+            with self.assertRaisesRegex(ValueError, "journal checkpoint mismatch"):
+                journal.verify_checkpoint(trusted_sequence=2, trusted_head=trusted_head)
+            journal.close()
+
+    def test_checkpoint_rejects_invalid_values(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            journal = PaperJournal(str(Path(tmp) / "events.sqlite3"))
+            try:
+                with self.assertRaisesRegex(ValueError, "invalid trusted checkpoint"):
+                    journal.verify_checkpoint(trusted_sequence=True, trusted_head="0" * 64)
+                with self.assertRaisesRegex(ValueError, "invalid trusted checkpoint"):
+                    journal.verify_checkpoint(trusted_sequence=0, trusted_head="invalid")
+            finally:
+                journal.close()
+
 if __name__ == "__main__":
     unittest.main()

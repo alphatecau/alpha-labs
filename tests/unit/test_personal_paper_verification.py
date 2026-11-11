@@ -62,7 +62,8 @@ class PersonalPaperVerification(unittest.TestCase):
                             quote_timestamp=now, now=now, marks={},
                             proposed_loss="1", aggregate_open_risk="0",
                             gross_notional="0", peak_nav="1000",
-                            day_start_nav="1000", operator_approved=True)
+                            day_start_nav="1000", operator_approved=True,
+                            order_id="recovery-001")
             runtime.close()
             recovered = PaperRuntime(path, starting_cash="1000")
             try:

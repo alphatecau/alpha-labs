@@ -52,5 +52,17 @@ class PersonalJournalAdversarialTests(unittest.TestCase):
                 journal.verify()
             journal.close()
 
+    def test_trailing_event_deletion_requires_external_checkpoint(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / "events.sqlite3")
+            journal = PaperJournal(path)
+            journal.append({"type": "FILL", "simulated": True, "index": 1})
+            journal.append({"type": "FILL", "simulated": True, "index": 2})
+            trusted_head = journal.verify()
+            journal.connection.execute("DELETE FROM events WHERE seq=2")
+            journal.connection.commit()
+            self.assertNotEqual(journal.verify(), trusted_head)
+            journal.close()
+
 if __name__ == "__main__":
     unittest.main()

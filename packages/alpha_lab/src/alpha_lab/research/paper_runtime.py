@@ -46,12 +46,11 @@ class PaperRuntime:
                 order_id=None):
         if not self.recovery_verified or self.ledger.halted or operator_approved is not True:
             raise PermissionError("HALT: operator approval and recovered ledger required")
-        if order_id is not None:
-            if not isinstance(order_id, str) or not order_id or len(order_id) > 128:
-                self.ledger.halt()
-                raise ValueError("invalid order ID: HALT")
-            if order_id in self.order_ids:
-                raise PermissionError("duplicate simulated order ID: HALT")
+        if not isinstance(order_id, str) or not order_id or len(order_id) > 128:
+            self.ledger.halt()
+            raise ValueError("mandatory order ID required: HALT")
+        if order_id in self.order_ids:
+            raise PermissionError("duplicate simulated order ID: HALT")
         if not isinstance(now, datetime) or not isinstance(quote_timestamp, datetime):
             self.ledger.halt()
             raise ValueError("missing quote time: HALT")

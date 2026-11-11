@@ -1,6 +1,7 @@
 """Offline-only Personal Edition order-id and durable append acceptance tests."""
 import tempfile
 import threading
+import multiprocessing
 import unittest
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -9,6 +10,20 @@ from unittest.mock import patch
 
 from alpha_lab.research.paper_runtime import PaperRuntime
 from alpha_lab.research.paper_journal import PaperJournal
+
+
+def _process_journal_append(path, barrier, outcomes, order_id):
+    journal = PaperJournal(path)
+    try:
+        barrier.wait(timeout=10)
+        try:
+            journal.append({"type": "FILL", "simulated": True, "order_id": order_id},
+                           expected_seq=0, expected_head="0" * 64)
+            outcomes.put("committed")
+        except ValueError as exc:
+            outcomes.put(str(exc))
+    finally:
+        journal.close()
 
 
 class PersonalOrderIdTests(unittest.TestCase):
@@ -71,6 +86,38 @@ class PersonalOrderIdTests(unittest.TestCase):
             self.assertEqual(recovered.ledger.cash, Decimal("900"))
         finally:
             recovered.close()
+
+    def test_two_processes_only_one_stale_snapshot_commits(self):
+        ctx = multiprocessing.get_context("spawn")
+        barrier = ctx.Barrier(2)
+        outcomes = ctx.Queue()
+        processes = [
+            ctx.Process(target=_process_journal_append,
+                        args=(self.path, barrier, outcomes, "process-order-" + str(i)))
+            for i in range(2)
+        ]
+        for process in processes:
+            process.start()
+        for process in processes:
+            process.join(timeout=20)
+        try:
+            self.assertTrue(all(not p.is_alive() for p in processes))
+            self.assertTrue(all(p.exitcode == 0 for p in processes))
+            results = [outcomes.get(timeout=5) for _ in processes]
+            self.assertEqual(results.count("committed"), 1)
+            self.assertTrue(any("stale journal state" in x for x in results))
+            verifier = PaperJournal(self.path)
+            try:
+                self.assertEqual(verifier.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0], 1)
+                verifier.verify()
+            finally:
+                verifier.close()
+        finally:
+            for process in processes:
+                if process.is_alive():
+                    process.terminate()
+                    process.join(timeout=5)
+            outcomes.close()
 
     def test_simultaneous_journal_writers_only_one_commits(self):
         barrier = threading.Barrier(2)

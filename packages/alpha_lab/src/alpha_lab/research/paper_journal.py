@@ -27,6 +27,23 @@ class PaperJournal:
             previous = digest
         return previous
 
+    def verify_checkpoint(self, *, trusted_sequence, trusted_head):
+        """Compare against a checkpoint supplied by an independent trusted channel.
+
+        The caller must authenticate and protect the checkpoint separately.
+        This method does not establish trust in the supplied values.
+        """
+        if not isinstance(trusted_sequence, int) or isinstance(trusted_sequence, bool) or trusted_sequence < 0:
+            raise ValueError("invalid trusted checkpoint: HALT")
+        if not isinstance(trusted_head, str) or len(trusted_head) != 64 or any(
+                character not in "0123456789abcdef" for character in trusted_head):
+            raise ValueError("invalid trusted checkpoint: HALT")
+        actual_head = self.verify()
+        actual_sequence = self.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+        if actual_sequence != trusted_sequence or actual_head != trusted_head:
+            raise ValueError("journal checkpoint mismatch: HALT")
+        return actual_head
+
     def append(self, event, *, expected_seq=None, expected_head=None):
         self.connection.execute("BEGIN IMMEDIATE")
         try:

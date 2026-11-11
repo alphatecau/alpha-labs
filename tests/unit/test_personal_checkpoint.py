@@ -5,10 +5,35 @@ import unittest
 from pathlib import Path
 
 from alpha_lab.research.paper_journal import PaperJournal
+from alpha_lab.research.paper_runtime import PaperRuntime
 from alpha_lab.research.paper_checkpoint import seal_checkpoint, verify_sealed_checkpoint
 
 
 class PersonalCheckpointTests(unittest.TestCase):
+    def test_runtime_recovery_requires_matching_authenticated_checkpoint(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / "journal.sqlite")
+            key = b"r" * 32
+            journal = PaperJournal(path)
+            envelope = seal_checkpoint(sequence=0, head=journal.verify(), secret=key)
+            journal.close()
+            runtime = PaperRuntime(path, trusted_checkpoint=envelope,
+                                   checkpoint_secret=key)
+            self.assertTrue(runtime.recovery_verified)
+            self.assertTrue(runtime.ledger.halted)
+            runtime.close()
+            with self.assertRaisesRegex(ValueError, "authentication failure"):
+                PaperRuntime(path, trusted_checkpoint=envelope,
+                             checkpoint_secret=b"x" * 32)
+            with self.assertRaisesRegex(ValueError, "both be supplied"):
+                PaperRuntime(path, trusted_checkpoint=envelope)
+            journal = PaperJournal(path)
+            journal.append({"type": "FILL", "simulated": True})
+            journal.close()
+            with self.assertRaisesRegex(ValueError, "journal checkpoint mismatch"):
+                PaperRuntime(path, trusted_checkpoint=envelope,
+                             checkpoint_secret=key)
+
     def test_valid_checkpoint_and_tail_deletion(self):
         with tempfile.TemporaryDirectory() as tmp:
             journal = PaperJournal(str(Path(tmp) / "journal.sqlite"))

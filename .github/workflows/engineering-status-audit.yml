@@ -1,0 +1,32 @@
+name: Engineering status audit (read-only)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 21 * * 1'
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify status collector tests
+        run: python -m unittest discover -s tests/unit -p test_engineering_status.py -v
+      - name: Collect read-only PR and CI evidence
+        run: python scripts/engineering_status.py --output engineering-status.json
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engineering-status
+          path: engineering-status.json
+          if-no-files-found: warn
+          retention-days: 14

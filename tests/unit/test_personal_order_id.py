@@ -49,7 +49,7 @@ class PersonalOrderIdTests(unittest.TestCase):
             first.enable(operator_approved=True)
             second.enable(operator_approved=True)
             first.execute(**self.kw)
-            with self.assertRaisesRegex(ValueError, "duplicate simulated order ID"):
+            with self.assertRaisesRegex(ValueError, "stale journal state"):
                 second.execute(**self.kw)
             self.assertTrue(second.ledger.halted)
             self.assertEqual(second.ledger.sequence, 0)

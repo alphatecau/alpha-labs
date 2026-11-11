@@ -78,7 +78,11 @@ class PaperRuntime:
         event = {"type":"FILL",**fill}
         if order_id is not None:
             event["order_id"] = order_id
-        self.journal.append(event)
+        try:
+            self.journal.append(event)
+        except Exception:
+            self.ledger.halt()
+            raise
         self.ledger = candidate
         if order_id is not None:
             self.order_ids.add(order_id)

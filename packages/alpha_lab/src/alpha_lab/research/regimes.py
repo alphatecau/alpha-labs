@@ -18,7 +18,14 @@ def classify_regime(closes, *, lookback=20, trend_threshold=0.03,
     Thresholds are research assumptions, not calibrated trading parameters.
     Volatility is the population standard deviation of simple per-bar returns.
     """
-    if lookback < 3 or any(not isfinite(float(x)) or float(x) <= 0 for x in closes):
+    closes = tuple(closes)
+    thresholds = (trend_threshold, volatility_threshold, crash_threshold)
+    if (not isinstance(lookback, int) or isinstance(lookback, bool) or lookback < 3
+            or any(not isfinite(float(x)) for x in thresholds)
+            or trend_threshold <= 0 or volatility_threshold <= 0
+            or not -1 < crash_threshold < 0):
+        raise ValueError("invalid regime parameters")
+    if any(not isfinite(float(x)) or float(x) <= 0 for x in closes):
         raise ValueError("positive finite prices and lookback >= 3 required")
     if len(closes) < lookback + 1:
         return RegimeAssessment("UNKNOWN", 0.0, 0.0, len(closes), False)

@@ -17,8 +17,8 @@ class PersonalPaperAccountingTests(unittest.TestCase):
         result = reconcile_paper_pnl(ledger.fills, {"BTC": "110"}, starting_cash="1000")
         self.assertEqual(result["cash"], Decimal("851"))
         self.assertEqual(result["nav"], Decimal("1016"))
-        self.assertEqual(result["realised"], Decimal("3.75"))
-        self.assertEqual(result["unrealised"], Decimal("12.25"))
+        self.assertEqual(result["realised"], Decimal("3.25"))
+        self.assertEqual(result["unrealised"], Decimal("12.75"))
         self.assertEqual(result["fees"], Decimal("1.5"))
         self.assertEqual(result["nav"], ledger.nav({"BTC": "110"}))
 

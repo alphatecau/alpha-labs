@@ -34,7 +34,8 @@ class PostgresOpaqueSessions:
     def _owner(subject, issuer):
         if not isinstance(subject, str) or not 1 <= len(subject) <= 255 or not isinstance(issuer, str) or not issuer.startswith("https://"):
             raise PermissionError("invalid verified identity")
-        return "oidc_" + hashlib.sha256((issuer.rstrip("/") + "\0" + subject).encode()).hexdigest()
+        # Match the verifier/ownership contract, including the issuer's slash.
+        return "oidc_" + hashlib.sha256((issuer + "\0" + subject).encode()).hexdigest()
 
     def create(self, subject, issuer):
         owner = self._owner(subject, issuer)

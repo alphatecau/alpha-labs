@@ -13,6 +13,10 @@ on:
       - 'tests/unit/test_auth0_staging_settings.py'
       - 'deployment/auth0_session_controller.py'
       - 'deployment/staging_authenticated_bff.py'
+      - 'packages/alpha_lab/src/alpha_lab/research/paper_ownership_registry.py'
+      - 'packages/alpha_lab/src/alpha_lab/research/postgres_paper_security.py'
+      - 'tests/unit/test_staging_ownership_revocation.py'
+      - 'tests/integration/test_staging_ownership_revocation.py'
       - 'deployment/staging_authenticated_assembly.py'
       - 'deployment/authenticated_staging_bootstrap.py'
       - 'tests/unit/test_authenticated_staging_bootstrap.py'
@@ -94,6 +98,7 @@ jobs:
           python -m unittest discover -s tests/unit -p 'test_auth0_staging_settings.py' -v
           python -m unittest discover -s tests/unit -p 'test_auth0_confidential_exchange.py' -v
           python -m unittest discover -s tests/unit -p 'test_staging_authenticated_bff.py' -v
+          PYTHONPATH=packages/alpha_lab/src:. python -m unittest discover -s tests/unit -p 'test_staging_ownership_revocation.py' -v
           python -m unittest discover -s tests/unit -p 'test_staging_authenticated_assembly.py' -v
           python -m unittest discover -s tests/unit -p 'test_authenticated_staging_bootstrap.py' -v
           python -m unittest discover -s tests/unit -p 'test_staging_boundary_adversarial.py' -v
@@ -125,6 +130,12 @@ jobs:
           ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
           PYTHONPATH: packages/alpha_lab/src:.:tests/integration
         run: python -m unittest discover -s tests/integration -p 'test_auth_postgres_durable.py' -v
+
+      - name: Verify ownership revocation before every research read
+        env:
+          ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
+          PYTHONPATH: packages/alpha_lab/src:.:tests/integration
+        run: python -m unittest discover -s tests/integration -p 'test_staging_ownership_revocation.py' -v
 
       - name: Verify tenant-role arbitrary SQL isolation
         env:

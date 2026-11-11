@@ -34,6 +34,7 @@ class FullChainPostgresTests(unittest.TestCase):
                            for s in ("alice", "bob")]
         verifier = SessionOwnershipVerifier(sessions=self.sessions, ownership=self.owners, limiter=self.limiter)
         self.cookies, owner_ids = [], []
+        self.owner_ids = owner_ids
         for p in self.principals:
             self.owners.provision(p, "primary")
             self.cookies.append("__Host-alpha_session=" + self.sessions.create(p.subject, p.issuer))
@@ -106,6 +107,30 @@ class FullChainPostgresTests(unittest.TestCase):
             self.assertFalse(conn.execute("SELECT has_table_privilege(current_user, 'public.research_run_registry', 'INSERT')").fetchone()[0])
         self.owners.revoke(self.principals[0], "primary")
         self.assertTrue(self.request(self.cookies[0])[0].startswith("401"))
+
+    def test_reused_connection_resets_tenant_context_on_commit_and_rollback(self):
+        with self.reader.connection_factory() as conn:
+            conn.autocommit = True
+            @contextmanager
+            def pooled_connection():
+                yield conn
+            pooled = TransactionScopedResearchReader(pooled_connection)
+            for index in (0, 1, 0, 1):
+                rows = pooled.list_runs(self.owner_ids[index])
+                self.assertEqual([r["run_id"] for r in rows], ["test-" + str(index)])
+                self.assertEqual(conn.execute("SELECT count(*) FROM public.research_run_registry").fetchone()[0], 0)
+            with self.assertRaisesRegex(RuntimeError, "synthetic rollback"):
+                with conn.transaction():
+                    conn.execute("SELECT set_config('alpha_labs.owner_id',%s,true)", (self.owner_ids[0],))
+                    raise RuntimeError("synthetic rollback")
+            self.assertEqual(conn.execute("SELECT count(*) FROM public.research_run_registry").fetchone()[0], 0)
+
+    def test_shared_reader_guc_is_not_independent_tenant_authority(self):
+        # Deliberately demonstrate the remaining security limitation, rather
+        # than claiming that fixed-query application checks contain arbitrary SQL.
+        with self.reader.connection_factory() as conn:
+            conn.execute("SELECT set_config('alpha_labs.owner_id',%s,true)", (self.owner_ids[1],))
+            self.assertEqual(conn.execute("SELECT run_id FROM public.research_run_registry").fetchall(), [("test-1",)])
 
 
 if __name__ == "__main__":

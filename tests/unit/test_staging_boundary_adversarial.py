@@ -16,7 +16,7 @@ class StagingBoundaryTests(unittest.TestCase):
         self.app = StagingResearchBFF(
             ExplodingDependency(), ExplodingDependency(),
             ExplodingDependency(), ExplodingDependency(),
-            origin="https://staging.example"
+            origin="https://staging.example", authorize_owner=lambda owner: True
         )
 
     def request(self, path, method="GET", **extra):

@@ -5,6 +5,7 @@ Never uses Render/staging DB; refuses DSNs without alpha_rls_test.
 import hashlib
 import os
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 import psycopg
 from disposable_pg_guard import require_disposable_ci_database
 from deployment.postgres_pkce_state_store import PostgresPKCEStateStore
@@ -47,5 +48,17 @@ class DurableAuthenticationTests(unittest.TestCase):
         store.put(digest,{"nonce":"n","verifier":"v","created_at":1000},1)
         later=PostgresPKCEStateStore(self.connect,clock=lambda:1002)
         self.assertIsNone(later.consume(digest))
+
+    def test_concurrent_instances_consume_state_once(self):
+        store = PostgresPKCEStateStore(self.connect)
+        digest = hashlib.sha256(b"concurrent-synthetic-state").hexdigest()
+        record = {"nonce": "synthetic", "verifier": "synthetic", "created_at": int(store.clock())}
+        store.put(digest, record, 300)
+        def consume(_):
+            return PostgresPKCEStateStore(self.connect).consume(digest)
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            results = list(pool.map(consume, range(8)))
+        self.assertEqual(sum(r == record for r in results), 1)
+        self.assertEqual(sum(r is None for r in results), 7)
 
 if __name__=="__main__": unittest.main()

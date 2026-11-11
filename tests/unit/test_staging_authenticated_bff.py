@@ -26,7 +26,7 @@ class BFFTests(unittest.TestCase):
     def setUp(self):
         self.sessions = Sessions()
         self.app = StagingResearchBFF(Flow(), Controller(), self.sessions, Reader(),
-                                      origin="https://staging.example")
+                                      origin="https://staging.example", authorize_owner=lambda owner: True)
     def call(self, path, method="GET", **env):
         result = {}
         def start(status, headers): result.update(status=status, headers=headers)

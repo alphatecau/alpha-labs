@@ -21,6 +21,8 @@ def assemble(*, verify_token, ownership, principal_factory, state_store,
     config = staging_auth0_settings(env)
     if not callable(verify_token) or ownership is None or not callable(principal_factory):
         raise ValueError("trusted OIDC verifier and ownership dependencies required")
+    if not callable(getattr(ownership, "require_owner_id", None)):
+        raise ValueError("current owner-ID authorization required")
     if state_store is None or not callable(session_connect) or not callable(tenant_connect):
         raise ValueError("persistent state and restricted database connectors required")
     secret = env.get("AUTH0_CLIENT_SECRET")
@@ -34,7 +36,8 @@ def assemble(*, verify_token, ownership, principal_factory, state_store,
     provider = RenderEnvironmentTenantSecrets(env)
     broker = TenantCredentialBroker(provider, tenant_connect)
     reader = AccountRoleResearchReader(broker)
-    return StagingResearchBFF(flow, controller, sessions, reader, origin=config["bff_origin"])
+    return StagingResearchBFF(flow, controller, sessions, reader, origin=config["bff_origin"],
+                              authorize_owner=lambda owner: ownership.require_owner_id(owner, "primary"))
 
 # Intentionally no module-level WSGI 'application': deployment must explicitly
 # supply a verified issuer/JWKS loader, restricted database connections,

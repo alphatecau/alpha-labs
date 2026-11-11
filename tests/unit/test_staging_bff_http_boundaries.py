@@ -16,7 +16,7 @@ class HttpBoundaryTests(unittest.TestCase):
         sentinel = NeverCall()
         self.app = StagingResearchBFF(
             sentinel, sentinel, sentinel, sentinel,
-            origin="https://staging.example")
+            origin="https://staging.example", authorize_owner=lambda owner: True)
 
     def request(self, path, method="GET", **kwargs):
         responses = []

@@ -1,4 +1,5 @@
 import unittest
+import hashlib
 
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 from alpha_lab.research.postgres_paper_security import PostgresPaperOwnership, PostgresIdentityLimiter, SCHEMA
@@ -56,6 +57,20 @@ class PostgresSecurityContractTests(unittest.TestCase):
         now[0] = 180
         self.assertTrue(limiter.allow(self.owner.issuer, self.owner.subject))
         self.assertTrue(any("ON CONFLICT(identity) DO UPDATE" in sql for sql in self.state["sql"]))
+
+    def test_owner_id_lookup_tracks_current_authorization(self):
+        registry = PostgresPaperOwnership(self.connect)
+        owner = "oidc_" + hashlib.sha256((self.owner.issuer + "\0" + self.owner.subject).encode()).hexdigest()
+        registry.provision(self.owner, "primary")
+        self.assertTrue(registry.require_owner_id(owner, "primary"))
+        registry.revoke(self.owner, "primary")
+        with self.assertRaises(PermissionError):
+            registry.require_owner_id(owner, "primary")
+        before = len(self.state["sql"])
+        for owner_id, account in (("oidc_bad", "primary"), (owner, "../bad")):
+            with self.assertRaises(PermissionError):
+                registry.require_owner_id(owner_id, account)
+        self.assertEqual(len(self.state["sql"]), before)
 
     def test_schema_and_invalid_inputs(self):
         self.assertIn("PRIMARY KEY(owner_digest, account)", SCHEMA)

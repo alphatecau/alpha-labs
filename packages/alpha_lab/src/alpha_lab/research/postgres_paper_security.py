@@ -59,6 +59,16 @@ class PostgresPaperOwnership:
 
     def require(self, principal, account):
         key = self._key(principal, account)
+        return self._require_key(key)
+
+    def require_owner_id(self, owner_id, account):
+        """Trusted session adapter only; never accept an owner from a browser."""
+        if (not isinstance(owner_id, str) or not re.fullmatch(r"oidc_[a-f0-9]{64}", owner_id)
+                or not isinstance(account, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", account)):
+            raise PermissionError("Verified owner ID and account required")
+        return self._require_key((owner_id[5:], account))
+
+    def _require_key(self, key):
         with self._connect() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT active FROM paper_ownership WHERE owner_digest=%s AND account=%s", key)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Read-only, exact-head GitHub Actions evidence; never a release approval."""
 import argparse
+import http.client
 import json
 import os
 import re
@@ -47,7 +48,7 @@ def fetch_json(path):
         return json.loads(raw)
     except urllib.error.HTTPError as exc:
         raise CollectionError(f"GitHub API HTTP {exc.code}") from None
-    except (OSError, ValueError):
+    except (OSError, ValueError, http.client.HTTPException):
         raise CollectionError("GitHub API request or JSON decoding failed") from None
 
 
@@ -65,8 +66,13 @@ def _valid_pr(pr):
 def _valid_run(run, sha):
     return (isinstance(run, dict) and type(run.get("id")) is int and run["id"] > 0
             and run.get("head_sha") == sha and isinstance(run.get("name"), str)
-            and isinstance(run.get("event"), str) and isinstance(run.get("status"), str)
-            and (run.get("conclusion") is None or isinstance(run["conclusion"], str))
+            and isinstance(run.get("event"), str) and bool(run["event"])
+            and run.get("status") in ("queued", "in_progress", "completed", "waiting", "requested", "pending")
+            and "conclusion" in run
+            and ((run["status"] != "completed" and run["conclusion"] is None)
+                 or (run["status"] == "completed" and run["conclusion"] in (
+                     "success", "failure", "neutral", "cancelled", "skipped", "timed_out",
+                     "action_required", "startup_failure", "stale")))
             and isinstance(run.get("html_url"), str))
 
 
@@ -125,14 +131,7 @@ def collect(*, fetch=None, clock=time.monotonic, budget=COLLECTION_BUDGET_SECOND
             raise CollectionError("collection time budget exhausted")
         return result
 
-    try:
-        branch = request("/branches/main")
-        if (not isinstance(branch, dict) or not isinstance(branch.get("commit"), dict)
-                or not _sha(branch["commit"].get("sha"))):
-            raise CollectionError("invalid main branch response")
-        main_sha = branch["commit"]["sha"]
-
-        stage = "open pull requests"
+    def read_prs(target):
         seen_prs = set()
         for page in range(1, MAX_PR_PAGES + 1):
             batch = request("/pulls?" + urlencode({"state": "open", "per_page": PAGE_SIZE, "page": page}))
@@ -142,12 +141,21 @@ def collect(*, fetch=None, clock=time.monotonic, budget=COLLECTION_BUDGET_SECOND
                 if not _valid_pr(pr) or pr["number"] in seen_prs:
                     raise CollectionError("invalid or repeated pull request")
                 seen_prs.add(pr["number"])
-                prs.append(pr)
+                target.append(pr)
             if len(batch) < PAGE_SIZE:
-                prs_complete = True
-                break
-        if not prs_complete:
-            raise CollectionError("pull request pagination limit reached")
+                return
+        raise CollectionError("pull request pagination limit reached")
+
+    try:
+        branch = request("/branches/main")
+        if (not isinstance(branch, dict) or not isinstance(branch.get("commit"), dict)
+                or not _sha(branch["commit"].get("sha"))):
+            raise CollectionError("invalid main branch response")
+        main_sha = branch["commit"]["sha"]
+
+        stage = "open pull requests"
+        read_prs(prs)
+        prs_complete = True
 
         for sha in dict.fromkeys([main_sha, *(p["head"]["sha"] for p in prs)]):
             stage = "workflow runs for " + sha
@@ -157,7 +165,8 @@ def collect(*, fetch=None, clock=time.monotonic, budget=COLLECTION_BUDGET_SECOND
                 data = request("/actions/runs?" + urlencode({"head_sha": sha, "per_page": PAGE_SIZE, "page": page}))
                 if (not isinstance(data, dict) or type(data.get("total_count")) is not int
                         or data["total_count"] < 0 or not isinstance(data.get("workflow_runs"), list)
-                        or len(data["workflow_runs"]) > PAGE_SIZE):
+                        or len(data["workflow_runs"]) > PAGE_SIZE
+                        or len(data["workflow_runs"]) > data["total_count"]):
                     raise CollectionError("invalid workflow run page")
                 expected = max(expected, data["total_count"])
                 for run in data["workflow_runs"]:
@@ -173,9 +182,24 @@ def collect(*, fetch=None, clock=time.monotonic, budget=COLLECTION_BUDGET_SECOND
                     raise CollectionError("workflow run results truncated or changed during collection")
             if coverage[sha] != "complete":
                 raise CollectionError("workflow run pagination limit reached")
+        stage = "revalidate current refs"
+        # Preserve the collected snapshot, but never call it complete if the
+        # current main/head inventory differs or cannot be revalidated.
+        prs_complete = False
+        coverage = {sha: "incomplete" for sha in coverage}
+        current_main = request("/branches/main")
+        current_prs = []
+        read_prs(current_prs)
+        if (not isinstance(current_main, dict) or not isinstance(current_main.get("commit"), dict)
+                or current_main["commit"].get("sha") != main_sha
+                or {p["number"]: p["head"]["sha"] for p in current_prs}
+                != {p["number"]: p["head"]["sha"] for p in prs}):
+            raise CollectionError("repository refs changed during collection; rerun required")
+        coverage = {sha: "complete" for sha in coverage}
+        prs_complete = True
     except CollectionError as exc:
         errors.append({"stage": stage, "reason": str(exc)})
-    except (OSError, ValueError, TypeError):
+    except (OSError, ValueError, TypeError, http.client.HTTPException):
         # Injected transports and malformed JSON must not print raw responses/secrets.
         errors.append({"stage": stage, "reason": "GitHub evidence request failed"})
     return summarise(prs, {"workflow_runs": runs}, main_sha=main_sha,

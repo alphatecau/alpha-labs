@@ -1,5 +1,6 @@
 """Offline regression and adversarial tests for read-only CI evidence collection."""
 import contextlib
+import http.client
 import importlib.util
 import io
 import json
@@ -303,6 +304,92 @@ class EngineeringStatusTests(unittest.TestCase):
                 self.assertEqual(MODULE.main(), 0)
             report = json.loads(output.read_text())
             self.assertEqual(report["open_prs"][0]["recent_checks"][0]["conclusion"], "failure")
+
+    def test_inconsistent_total_count_cannot_be_complete(self):
+        result = MODULE.collect(fetch=Transport(runs={
+            (OLD, 1): {"total_count": 0, "workflow_runs": [run()]}}))
+        self.assertEqual(result["collection"]["state"], "incomplete")
+        self.assertEqual(result["open_prs"][0]["recent_checks"], [])
+
+    def test_completed_missing_or_invalid_conclusions_are_incomplete(self):
+        for overrides in ({"conclusion": None}, {"status": "PASS"},
+                          {"conclusion": "PASS"}, {"status": "queued", "conclusion": "success"}):
+            with self.subTest(overrides=overrides):
+                item = run()
+                item.update(overrides)
+                result = MODULE.collect(fetch=Transport(runs={
+                    (OLD, 1): {"total_count": 1, "workflow_runs": [item]}}))
+                self.assertEqual(result["collection"]["state"], "incomplete")
+        item = run()
+        del item["conclusion"]
+        result = MODULE.collect(fetch=Transport(runs={
+            (OLD, 1): {"total_count": 1, "workflow_runs": [item]}}))
+        self.assertEqual(result["collection"]["state"], "incomplete")
+
+    def test_truncated_http_preserves_partial_report_and_exits_nonzero(self):
+        transport = Transport(runs={
+            (MAIN, 1): {"total_count": 1, "workflow_runs": [run(10, MAIN)]},
+            (OLD, 1): http.client.IncompleteRead(b"sensitive", 100),
+        })
+        with tempfile.TemporaryDirectory() as folder:
+            output = pathlib.Path(folder) / "report.json"
+            with mock.patch.object(MODULE, "fetch_json", side_effect=transport), \
+                    mock.patch.object(MODULE.sys, "argv", ["audit", "--output", str(output)]), \
+                    contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(MODULE.main(), 1)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["main"]["recent_checks"][0]["id"], 10)
+            self.assertEqual(report["open_prs"][0]["collection_state"], "incomplete")
+            self.assertNotIn("sensitive", output.read_text())
+
+    def test_response_read_http_errors_are_sanitized(self):
+        response = mock.MagicMock()
+        response.__enter__.return_value = response
+        response.read.side_effect = http.client.IncompleteRead(b"sensitive", 100)
+        opener = mock.Mock()
+        opener.open.return_value = response
+        with mock.patch.object(MODULE.urllib.request, "build_opener", return_value=opener):
+            with self.assertRaises(MODULE.CollectionError) as caught:
+                MODULE.fetch_json("/branches/main")
+        self.assertNotIn("sensitive", str(caught.exception))
+
+    def test_ref_changes_are_incomplete_with_original_evidence_preserved(self):
+        for latest_prs, latest_main in (([pr(sha=OTHER)], MAIN), ([], MAIN),
+                                        ([pr(), pr(2, OTHER)], MAIN), ([pr()], OTHER)):
+            with self.subTest(latest_prs=latest_prs, latest_main=latest_main):
+                transport = Transport(runs={
+                    (OLD, 1): {"total_count": 1, "workflow_runs": [run(conclusion="failure")]}})
+                counts = {"main": 0, "prs": 0}
+                def moving(path):
+                    if path == "/branches/main":
+                        counts["main"] += 1
+                        if counts["main"] > 1:
+                            return {"commit": {"sha": latest_main}}
+                    if path.startswith("/pulls?"):
+                        counts["prs"] += 1
+                        if counts["prs"] > 1:
+                            return latest_prs
+                    return transport(path)
+                result = MODULE.collect(fetch=moving)
+                self.assertEqual(result["collection"]["state"], "incomplete")
+                self.assertFalse(result["collection"]["pull_requests_complete"])
+                self.assertEqual(result["open_prs"][0]["collection_state"], "incomplete")
+                self.assertEqual(result["open_prs"][0]["recent_checks"][0]["conclusion"], "failure")
+
+    def test_revalidation_timeout_does_not_certify_stale_heads(self):
+        transport = Transport()
+        calls = 0
+        def failure(path):
+            nonlocal calls
+            if path == "/branches/main":
+                calls += 1
+                if calls > 1:
+                    raise TimeoutError("sensitive")
+            return transport(path)
+        result = MODULE.collect(fetch=failure)
+        self.assertEqual(result["collection"]["state"], "incomplete")
+        self.assertEqual(result["open_prs"][0]["collection_state"], "incomplete")
+        self.assertNotIn("sensitive", json.dumps(result))
 
     def test_output_failure_is_sanitized_and_nonzero(self):
         report = MODULE.collect(fetch=Transport(prs={1: []}))

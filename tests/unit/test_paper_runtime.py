@@ -29,7 +29,7 @@ class RuntimeTests(unittest.TestCase):
             self.assertEqual(str(restored.ledger.cash),"900")
             self.assertEqual(restored.ledger.sequence,1)
             restored.enable(operator_approved=True)
-            args.update(marks={"BTC":"100"},quantity="0.1",now=now+timedelta(minutes=2))
+            args.update(marks={"BTC":"100"},quantity="0.1",now=now+timedelta(minutes=2),order_id="stale-002")
             with self.assertRaisesRegex(PermissionError,"HALT"):
                 restored.execute(**args)
             self.assertTrue(restored.ledger.halted)

@@ -56,6 +56,17 @@ class PersonalOrderIdTests(unittest.TestCase):
         finally:
             r.close()
 
+    def test_missing_order_id_halts_without_fill(self):
+        r = PaperRuntime(self.path, starting_cash="1000")
+        try:
+            r.enable(operator_approved=True)
+            with self.assertRaisesRegex(ValueError, "mandatory order ID"):
+                r.execute(**(self.kw | {"order_id": None}))
+            self.assertTrue(r.ledger.halted)
+            self.assertEqual(r.ledger.sequence, 0)
+        finally:
+            r.close()
+
     def test_invalid_order_id_halts(self):
         r = PaperRuntime(self.path, starting_cash="1000")
         try:

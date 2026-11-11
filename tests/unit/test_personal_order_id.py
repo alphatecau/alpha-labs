@@ -73,37 +73,39 @@ class PersonalOrderIdTests(unittest.TestCase):
             recovered.close()
 
     def test_simultaneous_journal_writers_only_one_commits(self):
-        first = PaperJournal(self.path)
-        second = PaperJournal(self.path)
         barrier = threading.Barrier(2)
         outcomes = []
         lock = threading.Lock()
-        def attempt(journal, order_id):
-            barrier.wait()
+        def attempt(order_id):
+            journal = PaperJournal(self.path)
             try:
-                journal.append({"type": "FILL", "simulated": True, "order_id": order_id},
-                               expected_seq=0, expected_head="0" * 64)
-                outcome = "committed"
-            except ValueError as exc:
-                outcome = str(exc)
-            with lock:
-                outcomes.append(outcome)
+                barrier.wait()
+                try:
+                    journal.append({"type": "FILL", "simulated": True, "order_id": order_id},
+                                   expected_seq=0, expected_head="0" * 64)
+                    outcome = "committed"
+                except ValueError as exc:
+                    outcome = str(exc)
+                with lock:
+                    outcomes.append(outcome)
+            finally:
+                journal.close()
+        a = threading.Thread(target=attempt, args=("concurrent-a",))
+        b = threading.Thread(target=attempt, args=("concurrent-b",))
+        a.start()
+        b.start()
+        a.join(timeout=10)
+        b.join(timeout=10)
+        self.assertFalse(a.is_alive() or b.is_alive())
+        self.assertEqual(outcomes.count("committed"), 1)
+        self.assertEqual(len(outcomes), 2)
+        self.assertTrue(any("stale journal state" in x for x in outcomes))
+        verifier = PaperJournal(self.path)
         try:
-            a = threading.Thread(target=attempt, args=(first, "concurrent-a"))
-            b = threading.Thread(target=attempt, args=(second, "concurrent-b"))
-            a.start()
-            b.start()
-            a.join(timeout=10)
-            b.join(timeout=10)
-            self.assertFalse(a.is_alive() or b.is_alive())
-            self.assertEqual(outcomes.count("committed"), 1)
-            self.assertEqual(len(outcomes), 2)
-            self.assertTrue(any("stale journal state" in x for x in outcomes))
-            self.assertEqual(first.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0], 1)
-            first.verify()
+            self.assertEqual(verifier.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0], 1)
+            verifier.verify()
         finally:
-            first.close()
-            second.close()
+            verifier.close()
 
     def test_append_failure_cannot_change_authoritative_ledger(self):
         r = PaperRuntime(self.path, starting_cash="1000")

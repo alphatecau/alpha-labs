@@ -71,7 +71,7 @@ class PersonalOrderIdTests(unittest.TestCase):
         r = PaperRuntime(self.path, starting_cash="1000")
         try:
             r.enable(operator_approved=True)
-            with self.assertRaisesRegex(ValueError, "invalid order ID"):
+            with self.assertRaisesRegex(ValueError, "mandatory order ID"):
                 r.execute(**(self.kw | {"order_id": ""}))
             self.assertTrue(r.ledger.halted)
             self.assertEqual(r.ledger.sequence, 0)

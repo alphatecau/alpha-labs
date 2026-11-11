@@ -27,10 +27,19 @@ class PaperJournal:
             previous = digest
         return previous
 
-    def append(self, event):
+    def append(self, event, *, expected_seq=None, expected_head=None):
         self.connection.execute("BEGIN IMMEDIATE")
         try:
             previous = self.verify()
+            if expected_seq is not None:
+                current_seq = self.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+                if current_seq != expected_seq or previous != expected_head:
+                    raise ValueError("stale journal state: HALT")
+            order_id = event.get("order_id")
+            if order_id is not None:
+                for (existing_payload,) in self.connection.execute("SELECT payload FROM events"):
+                    if json.loads(existing_payload).get("order_id") == order_id:
+                        raise ValueError("duplicate simulated order ID: HALT")
             payload = json.dumps(event, sort_keys=True, separators=(",", ":"), allow_nan=False)
             digest = sha256((previous + payload).encode()).hexdigest()
             self.connection.execute("INSERT INTO events(previous_hash,payload,digest) VALUES(?,?,?)",

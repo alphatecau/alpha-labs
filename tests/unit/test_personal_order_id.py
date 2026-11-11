@@ -1,5 +1,6 @@
 """Offline-only Personal Edition order-id and durable append acceptance tests."""
 import tempfile
+import threading
 import unittest
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -7,6 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from alpha_lab.research.paper_runtime import PaperRuntime
+from alpha_lab.research.paper_journal import PaperJournal
 
 
 class PersonalOrderIdTests(unittest.TestCase):
@@ -69,6 +71,39 @@ class PersonalOrderIdTests(unittest.TestCase):
             self.assertEqual(recovered.ledger.cash, Decimal("900"))
         finally:
             recovered.close()
+
+    def test_simultaneous_journal_writers_only_one_commits(self):
+        first = PaperJournal(self.path)
+        second = PaperJournal(self.path)
+        barrier = threading.Barrier(2)
+        outcomes = []
+        lock = threading.Lock()
+        def attempt(journal, order_id):
+            barrier.wait()
+            try:
+                journal.append({"type": "FILL", "simulated": True, "order_id": order_id},
+                               expected_seq=0, expected_head="0" * 64)
+                outcome = "committed"
+            except ValueError as exc:
+                outcome = str(exc)
+            with lock:
+                outcomes.append(outcome)
+        try:
+            a = threading.Thread(target=attempt, args=(first, "concurrent-a"))
+            b = threading.Thread(target=attempt, args=(second, "concurrent-b"))
+            a.start()
+            b.start()
+            a.join(timeout=10)
+            b.join(timeout=10)
+            self.assertFalse(a.is_alive() or b.is_alive())
+            self.assertEqual(outcomes.count("committed"), 1)
+            self.assertEqual(len(outcomes), 2)
+            self.assertTrue(any("stale journal state" in x for x in outcomes))
+            self.assertEqual(first.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0], 1)
+            first.verify()
+        finally:
+            first.close()
+            second.close()
 
     def test_append_failure_cannot_change_authoritative_ledger(self):
         r = PaperRuntime(self.path, starting_cash="1000")

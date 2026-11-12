@@ -7,6 +7,7 @@ from unittest.mock import Mock
 
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
+from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.postgres_opaque_sessions import PostgresOpaqueSessions
 from deployment.staging_authenticated_bff import StagingResearchBFF
 
@@ -20,7 +21,9 @@ class OwnershipRevocationTests(unittest.TestCase):
             (self.principal.issuer + "\0" + self.principal.subject).encode()).hexdigest()
         self.registry.provision(self.principal, "primary")
         self.sessions = SimpleNamespace(resolve_owner=Mock(return_value=self.owner))
-        self.reader = SimpleNamespace(list_runs=Mock(return_value=[]), summary=Mock(return_value={}))
+        self.reader = Mock(spec=AccountRoleResearchReader)
+        self.reader.list_runs.return_value = []
+        self.reader.summary.return_value = {}
         self.authorize = Mock(side_effect=lambda owner: self.registry.require_owner_id(owner, "primary"))
         self.app = self.build(self.authorize)
 

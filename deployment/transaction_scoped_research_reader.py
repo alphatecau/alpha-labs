@@ -1,8 +1,7 @@
-"""Transaction-scoped PostgreSQL research reader.
+"""Legacy GUC-based reader kept for disposable regression reproduction only.
 
-The connection factory must return a dedicated connection as the restricted
-reader role (no BYPASSRLS, no table ownership, no write grants). Never accept
-SQL or owner identity from browser parameters.
+The shared login can change its own GUC. Authenticated research entry points
+require AccountRoleResearchReader and do not accept this adapter.
 """
 class TransactionScopedResearchReader:
     def __init__(self, connection_factory):

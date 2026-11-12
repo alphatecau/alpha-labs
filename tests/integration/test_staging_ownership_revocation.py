@@ -2,13 +2,13 @@
 import os
 import unittest
 from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
 from unittest.mock import Mock
 
 import psycopg
 from disposable_pg_guard import require_disposable_ci_database
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 from alpha_lab.research.postgres_paper_security import PostgresPaperOwnership
+from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.postgres_opaque_sessions import PostgresOpaqueSessions
 from deployment.staging_authenticated_bff import StagingResearchBFF
 
@@ -36,7 +36,9 @@ class PostgreSQLOwnershipRevocationTests(unittest.TestCase):
         self.alice = VerifiedPrincipal(subject="auth0|alice", issuer="https://issuer.example/")
         self.provisioner.provision(self.alice, "primary")
         self.token = self.sessions.create(self.alice.subject, self.alice.issuer)
-        self.reader = SimpleNamespace(list_runs=Mock(return_value=[]), summary=Mock(return_value={}))
+        self.reader = Mock(spec=AccountRoleResearchReader)
+        self.reader.list_runs.return_value = []
+        self.reader.summary.return_value = {}
         self.app = self.application()
 
     def cleanup_schema(self):

@@ -84,7 +84,7 @@ class Auth0AdversarialTests(unittest.TestCase):
                            "user":"postgres", "password":"test-only"},
             lambda **kwargs: self.fail("unsafe role connected"))
         with self.assertRaises(PermissionError):
-            with broker("verified_account"): pass
+            with broker("oidc_" + "a" * 64): pass
 
 
 if __name__ == "__main__":

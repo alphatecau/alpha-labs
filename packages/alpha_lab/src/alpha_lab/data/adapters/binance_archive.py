@@ -3,6 +3,7 @@
 No account, keys, exchange order endpoints or trade execution. Source archives
 are exchange-published but NOT independently cross-checked against another venue.
 """
+
 from __future__ import annotations
 
 import csv
@@ -43,11 +44,16 @@ def month_range(start: str, end: str) -> list[tuple[int, int]]:
     if not re.fullmatch(r"\d{4}-\d{2}", start) or not re.fullmatch(r"\d{4}-\d{2}", end):
         raise ValueError("Months must have format YYYY-MM")
     a, b = tuple(map(int, start.split("-"))), tuple(map(int, end.split("-")))
-    _month(*a); _month(*b)
+    _month(*a)
+    _month(*b)
     if a > b or (b[0] - a[0]) * 12 + b[1] - a[1] > 119:
         raise ValueError("Invalid range or range exceeds 10 years")
-    return [(year, month) for year in range(a[0], b[0] + 1)
-            for month in range(1, 13) if a <= (year, month) <= b]
+    return [
+        (year, month)
+        for year in range(a[0], b[0] + 1)
+        for month in range(1, 13)
+        if a <= (year, month) <= b
+    ]
 
 
 def archive_name(symbol: str, year: int, month: int) -> str:
@@ -58,7 +64,9 @@ def archive_name(symbol: str, year: int, month: int) -> str:
 
 
 def _read_url(url: str) -> bytes:
-    request = Request(url, headers={"User-Agent": "AlphaLabsResearch/0.7 (read-only-public-archive)"})
+    request = Request(
+        url, headers={"User-Agent": "AlphaLabsResearch/0.7 (read-only-public-archive)"}
+    )
     with urlopen(request, timeout=35) as response:
         # Limit network and disk cost, prevent oversized files.
         result = response.read(MAX_ARCHIVE_BYTES + 1)
@@ -67,7 +75,9 @@ def _read_url(url: str) -> bytes:
     return result
 
 
-def verify_checksum(zip_bytes: bytes, checksum_bytes: bytes, expected_filename: str) -> str:
+def verify_checksum(
+    zip_bytes: bytes, checksum_bytes: bytes, expected_filename: str
+) -> str:
     if len(zip_bytes) > MAX_ARCHIVE_BYTES:
         raise ValueError("Oversized archive")
     try:
@@ -83,8 +93,14 @@ def verify_checksum(zip_bytes: bytes, checksum_bytes: bytes, expected_filename: 
     return digest
 
 
-def parse_archive(data: bytes, symbol: str, year: int, month: int, *,
-                  anomalies: list[dict] | None = None) -> list[tuple[str, ...]]:
+def parse_archive(
+    data: bytes,
+    symbol: str,
+    year: int,
+    month: int,
+    *,
+    anomalies: list[dict] | None = None,
+) -> list[tuple[str, ...]]:
     """Require a complete hourly open-time grid; flag early close metadata.
 
     Some checksum-valid Binance archives contain an early in-bar close_time.
@@ -101,7 +117,9 @@ def parse_archive(data: bytes, symbol: str, year: int, month: int, *,
         with ZipFile(io.BytesIO(data)) as archive:
             members = [entry for entry in archive.infolist() if not entry.is_dir()]
             if len(members) != 1 or members[0].filename != expected:
-                raise ValueError("Unexpected ZIP member, suspicious path or additional content")
+                raise ValueError(
+                    "Unexpected ZIP member, suspicious path or additional content"
+                )
             if members[0].file_size > MAX_CSV_BYTES:
                 raise ValueError("Uncompressed data exceeds safe limit")
             # zipfile performs CRC checks when reading the complete member.
@@ -117,7 +135,11 @@ def parse_archive(data: bytes, symbol: str, year: int, month: int, *,
         raise ValueError("ZIP CSV is not UTF-8") from exc
     expected_stamp = first
     for idx, values in enumerate(csv.reader(io.StringIO(decoded)), 1):
-        if idx == 1 and values and values[0].strip().lower() in {"open time", "open_time"}:
+        if (
+            idx == 1
+            and values
+            and values[0].strip().lower() in {"open time", "open_time"}
+        ):
             continue
         if len(values) != 12:
             raise ValueError(f"Invalid 12-column kline row {idx}")
@@ -131,7 +153,9 @@ def parse_archive(data: bytes, symbol: str, year: int, month: int, *,
                 raise ValueError("Non-hourly timestamp alignment")
             observed = datetime.fromtimestamp(stamp / factor, tz=UTC)
             if observed != expected_stamp or observed >= end:
-                raise ValueError(f"Missing, duplicated, reordered or out-of-month candle: expected {expected_stamp.isoformat()}, observed {observed.isoformat()}")
+                raise ValueError(
+                    f"Missing, duplicated, reordered or out-of-month candle: expected {expected_stamp.isoformat()}, observed {observed.isoformat()}"
+                )
             expected_close = stamp + factor * 3600 - 1
             if close_stamp != expected_close:
                 if not (stamp <= close_stamp < expected_close):
@@ -141,33 +165,59 @@ def parse_archive(data: bytes, symbol: str, year: int, month: int, *,
                         f"expected_close={expected_close}, unit={'us' if year >= 2025 else 'ms'}"
                     )
                 if anomalies is None:
-                    raise ValueError("Early close timestamp requires an explicit anomaly ledger")
-                anomalies.append({
-                    "row": idx,
-                    "open_time_utc": observed.isoformat(),
-                    "recorded_close_timestamp": close_stamp,
-                    "expected_close_timestamp": expected_close,
-                    "earliness_in_source_units": expected_close - close_stamp,
-                    "timestamp_unit": "us" if year >= 2025 else "ms",
-                    "classification": "exchange_archive_early_close_metadata",
-                    "requires_independent_review": True,
-                })
-            o, h, l, c, v = (Decimal(values[j]) for j in (1, 2, 3, 4, 5))
-            if not all(x.is_finite() for x in (o, h, l, c, v)):
+                    raise ValueError(
+                        "Early close timestamp requires an explicit anomaly ledger"
+                    )
+                anomalies.append(
+                    {
+                        "row": idx,
+                        "open_time_utc": observed.isoformat(),
+                        "recorded_close_timestamp": close_stamp,
+                        "expected_close_timestamp": expected_close,
+                        "earliness_in_source_units": expected_close - close_stamp,
+                        "timestamp_unit": "us" if year >= 2025 else "ms",
+                        "classification": "exchange_archive_early_close_metadata",
+                        "requires_independent_review": True,
+                    }
+                )
+            open_price, high_price, low_price, close_price, volume = (
+                Decimal(values[j]) for j in (1, 2, 3, 4, 5)
+            )
+            if not all(
+                x.is_finite()
+                for x in (open_price, high_price, low_price, close_price, volume)
+            ):
                 raise ValueError("Nonfinite OHLCV")
-            if min(o, h, l, c) <= 0 or v < 0 or h < max(o, c, l) or l > min(o, c):
+            if (
+                min(open_price, high_price, low_price, close_price) <= 0
+                or volume < 0
+                or high_price < max(open_price, close_price, low_price)
+                or low_price > min(open_price, close_price)
+            ):
                 raise ValueError("Invalid OHLCV consistency")
-            rows.append((observed.isoformat(), str(o), str(h), str(l), str(c), str(v)))
+            rows.append(
+                (
+                    observed.isoformat(),
+                    str(open_price),
+                    str(high_price),
+                    str(low_price),
+                    str(close_price),
+                    str(volume),
+                )
+            )
             expected_stamp += timedelta(hours=1)
         except (ValueError, InvalidOperation, OverflowError, OSError) as exc:
             raise ValueError(f"Invalid kline data at row {idx}: {exc}") from exc
     if expected_stamp != end:
-        raise ValueError(f"Incomplete monthly series: {len(rows)} hours, expected {monthrange(year, month)[1] * 24}")
+        raise ValueError(
+            f"Incomplete monthly series: {len(rows)} hours, expected {monthrange(year, month)[1] * 24}"
+        )
     return rows
 
 
-def fetch_month(symbol: str, year: int, month: int, raw_dir: Path,
-                *, transport=_read_url) -> tuple[list[tuple[str, ...]], dict]:
+def fetch_month(
+    symbol: str, year: int, month: int, raw_dir: Path, *, transport=_read_url
+) -> tuple[list[tuple[str, ...]], dict]:
     """Download or check cached source archive; never accept missing checksums."""
     filename = archive_name(symbol, year, month)
     url = f"{BASE}/{symbol}/1h/{filename}"
@@ -201,8 +251,9 @@ def fetch_month(symbol: str, year: int, month: int, raw_dir: Path,
     }
 
 
-def build_dataset(symbol: str, start: str, end: str, root: Path,
-                  *, transport=_read_url) -> dict:
+def build_dataset(
+    symbol: str, start: str, end: str, root: Path, *, transport=_read_url
+) -> dict:
     """Assemble one uniform, checked multi-year 1h dataset and source manifest."""
     months = month_range(start, end)
     if symbol not in SYMBOLS:
@@ -220,7 +271,9 @@ def build_dataset(symbol: str, start: str, end: str, root: Path,
     # To avoid silently replacing a previous research dataset, reject
     # existing outputs. Reproducibility requires an explicit separate run.
     if dest.exists() or manifest_path.exists():
-        raise FileExistsError(f"Dataset already exists: {dest}. Use a new date range or archive it first.")
+        raise FileExistsError(
+            f"Dataset already exists: {dest}. Use a new date range or archive it first."
+        )
     collected = []
     provenance = []
     for year, month in months:
@@ -234,12 +287,23 @@ def build_dataset(symbol: str, start: str, end: str, root: Path,
             writer = csv.writer(fh, lineterminator="\n")
             writer.writerow(("timestamp", "open", "high", "low", "close", "volume"))
             writer.writerows(collected)
-        dataset = load_csv(pending, quote_currency="USDT", interval_minutes=60,
-                           provenance="binance-vision-spot-monthly-verified-archive-digest")
+        dataset = load_csv(
+            pending,
+            quote_currency="USDT",
+            interval_minutes=60,
+            provenance="binance-vision-spot-monthly-verified-archive-digest",
+        )
         retrieved = datetime.now(UTC).isoformat()
-        base = build_manifest(pending, quote_currency="USDT", interval_minutes=60,
-                              source_class="exchange-public", source_id="binance-vision-spot-monthly-1h",
-                              venue="binance-spot", instrument=symbol, retrieved_at_utc=retrieved)
+        base = build_manifest(
+            pending,
+            quote_currency="USDT",
+            interval_minutes=60,
+            source_class="exchange-public",
+            source_id="binance-vision-spot-monthly-1h",
+            venue="binance-spot",
+            instrument=symbol,
+            retrieved_at_utc=retrieved,
+        )
         verify_manifest(pending, base)
         full = {
             "schema": "alpha-labs.binance-vision-dataset.v1",
@@ -250,8 +314,12 @@ def build_dataset(symbol: str, start: str, end: str, root: Path,
             "csv_sha256": dataset.sha256,
             "candle_count": len(dataset.bars),
             "source_archives": provenance,
-            "source_close_timestamp_anomaly_count": sum(entry["close_timestamp_anomaly_count"] for entry in provenance),
-            "source_close_timestamp_anomalies_require_review": any(entry["close_timestamp_anomaly_count"] for entry in provenance),
+            "source_close_timestamp_anomaly_count": sum(
+                entry["close_timestamp_anomaly_count"] for entry in provenance
+            ),
+            "source_close_timestamp_anomalies_require_review": any(
+                entry["close_timestamp_anomaly_count"] for entry in provenance
+            ),
             "dataset_manifest": base,
             "source_archive_checksums_verified": True,
             "independent_price_crosscheck_performed": False,
@@ -259,10 +327,18 @@ def build_dataset(symbol: str, start: str, end: str, root: Path,
             "trading_enabled": False,
         }
         # Write manifest before making dataset visible; on failure clean up.
-        manifest_path.write_text(json.dumps(full, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        manifest_path.write_text(
+            json.dumps(full, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
         pending.replace(dest)
-        return {"csv": str(dest), "manifest": str(manifest_path), "sha256": dataset.sha256,
-                "bars": len(dataset.bars), "months": len(months), "symbol": symbol}
+        return {
+            "csv": str(dest),
+            "manifest": str(manifest_path),
+            "sha256": dataset.sha256,
+            "bars": len(dataset.bars),
+            "months": len(months),
+            "symbol": symbol,
+        }
     finally:
         if pending.exists():
             pending.unlink()
@@ -270,33 +346,58 @@ def build_dataset(symbol: str, start: str, end: str, root: Path,
 
 def verify_dataset(path: Path, manifest_path: Path) -> dict:
     doc = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
-    if doc.get("schema") != "alpha-labs.binance-vision-dataset.v1" or doc.get("trading_enabled") is not False:
+    if (
+        doc.get("schema") != "alpha-labs.binance-vision-dataset.v1"
+        or doc.get("trading_enabled") is not False
+    ):
         raise ValueError("Invalid dataset provenance contract")
-    if doc.get("source_archive_checksums_verified") is not True or doc.get("independent_price_crosscheck_performed") is not False:
+    if (
+        doc.get("source_archive_checksums_verified") is not True
+        or doc.get("independent_price_crosscheck_performed") is not False
+    ):
         raise ValueError("Misleading dataset verification declaration")
     from alpha_lab.data.manifests import verify_manifest
+
     original = doc["dataset_manifest"]
     verify_manifest(path, original)
     expected_provenance = {
-        "source_class": "exchange-public", "source_id": "binance-vision-spot-monthly-1h",
-        "venue": "binance-spot", "quote_currency": "USDT", "interval_minutes": 60,
+        "source_class": "exchange-public",
+        "source_id": "binance-vision-spot-monthly-1h",
+        "venue": "binance-spot",
+        "quote_currency": "USDT",
+        "interval_minutes": 60,
     }
     if any(original.get(key) != value for key, value in expected_provenance.items()):
         raise ValueError("Incorrect Binance archive provenance metadata")
-    if doc["csv_sha256"] != original["csv_sha256"] or doc["candle_count"] != original["candle_count"]:
+    if (
+        doc["csv_sha256"] != original["csv_sha256"]
+        or doc["candle_count"] != original["candle_count"]
+    ):
         raise ValueError("Dataset metadata mismatch")
     if doc["symbol"] != original["instrument"] or doc["symbol"] not in SYMBOLS:
         raise ValueError("Wrong instrument")
     required = month_range(doc["first_month"], doc["last_month"])
     if len(required) != len(doc["source_archives"]):
         raise ValueError("Missing archive entries")
-    reported_anomalies = sum(entry.get("close_timestamp_anomaly_count", -1)
-                             for entry in doc["source_archives"])
-    if (doc.get("source_close_timestamp_anomaly_count") != reported_anomalies
-            or doc.get("source_close_timestamp_anomalies_require_review") is not bool(reported_anomalies)):
+    reported_anomalies = sum(
+        entry.get("close_timestamp_anomaly_count", -1)
+        for entry in doc["source_archives"]
+    )
+    if doc.get("source_close_timestamp_anomaly_count") != reported_anomalies or doc.get(
+        "source_close_timestamp_anomalies_require_review"
+    ) is not bool(reported_anomalies):
         raise ValueError("Invalid source close timestamp anomaly declaration")
-    raw_dir = Path(path).resolve().parents[2] / "raw" / "binance-vision" / "spot-monthly-1h" / doc["symbol"]
-    if sum(entry.get("bars", 0) for entry in doc["source_archives"]) != doc["candle_count"]:
+    raw_dir = (
+        Path(path).resolve().parents[2]
+        / "raw"
+        / "binance-vision"
+        / "spot-monthly-1h"
+        / doc["symbol"]
+    )
+    if (
+        sum(entry.get("bars", 0) for entry in doc["source_archives"])
+        != doc["candle_count"]
+    ):
         raise ValueError("Inconsistent archived candle counts")
     canonical_digest = hashlib.sha256()
 
@@ -308,24 +409,37 @@ def verify_dataset(path: Path, manifest_path: Path) -> dict:
     canonical_csv = csv.writer(DigestWriter(), lineterminator="\n")
     canonical_csv.writerow(("timestamp", "open", "high", "low", "close", "volume"))
     for (year, month), entry in zip(required, doc["source_archives"]):
-        if entry["month"] != f"{year:04d}-{month:02d}" or entry["official_checksum_matched"] is not True:
+        if (
+            entry["month"] != f"{year:04d}-{month:02d}"
+            or entry["official_checksum_matched"] is not True
+        ):
             raise ValueError("Invalid archive provenance")
         if not re.fullmatch("[0-9a-f]{64}", entry["archive_sha256"]):
             raise ValueError("Invalid archived digest")
         filename = archive_name(doc["symbol"], year, month)
         expected_url = f"{BASE}/{doc['symbol']}/1h/{filename}"
-        if entry["archive_url"] != expected_url or entry["bars"] != monthrange(year, month)[1] * 24:
+        if (
+            entry["archive_url"] != expected_url
+            or entry["bars"] != monthrange(year, month)[1] * 24
+        ):
             raise ValueError("Inconsistent archive source or month length")
         zipped = (raw_dir / filename).read_bytes()
         checks = (raw_dir / (filename + ".CHECKSUM")).read_bytes()
         if verify_checksum(zipped, checks, filename) != entry["archive_sha256"]:
             raise ValueError("Cached archive no longer matches recorded checksum")
         actual_anomalies: list[dict] = []
-        source_rows = parse_archive(zipped, doc["symbol"], year, month, anomalies=actual_anomalies)
+        source_rows = parse_archive(
+            zipped, doc["symbol"], year, month, anomalies=actual_anomalies
+        )
         canonical_csv.writerows(source_rows)
-        if (entry.get("close_timestamp_anomalies") != actual_anomalies
-                or entry.get("close_timestamp_anomaly_count") != len(actual_anomalies)):
-            raise ValueError("Reported close timestamp anomalies do not match the source archive")
+        if entry.get("close_timestamp_anomalies") != actual_anomalies or entry.get(
+            "close_timestamp_anomaly_count"
+        ) != len(actual_anomalies):
+            raise ValueError(
+                "Reported close timestamp anomalies do not match the source archive"
+            )
     if canonical_digest.hexdigest() != doc["csv_sha256"]:
-        raise ValueError("Curated CSV does not match its checksum-verified source archives")
+        raise ValueError(
+            "Curated CSV does not match its checksum-verified source archives"
+        )
     return doc

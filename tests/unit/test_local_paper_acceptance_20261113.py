@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 from alpha_lab.research.local_paper_terminal import command
+from alpha_lab.research.paper_market import COINBASE_MARKET
 from alpha_lab.research.paper_risk import PaperRiskLimits, authorise_simulated_order
 from alpha_lab.research.paper_runtime import PaperRuntime
 
@@ -86,6 +87,7 @@ class LocalPaperAcceptance(unittest.TestCase):
 
     def test_terminal_rejects_unverified_markets_and_shell(self):
         session = Mock()
+        session.market = COINBASE_MARKET
         for line in ("buy SPY 1 400", "buy AAPL 1 100",
                      "buy BTC-USD 0.001", "shell whoami",
                      "sell SOL-USD 0.1 extra"):

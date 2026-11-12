@@ -15,6 +15,7 @@ from threading import RLock
 from alpha_lab.research.live_paper_quotes import simulated_fill_estimate
 from alpha_lab.research.paper_accounting import reconcile_paper_pnl
 from alpha_lab.research.paper_checkpoint import read_state_checkpoint
+from alpha_lab.research.paper_journal import LOCAL_TABLES, journal_tables
 from alpha_lab.research.paper_market import COINBASE_MARKET, DEFAULT_COSTS, PaperCosts, PaperMarket
 from alpha_lab.research.paper_risk import PaperRiskLimits, authorise_simulated_order
 from alpha_lab.research.paper_runtime import PaperRuntime
@@ -83,7 +84,8 @@ def parse_order(payload, products=COINBASE_MARKET.symbols):
 
 class LivePaperSession:
     def __init__(self, directory, account_id, feed, *, clock=lambda: datetime.now(timezone.utc),
-                 checkpoint_store=None, provision=False, market=COINBASE_MARKET, costs=DEFAULT_COSTS):
+                 checkpoint_store=None, provision=False, market=COINBASE_MARKET, costs=DEFAULT_COSTS,
+                 migrate=True):
         if not isinstance(account_id, str) or not _ACCOUNT_ID.fullmatch(account_id):
             raise ValueError("explicit paper account binding required")
         if checkpoint_store is not None and checkpoint_store.owner_id != account_id:
@@ -111,13 +113,18 @@ class LivePaperSession:
                     raise ValueError("protected genesis requires a new journal and empty authority: HALT")
                 if not provision and (envelope is None or not path.is_file()):
                     raise ValueError("protected journal or checkpoint missing: HALT")
-            self.runtime = PaperRuntime(path, check_same_thread=False, migrate=checkpoint_store is None or provision)
+            self.runtime = PaperRuntime(path, check_same_thread=False,
+                                        migrate=provision or (checkpoint_store is None and migrate))
             self.db = self.runtime.journal.connection
             self.db.row_factory = sqlite3.Row
             if checkpoint_store is None:
-                if self.db.execute("SELECT 1 FROM sqlite_schema WHERE name='paper_state_sequence'").fetchone():
-                    raise ValueError("protected journal cannot be opened without its authority: HALT")
-                self._open_account(account_id)
+                with self.runtime.journal.transaction():
+                    tables = journal_tables(self.db)
+                    if "paper_state_sequence" in tables:
+                        raise ValueError("protected journal cannot be opened without its authority: HALT")
+                    if not migrate and not LOCAL_TABLES <= tables:
+                        raise ValueError("journal schema requires a verified working copy: HALT")
+                    self._open_account(account_id, migrate=migrate)
             elif provision:
                 with self.runtime.journal.transaction():
                     self._open_account(account_id)
@@ -137,7 +144,33 @@ class LivePaperSession:
             self.file_lock.close()
             raise
 
-    def _open_account(self, account_id):
+    def _open_account(self, account_id, *, migrate=True):
+        if migrate:
+            self._create_control_tables()
+        row = self.db.execute("SELECT account FROM paper_guard WHERE id = 1").fetchone()
+        config = self.db.execute("SELECT configuration FROM paper_configuration WHERE id=1").fetchone()
+        expected = self._configuration()
+        if config is None:
+            if not migrate:
+                raise ValueError("paper journal configuration missing: HALT")
+            if row is not None and (self.market is not COINBASE_MARKET or self.costs != DEFAULT_COSTS):
+                raise ValueError("legacy journal requires its original Coinbase market and cost policy")
+            self.db.execute("INSERT INTO paper_configuration VALUES (1,?)", (expected,))
+        elif config["configuration"] != expected:
+            raise ValueError("journal market or cost policy mismatch")
+        if row is None:
+            if not migrate or self.runtime.events:
+                raise ValueError("paper journal missing its owner binding")
+            initial = str(self.runtime.ledger.starting_cash)
+            self.db.execute("INSERT INTO paper_guard VALUES (1, ?, 0, 'STARTUP_HALTED', '', ?, ?, ?, '', 0)",
+                            (account_id, initial, initial, initial))
+        elif row["account"] != account_id:
+            raise ValueError("paper journal owner mismatch")
+        else:
+            self.db.execute("UPDATE paper_guard SET enabled = 0, reason = 'STARTUP_HALTED', revision = revision + 1 "
+                            "WHERE id = 1 AND enabled = 1")
+
+    def _create_control_tables(self):
         self.db.execute("""CREATE TABLE IF NOT EXISTS paper_guard (
             id INTEGER PRIMARY KEY CHECK (id = 1), account TEXT NOT NULL,
             enabled INTEGER NOT NULL CHECK (enabled IN (0,1)), reason TEXT NOT NULL,
@@ -154,28 +187,6 @@ class LivePaperSession:
             status TEXT NOT NULL, reason TEXT NOT NULL, occurred_at TEXT NOT NULL)""")
         self.db.execute("""CREATE TABLE IF NOT EXISTS paper_configuration (
             id INTEGER PRIMARY KEY CHECK (id=1), configuration TEXT NOT NULL)""")
-        row = self.db.execute("SELECT account FROM paper_guard WHERE id = 1").fetchone()
-        config = self.db.execute("SELECT configuration FROM paper_configuration WHERE id=1").fetchone()
-        expected = self._configuration()
-        if config is None:
-            if row is not None and (self.market is not COINBASE_MARKET or self.costs != DEFAULT_COSTS):
-                raise ValueError("legacy journal requires its original Coinbase market and cost policy")
-            self.db.execute("INSERT INTO paper_configuration VALUES (1,?)", (expected,))
-        elif config["configuration"] != expected:
-            raise ValueError("journal market or cost policy mismatch")
-        if row is None:
-            if self.runtime.events:
-                raise ValueError("paper journal missing its owner binding")
-            initial = str(self.runtime.ledger.starting_cash)
-            self.db.execute("INSERT INTO paper_guard VALUES (1, ?, 0, 'STARTUP_HALTED', '', ?, ?, ?, '', 0)",
-                            (account_id, initial, initial, initial))
-        elif row["account"] != account_id:
-            raise ValueError("paper journal owner mismatch")
-        else:
-            self.db.execute("UPDATE paper_guard SET enabled = 0, reason = 'STARTUP_HALTED', revision = revision + 1 "
-                            "WHERE id = 1 AND enabled = 1")
-        if self.checkpoint_store is None:
-            self.db.commit()
 
     def close(self):
         with self.lock:
@@ -331,7 +342,9 @@ class LivePaperSession:
             details, quote = fill["details"], quotes[symbol]
             if (not self.market.accepts(quote, now) or quote.source != details["source"]
                     or quote.source_sequence < details["source_sequence"]
-                    or quote.exchange_at < datetime.fromisoformat(details["source_time"])):
+                    or quote.exchange_at < datetime.fromisoformat(details["source_time"])
+                    or quote.source_sequence == details["source_sequence"] and details.get("book") is not None
+                    and details["book"] != self._book_terms(quote)):
                 healthy[symbol] = False
             if seen == symbols:
                 break
@@ -404,9 +417,15 @@ class LivePaperSession:
 
     def _depth(self, quote, side):
         size = quote.ask_size if side == "BUY" else quote.bid_size
-        used = sum((Decimal(fill["quantity"]) for fill in self.runtime.events
-                    if fill["symbol"] == quote.symbol and fill["side"] == side
-                    and fill["details"]["source_sequence"] == quote.source_sequence), ZERO)
+        used = ZERO
+        for fill in self.runtime.events:
+            if fill["symbol"] != quote.symbol or fill["details"]["source_sequence"] != quote.source_sequence:
+                continue
+            if fill["details"].get("book") != self._book_terms(quote):
+                # A pre-upgrade fill does not attest to the original displayed depth.
+                return ZERO
+            if fill["side"] == side:
+                used += Decimal(fill["quantity"])
         return max(ZERO, size - used)
 
     def control(self, action, *, expected_revision=None):
@@ -521,7 +540,7 @@ class LivePaperSession:
             self._fill("limit_" + child, quote, side, quantity, stop, row["fingerprint"], "limit",
                        now, quotes, account, parent_order_id=row["order_id"])
         except PaperRejection as exc:
-            if exc.code in ("QUOTE_CHANGED", "RISK_HALT"):
+            if exc.code in ("QUOTE_CHANGED", "MARKET_DATA_HALT", "RISK_HALT"):
                 return row
             return self._transition_order(row, "REJECTED", remaining, exc.code, now)
         remaining -= quantity
@@ -578,16 +597,18 @@ class LivePaperSession:
         now = self.clock()
         current, healthy, _ = self.feed.snapshot(now)
         if (set(current) != set(quotes) or set(healthy) != set(quotes)
-                or not all(healthy[symbol] is True and item.exchange_at <= now
-                           and self.market.accepts(item, now)
-                           and self.market.accepts(current[symbol], now)
-                           and self._same_book(current[symbol], item) for symbol, item in quotes.items())):
+                or not all(healthy[symbol] is True and self.market.accepts(current[symbol], now)
+                           for symbol in quotes)):
+            self._set_control(False, "MARKET_DATA_HALT")
+            raise PaperRejection("MARKET_DATA_HALT", "Market data became unavailable before fill")
+        if not all(item.exchange_at <= now and self.market.accepts(item, now)
+                   and self._same_book(current[symbol], item) for symbol, item in quotes.items()):
             raise PaperRejection("QUOTE_CHANGED", "The market snapshot changed. Retry with fresh quotes.")
         details = {
             "origin": origin, "fingerprint": fingerprint, "stop_price": str(stop) if stop is not None else None,
             "planned_stop_loss": str(loss), "source": quote.source, "source_time": quote.source_timestamp,
             "source_sequence": quote.source_sequence, "received_at": quote.observed_at.isoformat(),
-            "filled_at": now.isoformat(),
+            "filled_at": now.isoformat(), "book": self._book_terms(quote),
         }
         if parent_order_id is not None:
             details["parent_order_id"] = parent_order_id
@@ -602,6 +623,10 @@ class LivePaperSession:
             raise PaperRejection("RISK_HALT", str(exc)) from exc
         self._refresh(now, quotes, dict.fromkeys(self.market.symbols, True))
         return self.runtime.events[-1]
+
+    @staticmethod
+    def _book_terms(quote):
+        return [str(value.normalize()) for value in (quote.bid, quote.ask, quote.bid_size, quote.ask_size)]
 
     @staticmethod
     def _same_book(left, right):
@@ -681,7 +706,7 @@ class LivePaperSession:
             "risk": {"armed": bool(guard["enabled"]), "reason": guard["reason"],
                      "can_arm": self._can_arm(guard, account), "revision": guard["revision"],
                      "day_start_nav": guard["day_start"], "peak_nav": guard["peak"],
-                     "data_healthy": all(healthy.values())},
+                     "data_healthy": account is not None},
             "fills": list(reversed(self.runtime.events[-30:])),
             "orders": [self._order_result(row)["order"] for row in self.db.execute(
                 "SELECT * FROM paper_orders ORDER BY status IN ('PENDING','PARTIALLY_FILLED') DESC, rowid DESC LIMIT 30")],

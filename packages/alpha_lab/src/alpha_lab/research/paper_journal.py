@@ -9,9 +9,22 @@ import re
 import sqlite3
 from contextlib import contextmanager, nullcontext
 from hashlib import sha256
+from pathlib import Path
 from threading import get_ident
 
 _ORDER_ID = re.compile(r"[A-Za-z0-9_-]{1,80}\Z")
+LOCAL_TABLES = frozenset({"events", "paper_guard", "relay_nonces", "paper_orders",
+                          "paper_order_history", "paper_configuration"})
+
+
+def journal_tables(connection):
+    tables = set()
+    for name, kind, definition in connection.execute(
+            "SELECT name,type,sql FROM sqlite_schema WHERE type IN ('table','view','trigger')"):
+        if kind != "table" or definition and definition.upper().startswith("CREATE VIRTUAL TABLE"):
+            raise ValueError("unexpected executable SQLite schema object: HALT")
+        tables.add(name)
+    return tables
 
 
 def _unique_object(pairs):
@@ -21,6 +34,33 @@ def _unique_object(pairs):
             raise ValueError("duplicate journal JSON member: HALT")
         value[key] = item
     return value
+
+
+def verified_events(connection):
+    """Yield contiguous hash-verified events from an existing SQLite connection."""
+    previous = "0" * 64
+    expected_seq = 1
+    seen_orders = set()
+    for seq, prior, payload, digest in connection.execute(
+            "SELECT seq,previous_hash,payload,digest FROM events ORDER BY seq"):
+        if seq != expected_seq:
+            raise ValueError("journal sequence gap: HALT")
+        expected_seq += 1
+        expected = sha256((previous + payload).encode()).hexdigest()
+        if prior != previous or digest != expected:
+            raise ValueError("journal integrity failure: HALT")
+        event = json.loads(payload, object_pairs_hook=_unique_object)
+        if not isinstance(event, dict):
+            raise ValueError("invalid journal event: HALT")
+        order_id = event.get("order_id")
+        if order_id is not None:
+            if not isinstance(order_id, str) or not _ORDER_ID.fullmatch(order_id):
+                raise ValueError("invalid journal order ID: HALT")
+            if order_id in seen_orders:
+                raise ValueError("duplicate simulated order ID: HALT")
+            seen_orders.add(order_id)
+        previous = digest
+        yield event, digest
 
 
 class PaperJournal:
@@ -37,7 +77,8 @@ class PaperJournal:
             self._lock_file.close()
             raise PermissionError("HALT: paper journal already has a writer") from exc
         try:
-            self.connection = sqlite3.connect(path, check_same_thread=check_same_thread)
+            database = path if migrate else Path(path).resolve().as_uri() + "?mode=rw"
+            self.connection = sqlite3.connect(database, uri=not migrate, check_same_thread=check_same_thread)
             self.connection.execute("PRAGMA synchronous=FULL")
             self.connection.execute("BEGIN IMMEDIATE")
             if migrate:
@@ -82,29 +123,10 @@ class PaperJournal:
             raise
 
     def verify(self):
-        previous = "0" * 64
-        expected_seq = 1
-        seen_orders = set()
-        for seq, prior, payload, digest in self.connection.execute(
-                "SELECT seq,previous_hash,payload,digest FROM events ORDER BY seq"):
-            if seq != expected_seq:
-                raise ValueError("journal sequence gap: HALT")
-            expected_seq += 1
-            expected = sha256((previous + payload).encode()).hexdigest()
-            if prior != previous or digest != expected:
-                raise ValueError("journal integrity failure: HALT")
-            event = json.loads(payload, object_pairs_hook=_unique_object)
-            if not isinstance(event, dict):
-                raise ValueError("invalid journal event: HALT")
-            order_id = event.get("order_id")
-            if order_id is not None:
-                if not isinstance(order_id, str) or not _ORDER_ID.fullmatch(order_id):
-                    raise ValueError("invalid journal order ID: HALT")
-                if order_id in seen_orders:
-                    raise ValueError("duplicate simulated order ID: HALT")
-                seen_orders.add(order_id)
-            previous = digest
-        return previous
+        head = "0" * 64
+        for _, head in verified_events(self.connection):
+            pass
+        return head
 
     def verify_checkpoint(self, *, trusted_sequence, trusted_head):
         """Compare with an independently authenticated and protected checkpoint."""

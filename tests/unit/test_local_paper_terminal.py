@@ -34,12 +34,16 @@ class TestLocalTerminal(unittest.TestCase):
         self.session.order.assert_not_called()
 
     def test_buy_routes_only_to_existing_simulator(self):
-        command(self.session, "buy BTC-USD 0.01 10000")
+        with self.assertRaisesRegex(ValueError, "stable --id"):
+            command(self.session, "buy BTC-USD 0.01 10000")
+        self.session.order.assert_not_called()
+        order_id = command(self.session, "new-id")["order_id"]
+        command(self.session, "buy BTC-USD 0.01 10000 --id " + order_id)
         payload = self.session.order.call_args.args[0]
         self.assertEqual(payload["side"], "BUY")
         self.assertEqual(payload["stop_price"], "10000")
         self.assertEqual(payload["symbol"], "BTC-USD")
-        self.assertEqual(len(payload["order_id"]), 32)
+        self.assertEqual(payload["order_id"], order_id)
 
     def test_halt_is_explicit(self):
         command(self.session, "halt")
@@ -67,8 +71,8 @@ class SyntheticEtfLifecycle(unittest.TestCase):
             try:
                 command(session, "advance")
                 command(session, "arm")
-                for symbol in ETF_SYMBOLS:
-                    result = command(session, f"buy {symbol} 1 {100 + ETF_SYMBOLS.index(symbol) * 10 - 1}")
+                for index, symbol in enumerate(ETF_SYMBOLS):
+                    result = command(session, f"buy {symbol} 1 {100 + index * 10 - 1} --id etf_market_order_{index:03d}")
                     fill = result["fill"]
                     self.assertEqual(result["status"], "SIMULATED_FILL")
                     self.assertEqual(Decimal(fill["fee"]), Decimal(fill["price"]) * costs.fee)
@@ -91,7 +95,7 @@ class SyntheticEtfLifecycle(unittest.TestCase):
                 command(session, "advance")
                 command(session, "arm")
                 with self.assertRaisesRegex(ValueError, "increment"):
-                    command(session, "buy SPY 0.5 90")
+                    command(session, "buy SPY 0.5 90 --id etf_fractional_order_001")
                 terms = "limit buy SPY 2 100.50 90 --id etf_fixture_limit_0001"
                 self.assertEqual(command(session, terms)["status"], "PARTIALLY_FILLED")
                 self.assertEqual(command(session, terms)["order"]["remaining"], "1")

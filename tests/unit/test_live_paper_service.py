@@ -9,6 +9,7 @@ import json
 import sqlite3
 import tempfile
 import unittest
+from dataclasses import replace
 from unittest.mock import patch
 
 from alpha_lab.research.coinbase_paper_book import PRODUCTS, executable, fetch_book, parse_book
@@ -329,6 +330,32 @@ class LivePaperServiceTests(unittest.TestCase):
                 self.open_session("different_owner_account")
         finally:
             self.session = self.open_session()
+
+    def test_outage_between_order_checks_requires_manual_rearm(self):
+        self.arm()
+        healthy = self.session.feed.snapshot(self.now)
+        with patch.object(self.session.feed, "snapshot", side_effect=[healthy, ({}, {}, {})]):
+            with self.assertRaisesRegex(PaperRejection, "unavailable before fill"):
+                self.session.order(self.order())
+        self.assertEqual(self.session.runtime.ledger.sequence, 0)
+        state = self.session.state()
+        self.assertTrue(state["risk"]["data_healthy"])
+        self.assertFalse(state["risk"]["armed"])
+        self.assertEqual(state["risk"]["reason"], "MARKET_DATA_HALT")
+        self.arm()
+        self.assertEqual(self.session.order(self.order())["status"], "SIMULATED_FILL")
+
+    def test_restarted_journal_detects_conflicting_depth_at_the_filled_sequence(self):
+        self.arm()
+        self.session.order(self.order())
+        self.restart()
+        quotes, healthy, history = self.session.feed.snapshot(self.now)
+        quotes["SOL-USD"] = replace(quotes["SOL-USD"], ask_size=quotes["SOL-USD"].ask_size + 1)
+        with patch.object(self.session.feed, "snapshot", return_value=(quotes, healthy, history)):
+            state = self.session.state()
+            self.assertFalse(state["risk"]["data_healthy"])
+            self.assertFalse(state["risk"]["can_arm"])
+        self.assertEqual(self.session.runtime.ledger.sequence, 1)
 
 
 if __name__ == "__main__":

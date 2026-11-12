@@ -16,6 +16,15 @@ _NUMBER = re.compile(r"[0-9]{1,10}(?:\.[0-9]{1,12})?")
 _TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z")
 
 
+class BookClockError(ValueError):
+    """Retain the evidence needed to distinguish clock lead from stale data."""
+    def __init__(self, source_time, observed_at, age):
+        super().__init__("stale or future exchange book")
+        self.source_time = source_time
+        self.observed_at = observed_at
+        self.age_seconds = age.total_seconds()
+
+
 def parse_book(product, body, received):
     if product not in PRODUCTS or not isinstance(body, dict) or body.get("auction_mode") is not False:
         raise ValueError("unsupported or indicative order book")
@@ -26,8 +35,11 @@ def parse_book(product, body, received):
     if type(sequence) is not int or not 0 < sequence < 2**63:
         raise ValueError("invalid exchange book sequence")
     event = datetime.fromisoformat(timestamp)
-    if received.utcoffset() != timedelta(0) or not -MAX_FUTURE_SKEW <= received - event <= MAX_AGE:
-        raise ValueError("stale or future exchange book")
+    if not isinstance(received, datetime) or received.utcoffset() != timedelta(0):
+        raise ValueError("UTC receipt clock required")
+    age = received - event
+    if not -MAX_FUTURE_SKEW <= age <= MAX_AGE:
+        raise BookClockError(timestamp, received, age)
 
     def level(side):
         rows = body.get(side)

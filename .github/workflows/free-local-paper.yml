@@ -2,11 +2,10 @@ name: Free local paper terminal acceptance
 on:
   pull_request:
     paths:
-      - 'packages/alpha_lab/src/alpha_lab/research/local_*'
-      - 'packages/alpha_lab/src/alpha_lab/research/coinbase_paper_book.py'
-      - 'tests/unit/test_local_*'
-      - 'tests/unit/test_coinbase_future_clock_tolerance.py'
-      - 'tests/unit/test_local_paper_acceptance_20261113.py'
+      - 'packages/alpha_lab/src/alpha_lab/research/**'
+      - 'packages/alpha_lab/src/alpha_lab/data/**'
+      - 'tests/unit/**'
+      - 'scripts/local_paper_live_smoke.py'
       - '.github/workflows/free-local-paper.yml'
   workflow_dispatch:
 permissions:
@@ -15,20 +14,34 @@ jobs:
   local-paper:
     runs-on: ubuntu-latest
     timeout-minutes: 12
+    strategy:
+      matrix:
+        python-version: ['3.12', '3.13']
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
       - name: Install existing project and test tools
-        run: python -m pip install . 'pytest>=8,<10' 'ruff>=0.9,<1'
-      - name: Lint local paper additions
-        run: python -m ruff check packages/alpha_lab/src/alpha_lab/research/local_multiasset_catalogue.py packages/alpha_lab/src/alpha_lab/research/local_paper_terminal.py tests/unit/test_local_multiasset_catalogue.py tests/unit/test_local_paper_terminal.py tests/unit/test_coinbase_future_clock_tolerance.py tests/unit/test_local_paper_acceptance_20261113.py
-      - name: Local CLI and inherited runtime regression
-        run: python -m pytest tests/unit/test_local_multiasset_catalogue.py tests/unit/test_local_paper_terminal.py tests/unit/test_paper_runtime.py tests/unit/test_live_paper_service.py tests/unit/test_local_paper_acceptance_20261113.py -q --junitxml=local-paper.xml
-      - name: Enforce no skipped/failed acceptance
+        run: python -m pip install . 'pytest>=8,<10' 'ruff==0.15.22' 'bandit==1.9.4'
+      - name: Verify local paper and shared dependencies
+        run: |
+          ruff check packages deployment tests scripts/local_paper_live_smoke.py
+          bandit -q -r packages deployment -ll -f json -o bandit.json
+      - name: Offline local paper acceptance
+        run: >-
+          python -m pytest tests/unit/test_local_*.py
+          tests/unit/test_coinbase_future_clock_tolerance.py
+          tests/unit/test_live_paper_service.py
+          tests/unit/test_paper_commit_boundaries.py
+          tests/unit/test_paper_control_checkpoint.py
+          tests/unit/test_paper_runtime.py
+          tests/unit/test_public_https_security.py
+          -q --junitxml=local-paper.xml
+      - name: Require complete test results
         run: |
           python - <<'PY'
           import xml.etree.ElementTree as ET
@@ -39,5 +52,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: local-paper-acceptance
-          path: local-paper.xml
+          name: local-paper-${{ matrix.python-version }}
+          path: |
+            local-paper.xml
+            bandit.json
+          if-no-files-found: error

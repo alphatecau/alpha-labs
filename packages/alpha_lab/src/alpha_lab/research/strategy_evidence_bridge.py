@@ -29,6 +29,8 @@ def screen_research_report(report: dict, *, config: ValidationConfig = Validatio
         return {
             "status": "INSUFFICIENT_EVIDENCE",
             "trading_enabled": False,
+            "promotion_authorised": False,
+            "live_trading_authorised": False,
             "missing_fields": tuple(k for k in (
                 "point_in_time_provenance_verified", "costs_modelled",
                 "holdout_independently_sealed") if report.get(k) is not True),

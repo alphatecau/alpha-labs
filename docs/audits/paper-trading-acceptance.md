@@ -40,7 +40,7 @@ Python 3.12.14, SQLite supplied by that runtime, PostgreSQL 16.15, cryptography 
 
 | Status | Exact command (with prefix/environment above) | Exit | Result |
 |---|---|---|---|
-| VERIFIED | `python -m pytest tests/unit -q --junitxml=/tmp/master-integration-unit.xml` | 0 | 517 passed + 230 subtests; 747 JUnit cases, zero failures/errors/skips |
+| VERIFIED | `python -m pytest tests/unit -q --junitxml=/tmp/master-integration-unit.xml` | 0 | 518 passed + 230 subtests; 748 JUnit cases, zero failures/errors/skips |
 | VERIFIED | `ALPHA_DISPOSABLE_PG_CI=1 ALPHA_TEST_PG_DSN=postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test ALPHA_TEST_POSTGRES_DSN=postgresql://alpha_test:local_ci_only@127.0.0.1:5432/alpha_security_test python -m unittest discover -s tests/integration -p 'test_*.py' -v` | 0 | 38 actual-database tests, no skips |
 | VERIFIED | `node --test apps/sites/tests/*.test.cjs` | 0 | 42 passed, zero skipped |
 | VERIFIED | `python -m alpha_lab.cli examples/SYNTHETIC_SOLUSDC_1h.csv --quote USDC --provenance synthetic --output /tmp/master-integration-smoke.json` | 0 | Synthetic offline smoke; no reserved dataset or profitability claim |
@@ -66,3 +66,13 @@ Local logs are `/tmp/master-integration-{unit,pg,website,gitleaks}.log`. CI arti
 - NOT_APPLICABLE: production migration, hosted-site publication, real-money execution and reserved 2027 evaluation data. None was accessed or enabled.
 
 Do not expose the order API until independent review and the remaining owner-controlled staging acceptance gates are complete.
+
+## Published first-head evidence and final snapshot
+
+Draft [#105](https://github.com/alphatecau/alpha-labs/pull/105), first source head `85b53738cf1489e4ccae5357501bddc1763a06e0`: eight exact-head workflow runs succeeded. [Owner acceptance 43177455781](https://github.com/alphatecau/alpha-labs/actions/runs/43177455781) decoded logs verify 18 tests plus two crash-boundary subtests, including actual PostgreSQL owner/quota cases. [Backend 43177455758](https://github.com/alphatecau/alpha-labs/actions/runs/43177455758) verifies the then-current 517 tests plus 230 subtests (747 JUnit cases, no skips). A subsequent audit regression test increases the final local unit total to 518, and the final CI head is recorded separately in the PR.
+
+The final repository inventory includes all 110 remote branches and 75 open PRs observed before the concluding audit commit. Its own branch row correctly identifies the observed first head above; an artifact cannot contain its own eventual commit hash. No other observed branch head changed in that refresh. Final CI must be matched to the subsequent published head, not inferred from the first-head checks.
+
+The concluding integration explicitly pins checkout to `github.event.pull_request.head.sha || github.sha` in 19 workflows and disables persisted checkout credentials. Existing explicit manual input refs remain explicit and are classified as unverified checkout targets by the evidence collector. The reconciliation policy rejects count mismatches, wrong heads, partial retrieval, pending/skipped evidence and manual events as a basis for READY_FOR_REVIEW. It preserves the original evidence instead of converting absence to PASS.
+
+Evidence labels: VERIFIED = observed/executed; IMPLEMENTED_NOT_TESTED = code without applicable acceptance; FAILED = executed failure; BLOCKED = missing dependency/authority/evidence; NOT_INSPECTED = no examination; NOT_APPLICABLE = outside scope.

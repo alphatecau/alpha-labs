@@ -53,3 +53,5 @@ Database tests exercise actual PostgreSQL RLS, role impersonation and forged ten
 - NOT_APPLICABLE: deployment, production database migration, production role provisioning and real-money trading. None was performed.
 
 Review sequence: #103 first, this security rollup second, the separately tested owner-paper integration last. No automatic merge or branch deletion is proposed. Passing this test scope does not authorize staging or production deployment.
+
+Evidence labels: VERIFIED = observed/executed; IMPLEMENTED_NOT_TESTED = code without applicable acceptance; FAILED = executed failure; BLOCKED = missing dependency/authority/evidence; NOT_INSPECTED = no examination; NOT_APPLICABLE = outside scope.

@@ -42,6 +42,8 @@ def reserved(path):
 def latest_runs(runs):
     latest = {}
     for run in sorted(runs, key=lambda r: (r["created_at"], r["id"]), reverse=True):
+        if run["event"] not in ("push", "pull_request"):
+            continue
         latest.setdefault((run["workflow_id"], run["event"]), run)
     return list(latest.values())
 
@@ -99,14 +101,18 @@ def reconcile(repo, metadata, ci):
         evidence = ci_by_name.get(name, {"state": "BLOCKED", "runs": []})
         exact_runs = [r for r in evidence.get("runs", []) if r.get("head_sha") == head]
         evidence_complete = (evidence["state"] == "VERIFIED" and evidence.get("head_sha") == head
+                             and type(evidence.get("total")) is int
+                             and len({r["id"] for r in exact_runs}) == evidence["total"]
                              and len(exact_runs) == len(evidence.get("runs", [])))
         checks = latest_runs(exact_runs)
+        decided = checks and all(r.get("status") == "completed" and r.get("conclusion") in (
+            "success", "failure", "timed_out", "startup_failure") for r in checks)
         failed = [r for r in checks if r["conclusion"] in ("failure", "timed_out", "startup_failure")]
         reviewed = any(p["number"] in priority for p in prs)
         historical = not reviewed and (not prs or any(
             word in name for word in ("strategy-v0.", "multi-asset-v0.", "behaviour-simulation")))
         disposition = classify(incorporated=incorporated, historical=historical,
-                               failed=bool(failed), missing_ci=not checks or not evidence_complete,
+                               failed=bool(failed), missing_ci=not decided or not evidence_complete,
                                conflicts=bool(conflicts), reviewed=reviewed)
         if blocked_data or conflict_state == "BLOCKED":
             disposition = "BLOCKED"
@@ -155,6 +161,7 @@ def reconcile(repo, metadata, ci):
                              "changed_manifests": [p for p in changed if p.endswith(("pyproject.toml", "package.json", "requirements.txt", "ruff.toml"))]},
             "merge_conflicts": {"status": conflict_state, "against_main": conflicts},
             "ci": {"status": "VERIFIED" if evidence_complete else "BLOCKED", "total_runs": evidence.get("total", 0),
+                   "other_events": [r for r in exact_runs if r["event"] not in ("push", "pull_request")],
                    "latest_per_workflow_event": checks, "failed_run_ids": [r["id"] for r in failed]},
             "risk_domains": risks,
             "source_review_status": "VERIFIED" if reviewed else "NOT_INSPECTED",
@@ -173,6 +180,13 @@ def reconcile(repo, metadata, ci):
     return {"generated_utc": datetime.now(timezone.utc).isoformat(),
             "snapshot_observed_at": metadata["observed_at"], "main_sha": main,
             "status": "VERIFIED", "branch_count": len(records),
+            "evidence_status_definitions": {
+                "VERIFIED": "Observed or executed with recorded evidence; scoped, not deployment approval",
+                "IMPLEMENTED_NOT_TESTED": "Implemented but applicable acceptance evidence unavailable",
+                "FAILED": "Executed check failed; retained even if repaired elsewhere",
+                "BLOCKED": "Missing dependency, authorization or trustworthy evidence",
+                "NOT_INSPECTED": "Not examined; no implied assurance",
+                "NOT_APPLICABLE": "Outside this research-only scope"},
             "open_pr_count": sum(p["state"] == "open" for p in metadata["prs"]),
             "disposition_counts": dict(Counter(r["disposition"] for r in records)),
             "limits": ["Inventory and CI are timestamped snapshots; later branch updates require recollection at their new exact SHAs.",
@@ -189,6 +203,7 @@ def markdown(report):
              "", "Machine evidence: `branch-reconciliation.json`. Every row is an observed snapshot, not merge approval.",
              "Original creation SHAs are NOT_INSPECTED because GitHub does not expose them; declared bases and computed merge bases are recorded.",
              "Historical line-by-line security review remains NOT_INSPECTED unless explicitly recorded.", "",
+             "Evidence labels: VERIFIED = observed/executed; IMPLEMENTED_NOT_TESTED = code without applicable acceptance; FAILED = executed failure; BLOCKED = missing dependency/authority/evidence; NOT_INSPECTED = no examination; NOT_APPLICABLE = outside scope.", "",
              "| Branch | Head | PRs | Disposition | CI failures | Main conflicts |",
              "|---|---|---|---|---|---|"]
     for r in report["branches"]:

@@ -1,11 +1,13 @@
 # Branch reconciliation
 
 Snapshot main: `b973e4330888970184cf9f90fb9487a1ff563b3b`.
-Inventoried **109 remote branches** and **74 open PRs**.
+Inventoried **110 remote branches** and **75 open PRs**.
 
 Machine evidence: `branch-reconciliation.json`. Every row is an observed snapshot, not merge approval.
 Original creation SHAs are NOT_INSPECTED because GitHub does not expose them; declared bases and computed merge bases are recorded.
 Historical line-by-line security review remains NOT_INSPECTED unless explicitly recorded.
+
+Evidence labels: VERIFIED = observed/executed; IMPLEMENTED_NOT_TESTED = code without applicable acceptance; FAILED = executed failure; BLOCKED = missing dependency/authority/evidence; NOT_INSPECTED = no examination; NOT_APPLICABLE = outside scope.
 
 | Branch | Head | PRs | Disposition | CI failures | Main conflicts |
 |---|---|---|---|---|---|
@@ -64,6 +66,7 @@ Historical line-by-line security review remains NOT_INSPECTED unless explicitly 
 | `research/issue16-reconciliation-review-20261109` | `1c100669b6` | #36 | INTEGRATION_REQUIRED | 0 | 0 |
 | `research/live-paper-console-20261112` | `f9eff55b99` | #101 | INTEGRATION_REQUIRED | 0 | 3 |
 | `research/live-paper-market-data-foundation-20261112` | `5b893b6e34` | #98 | ALREADY_INTEGRATED | 0 | 0 |
+| `research/master-integration-20261112` | `85b53738cf` | #105 | READY_FOR_REVIEW | 0 | 0 |
 | `research/minimal-auth-boundaries-main-20261110` | `b4eac82018` | #85 | ALREADY_INTEGRATED | 0 | 0 |
 | `research/multi-asset-v0.11` | `f388d9c957` | — | HISTORICAL_RETAIN | 0 | 0 |
 | `research/oidc-account-provisioning-20261109` | `ccd1eef694` | #65 | INTEGRATION_REQUIRED | 0 | 0 |

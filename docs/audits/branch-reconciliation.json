@@ -1,17 +1,25 @@
 {
-  "generated_utc": "2026-11-12T07:38:41.509088+00:00",
-  "snapshot_observed_at": "2026-11-12T07:36:36.895Z",
+  "generated_utc": "2026-11-12T07:51:48.656963+00:00",
+  "snapshot_observed_at": "2026-11-12T07:47:43.469Z",
   "main_sha": "b973e4330888970184cf9f90fb9487a1ff563b3b",
   "status": "VERIFIED",
-  "branch_count": 109,
-  "open_pr_count": 74,
+  "branch_count": 110,
+  "evidence_status_definitions": {
+    "VERIFIED": "Observed or executed with recorded evidence; scoped, not deployment approval",
+    "IMPLEMENTED_NOT_TESTED": "Implemented but applicable acceptance evidence unavailable",
+    "FAILED": "Executed check failed; retained even if repaired elsewhere",
+    "BLOCKED": "Missing dependency, authorization or trustworthy evidence",
+    "NOT_INSPECTED": "Not examined; no implied assurance",
+    "NOT_APPLICABLE": "Outside this research-only scope"
+  },
+  "open_pr_count": 75,
   "disposition_counts": {
     "INTEGRATION_REQUIRED": 67,
     "ALREADY_INTEGRATED": 24,
     "SUPERSEDED": 2,
     "REPAIR_REQUIRED": 3,
     "HISTORICAL_RETAIN": 9,
-    "READY_FOR_REVIEW": 4
+    "READY_FOR_REVIEW": 5
   },
   "limits": [
     "Inventory and CI are timestamped snapshots; later branch updates require recollection at their new exact SHAs.",
@@ -75,6 +83,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42553399993,
@@ -198,6 +207,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42553278932,
@@ -350,6 +360,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42521917107,
@@ -571,6 +582,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42379907916,
@@ -724,6 +736,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41848940024,
@@ -845,6 +858,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41950683898,
@@ -975,6 +989,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41949183950,
@@ -1086,6 +1101,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 2,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41953451858,
@@ -1184,6 +1200,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41819581275,
@@ -1308,6 +1325,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41831181274,
@@ -1427,6 +1445,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41981178147,
@@ -1601,6 +1620,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42552003295,
@@ -1728,6 +1748,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43153573930,
@@ -1864,6 +1885,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 8,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43153779756,
@@ -2048,6 +2070,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42480024261,
@@ -2179,6 +2202,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42481480095,
@@ -2437,6 +2461,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 2,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42479032285,
@@ -2520,6 +2545,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 2,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43165955796,
@@ -2600,6 +2626,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 2,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41539824041,
@@ -2698,6 +2725,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42481728639,
@@ -2828,6 +2856,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42483277290,
@@ -2985,6 +3014,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42483550169,
@@ -3128,6 +3158,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42749012146,
@@ -3314,6 +3345,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42587069433,
@@ -3515,6 +3547,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42587584491,
@@ -3706,6 +3739,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42587315703,
@@ -3871,6 +3905,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42586375922,
@@ -4263,6 +4298,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43116873939,
@@ -4643,6 +4679,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42738321185,
@@ -4918,6 +4955,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 8,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42641916245,
@@ -5205,6 +5243,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 8,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42597455984,
@@ -5617,6 +5656,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42703713829,
@@ -6021,6 +6061,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42747101820,
@@ -6179,6 +6220,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42459012165,
@@ -6304,6 +6346,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43107134829,
@@ -6431,6 +6474,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43114343486,
@@ -6629,6 +6673,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 12,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43171223101,
@@ -6875,6 +6920,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 8,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43159023869,
@@ -7055,6 +7101,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42484546848,
@@ -7192,6 +7239,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42527145473,
@@ -7331,6 +7379,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42553487785,
@@ -7489,6 +7538,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42573182797,
@@ -7646,6 +7696,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42521124957,
@@ -7781,6 +7832,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42550103328,
@@ -8050,6 +8102,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42646407517,
@@ -8344,6 +8397,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42334672651,
@@ -8470,6 +8524,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42544348554,
@@ -8592,6 +8647,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42546787256,
@@ -8727,6 +8783,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42544317652,
@@ -8851,6 +8908,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42534938116,
@@ -9004,6 +9062,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42543255972,
@@ -9286,6 +9345,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 3,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42534741774,
@@ -9396,6 +9456,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42533894100,
@@ -9559,6 +9620,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 2,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43162057960,
@@ -9664,6 +9726,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43161796075,
@@ -9736,6 +9799,593 @@
       "identical_delta_branches": []
     },
     {
+      "name": "research/master-integration-20261112",
+      "head_sha": "85b53738cf1489e4ccae5357501bddc1763a06e0",
+      "status": "VERIFIED",
+      "associated_prs": [
+        {
+          "number": 105,
+          "state": "open",
+          "merged_at": null,
+          "url": "https://github.com/alphatecau/alpha-labs/pull/105"
+        }
+      ],
+      "base": {
+        "declared_ref": "research/security-main-reconciliation-20261112",
+        "current_base_sha": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+        "observed_pr_base_shas": [
+          "f41e8c7ee43575d50771ddc4cfe96389c468243e"
+        ],
+        "main_merge_base_sha": "b973e4330888970184cf9f90fb9487a1ff563b3b",
+        "inferred_declared_base_fork_sha": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+        "original_creation_sha": null,
+        "original_creation_status": "NOT_INSPECTED",
+        "reason": "GitHub has no original creation-tip field; merge base is inferred Git ancestry, not original creation provenance."
+      },
+      "main_comparison": {
+        "ahead": 177,
+        "behind": 0,
+        "ancestor_of_main": false,
+        "all_delta_files_equal_main": false,
+        "verified_main_merge_prs": []
+      },
+      "semantic_equivalence": {
+        "status": "NOT_INSPECTED",
+        "basis": "No semantic equivalence claim"
+      },
+      "changed_files": [
+        ".github/dependabot.yml",
+        ".github/workflows/auth0-staging-security.yml",
+        ".github/workflows/authenticated-staging-entry.yml",
+        ".github/workflows/backend-ci.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/disposable-postgres-security.yml",
+        ".github/workflows/engineering-status-audit.yml",
+        ".github/workflows/engineering-team-verification.yml",
+        ".github/workflows/minimal-auth-boundaries.yml",
+        ".github/workflows/oidc-browser-security.yml",
+        ".github/workflows/owner-paper-acceptance.yml",
+        ".github/workflows/postgres-paper-security.yml",
+        ".github/workflows/read-only-dashboard-api.yml",
+        ".github/workflows/research-ci.yml",
+        ".github/workflows/ruff.yml",
+        ".github/workflows/secret-scan.yml",
+        ".github/workflows/signed-archive-verification.yml",
+        ".github/workflows/sites-ci.yml",
+        ".github/workflows/staging-probe.yml",
+        "apps/sites/owner-paper/index.html",
+        "apps/sites/owner-paper/paper.css",
+        "apps/sites/owner-paper/paper.js",
+        "apps/sites/tests/owner-paper.test.cjs",
+        "deployment/account_role_research_reader.py",
+        "deployment/auth0_login_flow.py",
+        "deployment/auth0_refreshing_verifier.py",
+        "deployment/auth0_session_controller.py",
+        "deployment/auth0_staging_settings.py",
+        "deployment/auth0_trusted_jwks.py",
+        "deployment/authenticated_staging_bootstrap.py",
+        "deployment/authenticated_staging_entry.py",
+        "deployment/bff_session_bridge.py",
+        "deployment/disposable_tenant_role_provisioning.py",
+        "deployment/fixed_origin_research_transport.py",
+        "deployment/mounted_tenant_secret_provider.py",
+        "deployment/oidc_verifier.py",
+        "deployment/owner_paper_bff.py",
+        "deployment/postgres_opaque_sessions.py",
+        "deployment/postgres_pkce_state_store.py",
+        "deployment/render-paper-staging.yaml",
+        "deployment/render_environment_tenant_secrets.py",
+        "deployment/research_dashboard_bff.py",
+        "deployment/research_readonly_api.py",
+        "deployment/research_readonly_db_policy.sql",
+        "deployment/research_readonly_store.py",
+        "deployment/research_rls_isolated.sql",
+        "deployment/research_rls_transaction_fixture.sql",
+        "deployment/research_role_isolation_fixture.sql",
+        "deployment/sqlite_pkce_state_store.py",
+        "deployment/staging_authenticated_assembly.py",
+        "deployment/staging_authenticated_bff.py",
+        "deployment/staging_dependency_readiness.py",
+        "deployment/staging_probe.py",
+        "deployment/strict_direct_https_ingress.py",
+        "deployment/tenant_credential_broker.py",
+        "deployment/transaction_scoped_research_reader.py",
+        "deployment/trusted_site_relay.py",
+        "docs/GPT_SITE_RELAY_INTEGRATION.md",
+        "docs/SITE_CONNECTIVITY_SECURITY_GATE.md",
+        "docs/architecture/auth0-staging-integration-gate-20261109.md",
+        "docs/architecture/paper-staging-deployment-checklist.md",
+        "docs/architecture/paper-trading-server-contract-20261109.md",
+        "docs/audits/branch-reconciliation.json",
+        "docs/audits/branch-reconciliation.md",
+        "docs/audits/ci-repair-report.md",
+        "docs/audits/live-market-observation.json",
+        "docs/audits/paper-first-entry-point-audit-20261109.md",
+        "docs/audits/paper-trading-acceptance.md",
+        "docs/audits/security-integration-report.md",
+        "docs/audits/staging-readiness.md",
+        "docs/authentication-research-consolidation-20261110.md",
+        "docs/research/live-paper-console-staging.md",
+        "docs/security/AUTH0_STAGING_RELEASE_GATE_20261109.md",
+        "docs/security/OIDC_POSTGRES_STAGING_INTEGRATION_20261109.md",
+        "docs/security/auth0-render-operator-handoff-20261110.md",
+        "docs/security/authenticated-entry-audit-20261110.md",
+        "docs/security/authenticated-staging-release-gates.md",
+        "docs/security/live-ownership-revocation-20261111.md",
+        "docs/security/pr79-acceptance-review-2026-11-10.md",
+        "docs/security/pr92-source-review-20261111.md",
+        "docs/security/render-auth0-staging-preparation.md",
+        "docs/security/staging-acceptance-audit-20261110.md",
+        "docs/staging-authenticated-acceptance-gate-20261110.md",
+        "packages/alpha_lab/src/alpha_lab/backtest/engine.py",
+        "packages/alpha_lab/src/alpha_lab/cli.py",
+        "packages/alpha_lab/src/alpha_lab/data/adapters/binance_archive.py",
+        "packages/alpha_lab/src/alpha_lab/data/adapters/kraken_ohlc.py",
+        "packages/alpha_lab/src/alpha_lab/data/csv_import.py",
+        "packages/alpha_lab/src/alpha_lab/research/auth0_jwt.py",
+        "packages/alpha_lab/src/alpha_lab/research/auth0_staging_app.py",
+        "packages/alpha_lab/src/alpha_lab/research/coinbase_paper_book.py",
+        "packages/alpha_lab/src/alpha_lab/research/guarded_paper_runtime.py",
+        "packages/alpha_lab/src/alpha_lab/research/identity_rate_limit.py",
+        "packages/alpha_lab/src/alpha_lab/research/live_paper_api.py",
+        "packages/alpha_lab/src/alpha_lab/research/live_paper_quotes.py",
+        "packages/alpha_lab/src/alpha_lab/research/live_paper_session.py",
+        "packages/alpha_lab/src/alpha_lab/research/metrics.py",
+        "packages/alpha_lab/src/alpha_lab/research/oidc_browser_wsgi.py",
+        "packages/alpha_lab/src/alpha_lab/research/oidc_durable_store.py",
+        "packages/alpha_lab/src/alpha_lab/research/oidc_postgres_store.py",
+        "packages/alpha_lab/src/alpha_lab/research/oidc_session_foundation.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_account_service.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_accounting.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_checkpoint.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_first_authority.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_identity.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_journal.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_market_feed.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_ownership_registry.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_risk.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_runtime.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_simulator.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_staging_app.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_staging_wsgi.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_status_wsgi.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_trading_session.py",
+        "packages/alpha_lab/src/alpha_lab/research/phase1_accounting.py",
+        "packages/alpha_lab/src/alpha_lab/research/phase1_daily_data.py",
+        "packages/alpha_lab/src/alpha_lab/research/phase1_evidence.py",
+        "packages/alpha_lab/src/alpha_lab/research/postgres_paper_security.py",
+        "packages/alpha_lab/src/alpha_lab/research/postgres_security_migration.py",
+        "packages/alpha_lab/src/alpha_lab/research/session_paper_status_wsgi.py",
+        "packages/alpha_lab/src/alpha_lab/research/strategies/momentum.py",
+        "packages/alpha_lab/src/alpha_lab/research/trusted_proxy_boundary.py",
+        "pyproject.toml",
+        "ruff.toml",
+        "scripts/engineering_status.py",
+        "scripts/reconcile_repository.py",
+        "tests/integration/disposable_pg_guard.py",
+        "tests/integration/tenant_research_fixture.py",
+        "tests/integration/test_account_role_isolation.py",
+        "tests/integration/test_auth_postgres_durable.py",
+        "tests/integration/test_bff_postgres_chain.py",
+        "tests/integration/test_disposable_pg_guard.py",
+        "tests/integration/test_owner_paper_postgres.py",
+        "tests/integration/test_pg_credential_rotation.py",
+        "tests/integration/test_postgres_paper_security_real.py",
+        "tests/integration/test_staging_ownership_revocation.py",
+        "tests/integration/test_staging_shared_rate_limit.py",
+        "tests/unit/test_auth0_broker_preparation.py",
+        "tests/unit/test_auth0_confidential_exchange.py",
+        "tests/unit/test_auth0_discovery_pkce_foundation.py",
+        "tests/unit/test_auth0_refreshing_verifier.py",
+        "tests/unit/test_auth0_session_adversarial.py",
+        "tests/unit/test_auth0_staging.py",
+        "tests/unit/test_auth0_staging_settings.py",
+        "tests/unit/test_auth0_trusted_discovery.py",
+        "tests/unit/test_authenticated_staging_bootstrap.py",
+        "tests/unit/test_authenticated_staging_entry.py",
+        "tests/unit/test_bff_session_bridge.py",
+        "tests/unit/test_binance_archive.py",
+        "tests/unit/test_branch_reconciliation.py",
+        "tests/unit/test_engineering_status.py",
+        "tests/unit/test_fixed_origin_research_transport.py",
+        "tests/unit/test_guarded_paper_runtime.py",
+        "tests/unit/test_identity_rate_limit.py",
+        "tests/unit/test_kraken_ohlc_adapter.py",
+        "tests/unit/test_live_paper_service.py",
+        "tests/unit/test_long_history.py",
+        "tests/unit/test_mounted_tenant_secret_provider.py",
+        "tests/unit/test_oidc_browser_wsgi.py",
+        "tests/unit/test_oidc_durable_store.py",
+        "tests/unit/test_oidc_postgres_store.py",
+        "tests/unit/test_oidc_proxy_host.py",
+        "tests/unit/test_oidc_session_foundation.py",
+        "tests/unit/test_oidc_transport_hardening.py",
+        "tests/unit/test_oidc_verifier.py",
+        "tests/unit/test_owner_paper_bff.py",
+        "tests/unit/test_paper_account_service.py",
+        "tests/unit/test_paper_commit_boundaries.py",
+        "tests/unit/test_paper_first_authority.py",
+        "tests/unit/test_paper_identity.py",
+        "tests/unit/test_paper_ownership_registry.py",
+        "tests/unit/test_paper_runtime.py",
+        "tests/unit/test_paper_simulator.py",
+        "tests/unit/test_paper_staging_app.py",
+        "tests/unit/test_paper_status_wsgi.py",
+        "tests/unit/test_paper_trading_session.py",
+        "tests/unit/test_personal_checkpoint.py",
+        "tests/unit/test_personal_journal_adversarial.py",
+        "tests/unit/test_personal_order_id.py",
+        "tests/unit/test_personal_paper_accounting.py",
+        "tests/unit/test_personal_paper_verification.py",
+        "tests/unit/test_phase1_daily_data.py",
+        "tests/unit/test_postgres_paper_security.py",
+        "tests/unit/test_readonly_research_api.py",
+        "tests/unit/test_render_environment_tenant_secrets.py",
+        "tests/unit/test_research_dashboard_bff.py",
+        "tests/unit/test_research_foundation.py",
+        "tests/unit/test_session_paper_status_wsgi.py",
+        "tests/unit/test_staging_authenticated_assembly.py",
+        "tests/unit/test_staging_authenticated_bff.py",
+        "tests/unit/test_staging_bff_http_boundaries.py",
+        "tests/unit/test_staging_boundary_adversarial.py",
+        "tests/unit/test_staging_dependency_readiness.py",
+        "tests/unit/test_staging_ownership_revocation.py",
+        "tests/unit/test_staging_probe.py",
+        "tests/unit/test_staging_tenant_disposable_fixtures.py",
+        "tests/unit/test_strict_direct_https_ingress.py",
+        "tests/unit/test_trusted_proxy_boundary.py",
+        "tests/unit/test_trusted_site_relay.py"
+      ],
+      "unique_delta_files": [
+        ".github/dependabot.yml",
+        ".github/workflows/auth0-staging-security.yml",
+        ".github/workflows/authenticated-staging-entry.yml",
+        ".github/workflows/backend-ci.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/disposable-postgres-security.yml",
+        ".github/workflows/engineering-status-audit.yml",
+        ".github/workflows/engineering-team-verification.yml",
+        ".github/workflows/minimal-auth-boundaries.yml",
+        ".github/workflows/oidc-browser-security.yml",
+        ".github/workflows/owner-paper-acceptance.yml",
+        ".github/workflows/postgres-paper-security.yml",
+        ".github/workflows/read-only-dashboard-api.yml",
+        ".github/workflows/research-ci.yml",
+        ".github/workflows/ruff.yml",
+        ".github/workflows/secret-scan.yml",
+        ".github/workflows/signed-archive-verification.yml",
+        ".github/workflows/sites-ci.yml",
+        ".github/workflows/staging-probe.yml",
+        "apps/sites/owner-paper/index.html",
+        "apps/sites/owner-paper/paper.css",
+        "apps/sites/owner-paper/paper.js",
+        "apps/sites/tests/owner-paper.test.cjs",
+        "deployment/account_role_research_reader.py",
+        "deployment/auth0_login_flow.py",
+        "deployment/auth0_refreshing_verifier.py",
+        "deployment/auth0_session_controller.py",
+        "deployment/auth0_staging_settings.py",
+        "deployment/auth0_trusted_jwks.py",
+        "deployment/authenticated_staging_bootstrap.py",
+        "deployment/authenticated_staging_entry.py",
+        "deployment/bff_session_bridge.py",
+        "deployment/disposable_tenant_role_provisioning.py",
+        "deployment/fixed_origin_research_transport.py",
+        "deployment/mounted_tenant_secret_provider.py",
+        "deployment/oidc_verifier.py",
+        "deployment/owner_paper_bff.py",
+        "deployment/postgres_opaque_sessions.py",
+        "deployment/postgres_pkce_state_store.py",
+        "deployment/render-paper-staging.yaml",
+        "deployment/render_environment_tenant_secrets.py",
+        "deployment/research_dashboard_bff.py",
+        "deployment/research_readonly_api.py",
+        "deployment/research_readonly_db_policy.sql",
+        "deployment/research_readonly_store.py",
+        "deployment/research_rls_isolated.sql",
+        "deployment/research_rls_transaction_fixture.sql",
+        "deployment/research_role_isolation_fixture.sql",
+        "deployment/sqlite_pkce_state_store.py",
+        "deployment/staging_authenticated_assembly.py",
+        "deployment/staging_authenticated_bff.py",
+        "deployment/staging_dependency_readiness.py",
+        "deployment/staging_probe.py",
+        "deployment/strict_direct_https_ingress.py",
+        "deployment/tenant_credential_broker.py",
+        "deployment/transaction_scoped_research_reader.py",
+        "deployment/trusted_site_relay.py",
+        "docs/GPT_SITE_RELAY_INTEGRATION.md",
+        "docs/SITE_CONNECTIVITY_SECURITY_GATE.md",
+        "docs/architecture/auth0-staging-integration-gate-20261109.md",
+        "docs/architecture/paper-staging-deployment-checklist.md",
+        "docs/architecture/paper-trading-server-contract-20261109.md",
+        "docs/audits/branch-reconciliation.json",
+        "docs/audits/branch-reconciliation.md",
+        "docs/audits/ci-repair-report.md",
+        "docs/audits/live-market-observation.json",
+        "docs/audits/paper-first-entry-point-audit-20261109.md",
+        "docs/audits/paper-trading-acceptance.md",
+        "docs/audits/security-integration-report.md",
+        "docs/audits/staging-readiness.md",
+        "docs/authentication-research-consolidation-20261110.md",
+        "docs/research/live-paper-console-staging.md",
+        "docs/security/AUTH0_STAGING_RELEASE_GATE_20261109.md",
+        "docs/security/OIDC_POSTGRES_STAGING_INTEGRATION_20261109.md",
+        "docs/security/auth0-render-operator-handoff-20261110.md",
+        "docs/security/authenticated-entry-audit-20261110.md",
+        "docs/security/authenticated-staging-release-gates.md",
+        "docs/security/live-ownership-revocation-20261111.md",
+        "docs/security/pr79-acceptance-review-2026-11-10.md",
+        "docs/security/pr92-source-review-20261111.md",
+        "docs/security/render-auth0-staging-preparation.md",
+        "docs/security/staging-acceptance-audit-20261110.md",
+        "docs/staging-authenticated-acceptance-gate-20261110.md",
+        "packages/alpha_lab/src/alpha_lab/backtest/engine.py",
+        "packages/alpha_lab/src/alpha_lab/cli.py",
+        "packages/alpha_lab/src/alpha_lab/data/adapters/binance_archive.py",
+        "packages/alpha_lab/src/alpha_lab/data/adapters/kraken_ohlc.py",
+        "packages/alpha_lab/src/alpha_lab/data/csv_import.py",
+        "packages/alpha_lab/src/alpha_lab/research/auth0_jwt.py",
+        "packages/alpha_lab/src/alpha_lab/research/auth0_staging_app.py",
+        "packages/alpha_lab/src/alpha_lab/research/coinbase_paper_book.py",
+        "packages/alpha_lab/src/alpha_lab/research/guarded_paper_runtime.py",
+        "packages/alpha_lab/src/alpha_lab/research/identity_rate_limit.py",
+        "packages/alpha_lab/src/alpha_lab/research/live_paper_api.py",
+        "packages/alpha_lab/src/alpha_lab/research/live_paper_quotes.py",
+        "packages/alpha_lab/src/alpha_lab/research/live_paper_session.py",
+        "packages/alpha_lab/src/alpha_lab/research/metrics.py",
+        "packages/alpha_lab/src/alpha_lab/research/oidc_browser_wsgi.py",
+        "packages/alpha_lab/src/alpha_lab/research/oidc_durable_store.py",
+        "packages/alpha_lab/src/alpha_lab/research/oidc_postgres_store.py",
+        "packages/alpha_lab/src/alpha_lab/research/oidc_session_foundation.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_account_service.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_accounting.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_checkpoint.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_first_authority.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_identity.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_journal.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_market_feed.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_ownership_registry.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_risk.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_runtime.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_simulator.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_staging_app.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_staging_wsgi.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_status_wsgi.py",
+        "packages/alpha_lab/src/alpha_lab/research/paper_trading_session.py",
+        "packages/alpha_lab/src/alpha_lab/research/phase1_accounting.py",
+        "packages/alpha_lab/src/alpha_lab/research/phase1_daily_data.py",
+        "packages/alpha_lab/src/alpha_lab/research/phase1_evidence.py",
+        "packages/alpha_lab/src/alpha_lab/research/postgres_paper_security.py",
+        "packages/alpha_lab/src/alpha_lab/research/postgres_security_migration.py",
+        "packages/alpha_lab/src/alpha_lab/research/session_paper_status_wsgi.py",
+        "packages/alpha_lab/src/alpha_lab/research/strategies/momentum.py",
+        "packages/alpha_lab/src/alpha_lab/research/trusted_proxy_boundary.py",
+        "pyproject.toml",
+        "ruff.toml",
+        "scripts/engineering_status.py",
+        "scripts/reconcile_repository.py",
+        "tests/integration/disposable_pg_guard.py",
+        "tests/integration/tenant_research_fixture.py",
+        "tests/integration/test_account_role_isolation.py",
+        "tests/integration/test_auth_postgres_durable.py",
+        "tests/integration/test_bff_postgres_chain.py",
+        "tests/integration/test_disposable_pg_guard.py",
+        "tests/integration/test_owner_paper_postgres.py",
+        "tests/integration/test_pg_credential_rotation.py",
+        "tests/integration/test_postgres_paper_security_real.py",
+        "tests/integration/test_staging_ownership_revocation.py",
+        "tests/integration/test_staging_shared_rate_limit.py",
+        "tests/unit/test_auth0_broker_preparation.py",
+        "tests/unit/test_auth0_confidential_exchange.py",
+        "tests/unit/test_auth0_discovery_pkce_foundation.py",
+        "tests/unit/test_auth0_refreshing_verifier.py",
+        "tests/unit/test_auth0_session_adversarial.py",
+        "tests/unit/test_auth0_staging.py",
+        "tests/unit/test_auth0_staging_settings.py",
+        "tests/unit/test_auth0_trusted_discovery.py",
+        "tests/unit/test_authenticated_staging_bootstrap.py",
+        "tests/unit/test_authenticated_staging_entry.py",
+        "tests/unit/test_bff_session_bridge.py",
+        "tests/unit/test_binance_archive.py",
+        "tests/unit/test_branch_reconciliation.py",
+        "tests/unit/test_engineering_status.py",
+        "tests/unit/test_fixed_origin_research_transport.py",
+        "tests/unit/test_guarded_paper_runtime.py",
+        "tests/unit/test_identity_rate_limit.py",
+        "tests/unit/test_kraken_ohlc_adapter.py",
+        "tests/unit/test_live_paper_service.py",
+        "tests/unit/test_long_history.py",
+        "tests/unit/test_mounted_tenant_secret_provider.py",
+        "tests/unit/test_oidc_browser_wsgi.py",
+        "tests/unit/test_oidc_durable_store.py",
+        "tests/unit/test_oidc_postgres_store.py",
+        "tests/unit/test_oidc_proxy_host.py",
+        "tests/unit/test_oidc_session_foundation.py",
+        "tests/unit/test_oidc_transport_hardening.py",
+        "tests/unit/test_oidc_verifier.py",
+        "tests/unit/test_owner_paper_bff.py",
+        "tests/unit/test_paper_account_service.py",
+        "tests/unit/test_paper_commit_boundaries.py",
+        "tests/unit/test_paper_first_authority.py",
+        "tests/unit/test_paper_identity.py",
+        "tests/unit/test_paper_ownership_registry.py",
+        "tests/unit/test_paper_runtime.py",
+        "tests/unit/test_paper_simulator.py",
+        "tests/unit/test_paper_staging_app.py",
+        "tests/unit/test_paper_status_wsgi.py",
+        "tests/unit/test_paper_trading_session.py",
+        "tests/unit/test_personal_checkpoint.py",
+        "tests/unit/test_personal_journal_adversarial.py",
+        "tests/unit/test_personal_order_id.py",
+        "tests/unit/test_personal_paper_accounting.py",
+        "tests/unit/test_personal_paper_verification.py",
+        "tests/unit/test_phase1_daily_data.py",
+        "tests/unit/test_postgres_paper_security.py",
+        "tests/unit/test_readonly_research_api.py",
+        "tests/unit/test_render_environment_tenant_secrets.py",
+        "tests/unit/test_research_dashboard_bff.py",
+        "tests/unit/test_research_foundation.py",
+        "tests/unit/test_session_paper_status_wsgi.py",
+        "tests/unit/test_staging_authenticated_assembly.py",
+        "tests/unit/test_staging_authenticated_bff.py",
+        "tests/unit/test_staging_bff_http_boundaries.py",
+        "tests/unit/test_staging_boundary_adversarial.py",
+        "tests/unit/test_staging_dependency_readiness.py",
+        "tests/unit/test_staging_ownership_revocation.py",
+        "tests/unit/test_staging_probe.py",
+        "tests/unit/test_staging_tenant_disposable_fixtures.py",
+        "tests/unit/test_strict_direct_https_ingress.py",
+        "tests/unit/test_trusted_proxy_boundary.py",
+        "tests/unit/test_trusted_site_relay.py"
+      ],
+      "delta_signature": "ba4b570b7bd90908e3eb3473fa7abb6ab63e29eeef4d832a8242a0786b107712",
+      "dependencies": {
+        "base_missing": false,
+        "base_ahead_of_branch": false,
+        "changed_manifests": [
+          "pyproject.toml",
+          "ruff.toml"
+        ]
+      },
+      "merge_conflicts": {
+        "status": "VERIFIED",
+        "against_main": []
+      },
+      "ci": {
+        "status": "VERIFIED",
+        "total_runs": 8,
+        "other_events": [],
+        "latest_per_workflow_event": [
+          {
+            "id": 43177455832,
+            "workflow_id": 415499172,
+            "name": "Gitleaks secret scan",
+            "event": "pull_request",
+            "head_sha": "85b53738cf1489e4ccae5357501bddc1763a06e0",
+            "head_branch": "research/master-integration-20261112",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-12T07:44:15Z",
+            "updated_at": "2026-11-12T07:44:24Z",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43177455832",
+            "run_attempt": 1
+          },
+          {
+            "id": 43177455781,
+            "workflow_id": 415702090,
+            "name": "Owner paper acceptance (disposable only)",
+            "event": "pull_request",
+            "head_sha": "85b53738cf1489e4ccae5357501bddc1763a06e0",
+            "head_branch": "research/master-integration-20261112",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-12T07:44:15Z",
+            "updated_at": "2026-11-12T07:44:49Z",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43177455781",
+            "run_attempt": 1
+          },
+          {
+            "id": 43177455761,
+            "workflow_id": 415499171,
+            "name": "Ruff syntax and correctness",
+            "event": "pull_request",
+            "head_sha": "85b53738cf1489e4ccae5357501bddc1763a06e0",
+            "head_branch": "research/master-integration-20261112",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-12T07:44:15Z",
+            "updated_at": "2026-11-12T07:44:24Z",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43177455761",
+            "run_attempt": 1
+          },
+          {
+            "id": 43177455758,
+            "workflow_id": 415499173,
+            "name": "Backend CI baseline",
+            "event": "pull_request",
+            "head_sha": "85b53738cf1489e4ccae5357501bddc1763a06e0",
+            "head_branch": "research/master-integration-20261112",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-12T07:44:15Z",
+            "updated_at": "2026-11-12T07:44:47Z",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43177455758",
+            "run_attempt": 1
+          },
+          {
+            "id": 43177455752,
+            "workflow_id": 404710099,
+            "name": "Alpha Labs offline research tests",
+            "event": "pull_request",
+            "head_sha": "85b53738cf1489e4ccae5357501bddc1763a06e0",
+            "head_branch": "research/master-integration-20261112",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-12T07:44:15Z",
+            "updated_at": "2026-11-12T07:44:43Z",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43177455752",
+            "run_attempt": 1
+          },
+          {
+            "id": 43177455700,
+            "workflow_id": 404710102,
+            "name": "Sites v0.3 existing tests",
+            "event": "pull_request",
+            "head_sha": "85b53738cf1489e4ccae5357501bddc1763a06e0",
+            "head_branch": "research/master-integration-20261112",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-12T07:44:15Z",
+            "updated_at": "2026-11-12T07:44:28Z",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43177455700",
+            "run_attempt": 1
+          },
+          {
+            "id": 43177455653,
+            "workflow_id": 415499174,
+            "name": "CodeQL baseline",
+            "event": "pull_request",
+            "head_sha": "85b53738cf1489e4ccae5357501bddc1763a06e0",
+            "head_branch": "research/master-integration-20261112",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-12T07:44:15Z",
+            "updated_at": "2026-11-12T07:45:15Z",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43177455653",
+            "run_attempt": 1
+          },
+          {
+            "id": 43177448701,
+            "workflow_id": 404710099,
+            "name": "Alpha Labs offline research tests",
+            "event": "push",
+            "head_sha": "85b53738cf1489e4ccae5357501bddc1763a06e0",
+            "head_branch": "research/master-integration-20261112",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-12T07:44:12Z",
+            "updated_at": "2026-11-12T07:44:41Z",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43177448701",
+            "run_attempt": 1
+          }
+        ],
+        "failed_run_ids": []
+      },
+      "risk_domains": [
+        "identity",
+        "database",
+        "execution_and_risk",
+        "ci_permissions",
+        "market_data"
+      ],
+      "source_review_status": "VERIFIED",
+      "source_review_level": "priority targeted review",
+      "reserved_data_skipped": [],
+      "disposition": "READY_FOR_REVIEW",
+      "identical_delta_branches": []
+    },
+    {
       "name": "research/minimal-auth-boundaries-main-20261110",
       "head_sha": "b4eac82018a1d55c27b886daaab27e310c7cb333",
       "status": "VERIFIED",
@@ -9795,6 +10445,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42748323099,
@@ -10082,6 +10733,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42334446575,
@@ -10260,6 +10912,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42588833403,
@@ -10468,6 +11121,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42588995136,
@@ -10684,6 +11338,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42589335106,
@@ -10888,6 +11543,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42588661314,
@@ -11114,6 +11770,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42589170881,
@@ -11308,6 +11965,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42587906562,
@@ -11521,6 +12179,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42588207031,
@@ -11737,6 +12396,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42588418352,
@@ -11881,6 +12541,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42749085846,
@@ -12068,6 +12729,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42582747035,
@@ -12237,6 +12899,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42541379108,
@@ -12369,6 +13032,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42536745494,
@@ -12505,6 +13169,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42537405916,
@@ -12608,6 +13273,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42535530019,
@@ -12963,6 +13629,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42666389175,
@@ -13129,6 +13796,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42946469560,
@@ -13253,6 +13921,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42939322346,
@@ -13481,6 +14150,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42475988912,
@@ -13708,6 +14378,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42534176057,
@@ -13844,6 +14515,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 8,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42532874067,
@@ -14026,6 +14698,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42533020647,
@@ -14170,6 +14843,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42525398353,
@@ -14319,6 +14993,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42526592129,
@@ -14729,6 +15404,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43125757585,
@@ -15153,6 +15829,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43124892784,
@@ -15387,6 +16064,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42589764817,
@@ -15621,6 +16299,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 8,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42589648361,
@@ -16005,6 +16684,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42704325300,
@@ -16249,6 +16929,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42590321101,
@@ -16531,6 +17212,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42646003059,
@@ -16663,6 +17345,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43116876155,
@@ -16804,6 +17487,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42484140170,
@@ -16931,6 +17615,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42483882825,
@@ -17074,6 +17759,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42550766431,
@@ -17299,6 +17985,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42593540064,
@@ -17431,6 +18118,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42966134962,
@@ -17660,6 +18348,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 10,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42638214828,
@@ -18149,6 +18838,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 16,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43174501099,
@@ -18456,6 +19146,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 6,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42553442048,
@@ -18818,6 +19509,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42709161593,
@@ -18958,6 +19650,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42526954756,
@@ -19081,6 +19774,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42526961561,
@@ -19202,6 +19896,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42526962087,
@@ -19409,6 +20104,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 5,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42472394515,
@@ -19545,6 +20241,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42215273176,
@@ -19788,6 +20485,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42230249266,
@@ -19939,6 +20637,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 7,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43167363453,
@@ -20110,6 +20809,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 43167425319,
@@ -20328,6 +21028,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42475764493,
@@ -20426,6 +21127,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 42578316676,
@@ -20534,6 +21236,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 2,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41482440250,
@@ -20867,6 +21570,7 @@
       "ci": {
         "status": "VERIFIED",
         "total_runs": 4,
+        "other_events": [],
         "latest_per_workflow_event": [
           {
             "id": 41560748190,

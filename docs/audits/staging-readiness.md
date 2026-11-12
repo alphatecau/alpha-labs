@@ -36,3 +36,9 @@ This is a review sequence, not an automatic merge sequence. Every proposal remai
 | NOT_APPLICABLE | Production/live trading/2027 evaluation | Prohibited; no such action was taken |
 
 No additional approval is needed to review these drafts. Actual deployment, production/credential changes or infrastructure provisioning are outside this session's authorization and must stop for owner authorization. No such action was attempted.
+
+## Final reconciliation snapshot
+
+All 110 remote branches and 75 open PRs observed at the final capture are inventoried in `branch-reconciliation.json`: 24 ALREADY_INTEGRATED, two SUPERSEDED, three REPAIR_REQUIRED, nine HISTORICAL_RETAIN, 67 INTEGRATION_REQUIRED and five READY_FOR_REVIEW. Twenty-six branches have verified merge conflicts against main. READY_FOR_REVIEW is scoped to recorded source/CI evidence and is never deployment approval. Original creation provenance and exhaustive historical security review remain explicitly NOT_INSPECTED. The audit artifact's own branch row is the captured pre-artifact head; final head/CI evidence is recorded in draft #105.
+
+Evidence labels: VERIFIED = observed/executed; IMPLEMENTED_NOT_TESTED = code without applicable acceptance; FAILED = executed failure; BLOCKED = missing dependency/authority/evidence; NOT_INSPECTED = no examination; NOT_APPLICABLE = outside scope.

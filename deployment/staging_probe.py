@@ -27,5 +27,5 @@ def application(environ, start_response):
 if __name__ == "__main__":
     from wsgiref.simple_server import make_server
     port = int(os.environ.get("PORT", "10000"))
-    with make_server("0.0.0.0", port, application) as server:
+    with make_server(os.environ.get("HOST", "127.0.0.1"), port, application) as server:
         server.serve_forever()

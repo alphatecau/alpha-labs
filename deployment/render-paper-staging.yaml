@@ -1,26 +1,22 @@
-# Deployment preparation only. Do not apply until security approval.
+# SAFE PREPARATION ONLY: non-trading health probe, NOT an owner paper release.
+# Do not apply until the operator explicitly approves a new isolated Render service.
+# This intentionally exposes NO login, paper order, journal, broker or database endpoint.
+# A functional paper BFF cannot be deployed until Auth0, proxy, persistence,
+# protected checkpoint and Android acceptance are independently verified.
 services:
   - type: web
-    name: alpha-labs-paper-staging
+    name: alpha-labs-private-staging-probe
     runtime: python
     region: singapore
-    plan: starter
-    branch: research/paper-first-copy-trading-gates-20261109
+    plan: free
+    branch: research/private-staging-gates-20261112
     autoDeploy: false
-    buildCommand: python -m pip install . gunicorn
-    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 1 --timeout 30 alpha_lab.research.paper_staging_wsgi:app
+    buildCommand: python -m pip install .
+    startCommand: python deployment/staging_probe.py
+    healthCheckPath: /healthz
     envVars:
-      - key: ALPHA_PAPER_SIGNING_KEY_B64
-        sync: false
-      - key: ALPHA_PAPER_ISSUER
-        sync: false
-      - key: ALPHA_PAPER_AUDIENCE
-        sync: false
-      - key: ALPHA_PAPER_OWNER_SUBJECT
-        sync: false
-      - key: ALPHA_PAPER_DATA_DIR
-        value: /var/data
-    disk:
-      name: paper-journal-staging
-      mountPath: /var/data
-      sizeGB: 1
+      # Explicit public bind only for health-only probe. Never for authenticated BFF.
+      - key: HOST
+        value: "0.0.0.0"
+      - key: ALPHA_TRADING_ENABLED
+        value: "false"

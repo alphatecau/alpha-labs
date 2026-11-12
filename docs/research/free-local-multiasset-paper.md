@@ -21,5 +21,17 @@ The new catalogue covers a broad watchlist of cryptocurrency, US equities/ETFs a
 5. Complete Android Termux smoke test; browser UI is optional for the first local milestone.
 6. No merge/deployment without passing tests and independent review.
 
+
+## Local terminal candidate (CI and Android acceptance pending)
+The new alpha_lab.research.local_paper_terminal starts the existing Coinbase BTC-USD/ETH-USD/SOL-USD polling feed and the single-writer SQLite-backed LivePaperSession. It binds no HTTP port and contains no broker execution. Journal replay and startup HALT are inherited from PaperRuntime. All commands are manual.
+
+Install Python >=3.12, clone this branch, and from the repository root run this single bundled command:
+
+    python -m pip install . && python -m alpha_lab.research.local_paper_terminal --directory ~/.alpha-labs-paper
+
+Commands: help, markets, state, arm, halt, buy BTC-USD 0.001 10000, sell BTC-USD 0.001, backup ~/separate-backups/paper.sqlite3, quit. Create a separate backup directory first. The session requires healthy, timestamped Coinbase quotes for ALL THREE products before arming. Network failure HALTs orders; every startup is halted until manually armed. Protective stop mandatory for buys. Existing fee, slippage, idempotency, risk limits and simulated fills are reused.
+
+Caveats: A SQLite backup is NOT an independently authenticated checkpoint. The existing checkpoint support is not yet wired into the new launcher; independently protect and verify backups. No Android graphical dashboard or US/ASX quote integration. No provider availability guarantee. Local-only account binding must not be reused as hosted identity.
+
 ## Current readiness
-Catalogue and fail-closed unit tests added. No new multiasset order adapter or local launcher implemented. No claim of live ASX/US data availability. Existing paper runtime is inherited but has not been accepted for all instruments.
+Catalogue, CLI, targeted tests and CI workflow committed. Tests are NOT yet confirmed passed; physical Android Termux test not performed. Inherited runtime requires end-to-end local acceptance. All non-Coinbase instruments remain UNVERIFIED/DISABLED. No merge, deployment or real-money execution.

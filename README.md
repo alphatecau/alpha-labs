@@ -2,6 +2,8 @@
 
 **Status:** v0.6 mobile-first operator dashboard implemented; v0.3 research workspace preserved under `apps/sites/advanced/`; offline Python research engine retained. This project does not provide financial advice, live trading, verified alpha or guaranteed profit.
 
+Strategy Research v0.8 rejected its registered momentum candidate after testing BTC, ETH and SOL. See the [results and Termux reproduction commands](docs/26_STRATEGY_RESEARCH_V08.md).
+
 ## Run the first research pipeline (Android Codespaces-friendly)
 
 Python 3.12+, no exchange account, API keys or AI tokens required:

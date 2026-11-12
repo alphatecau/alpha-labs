@@ -1,0 +1,1052 @@
+{
+  "candidate_id": "regime_filtered_momentum_01",
+  "candidate_targets_sha256": "fe13db921aa05261294de8a2d68ccde268d157cbd301bee6fc7b5c31808cd024",
+  "candles": 24144,
+  "dataset_sha256": "64b0a9e8f264965249d4c2afaa58946d4eb7fa6e5b285355818e911f5b6daa09",
+  "evidence_class": "previously_examined_historical_development",
+  "frozen_benchmark_parity_verified": true,
+  "independently_sealed_holdout": false,
+  "instrument": "BTCUSDT",
+  "overall_research_decision": "FAIL",
+  "periods": {
+    "development": {
+      "base_friction": {
+        "candidate": {
+          "annualised_return_pct": 0.22721863102250772,
+          "annualised_volatility_pct": 1.704115125792137,
+          "calmar": 0.09857243519027102,
+          "closed_trades": 215,
+          "expectancy_usdt_per_closed_trade": 0.17313901935461137,
+          "exposure_fraction_of_hours": 0.344118262324803,
+          "final_liquidatable_usdt": "10037.22488916124144430715129",
+          "max_daily_mark_to_market_loss_pct": 0.6256437956917881,
+          "max_drawdown_pct": 2.3050930068219917,
+          "modelled_fees_usdt": "244.0692585410123905362236735",
+          "modelled_fills": 430,
+          "modelled_slippage_usdt": "244.0697839049439977340562507",
+          "net_execution_return_pct": 0.3722488916124144,
+          "open_position_at_end": false,
+          "profit_factor": 1.0390399694279828,
+          "risk": {
+            "daily_suspensions": 0,
+            "drawdown_suspension": false,
+            "entry_rejections": {},
+            "exit_reasons": {
+              "SIGNAL_FLAT": 214,
+              "STOP_AT_CLOSE": 1
+            },
+            "max_planned_stop_risk_pct": 0.25
+          },
+          "sharpe_zero_risk_free": 0.14170391979137026,
+          "sortino_zero_target": 0.20475039656700225,
+          "turnover_to_starting_capital": 24.40692585410124
+        },
+        "candidate_after_primary_overhead_pct": -1.592271656332791,
+        "candidate_operating_cost_sensitivity": {
+          "0": {
+            "modelled_overhead_usdt": "0",
+            "net_pnl_usdt": "37.22488916124144430715129",
+            "net_return_pct": 0.3722488916124144
+          },
+          "120": {
+            "modelled_overhead_usdt": "196.4520547945205479452054795",
+            "net_pnl_usdt": "-159.2271656332791036380541895",
+            "net_return_pct": -1.592271656332791
+          },
+          "360": {
+            "modelled_overhead_usdt": "589.3561643835616438356164384",
+            "net_pnl_usdt": "-552.1312752223201995284651484",
+            "net_return_pct": -5.521312752223202
+          }
+        },
+        "ema_12_48_frozen": {
+          "annualised_return_pct": 2.859211786029925,
+          "annualised_volatility_pct": 7.418465816383741,
+          "calmar": 0.2729923811654996,
+          "closed_trades": 179,
+          "expectancy_usdt_per_closed_trade": 2.638717253789407,
+          "exposure_fraction_of_hours": 0.5480789345233945,
+          "final_liquidatable_usdt": "10472.33038842830383938956986",
+          "max_daily_mark_to_market_loss_pct": 2.510616956962829,
+          "max_drawdown_pct": 10.473595540736166,
+          "modelled_fees_usdt": "716.4735191923359244791534392",
+          "modelled_fills": 358,
+          "modelled_slippage_usdt": "716.4754244716680167869340974",
+          "net_execution_return_pct": 4.723303884283038,
+          "open_position_at_end": false,
+          "profit_factor": 1.1120894774699024,
+          "sharpe_zero_risk_free": 0.41710095429716354,
+          "sortino_zero_target": 0.598685784573707,
+          "turnover_to_starting_capital": 71.64735191923359
+        },
+        "excess_vs_benchmarks_pp": {
+          "ema_12_48_frozen": -6.315575540615829,
+          "flat": -1.592271656332791,
+          "passive_hold": -50.513106801063316
+        },
+        "flat": {
+          "annualised_return_pct": 0.0,
+          "annualised_volatility_pct": 0.0,
+          "calmar": null,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 0.0,
+          "final_liquidatable_usdt": "10000.00000000000000",
+          "max_daily_mark_to_market_loss_pct": 0.0,
+          "max_drawdown_pct": 0.0,
+          "modelled_fees_usdt": "0",
+          "modelled_fills": 0,
+          "modelled_slippage_usdt": "0",
+          "net_execution_return_pct": 0.0,
+          "open_position_at_end": false,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": null,
+          "sortino_zero_target": null,
+          "turnover_to_starting_capital": 0.0
+        },
+        "passive_hold": {
+          "annualised_return_pct": 27.540300053652555,
+          "annualised_volatility_pct": 14.86939129308318,
+          "calmar": 2.159584842287058,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 1.0,
+          "final_liquidatable_usdt": "14892.08351447305212307637730",
+          "max_daily_mark_to_market_loss_pct": 4.8870365242381375,
+          "max_drawdown_pct": 12.7525899952542,
+          "modelled_fees_usdt": "1.998001998001998001998001998",
+          "modelled_fills": 1,
+          "modelled_slippage_usdt": "1.996005992009988013984017980",
+          "net_execution_return_pct": 48.920835144730525,
+          "open_position_at_end": true,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": 1.7103704477385933,
+          "sortino_zero_target": 2.43180602663948,
+          "turnover_to_starting_capital": 0.1998001998001998
+        }
+      },
+      "double_friction": {
+        "candidate": {
+          "annualised_return_pct": -2.940639011020074,
+          "annualised_volatility_pct": 1.4790068011301907,
+          "calmar": -0.5818947072831965,
+          "closed_trades": 191,
+          "expectancy_usdt_per_closed_trade": -2.4967872055857865,
+          "exposure_fraction_of_hours": 0.2985844780698696,
+          "final_liquidatable_usdt": "9523.113643733114766143835718",
+          "max_daily_mark_to_market_loss_pct": 0.5943960093360323,
+          "max_drawdown_pct": 5.053558615010608,
+          "modelled_fees_usdt": "390.1479918617583156449498446",
+          "modelled_fills": 382,
+          "modelled_slippage_usdt": "390.1492055051227156281395126",
+          "net_execution_return_pct": -4.7688635626688525,
+          "open_position_at_end": false,
+          "profit_factor": 0.5756983181248688,
+          "risk": {
+            "daily_suspensions": 0,
+            "drawdown_suspension": true,
+            "entry_rejections": {
+              "DRAWDOWN_LIMIT": 653
+            },
+            "exit_reasons": {
+              "DRAWDOWN_LIMIT": 1,
+              "SIGNAL_FLAT": 189,
+              "STOP_AT_CLOSE": 1
+            },
+            "max_planned_stop_risk_pct": 0.25
+          },
+          "sharpe_zero_risk_free": -2.01067405461757,
+          "sortino_zero_target": -2.765309963546793,
+          "turnover_to_starting_capital": 19.507399593087914
+        },
+        "candidate_after_primary_overhead_pct": -6.7333841106140575,
+        "candidate_operating_cost_sensitivity": {
+          "0": {
+            "modelled_overhead_usdt": "0",
+            "net_pnl_usdt": "-476.886356266885233856164282",
+            "net_return_pct": -4.7688635626688525
+          },
+          "120": {
+            "modelled_overhead_usdt": "196.4520547945205479452054795",
+            "net_pnl_usdt": "-673.3384110614057818013697615",
+            "net_return_pct": -6.7333841106140575
+          },
+          "360": {
+            "modelled_overhead_usdt": "589.3561643835616438356164384",
+            "net_pnl_usdt": "-1066.242520650446877691780720",
+            "net_return_pct": -10.66242520650447
+          }
+        },
+        "ema_12_48_frozen": {
+          "annualised_return_pct": -5.970464099068174,
+          "annualised_volatility_pct": 8.263716989195848,
+          "calmar": -0.29309638425995804,
+          "closed_trades": 179,
+          "expectancy_usdt_per_closed_trade": -5.355856462351197,
+          "exposure_fraction_of_hours": 0.5480789345233945,
+          "final_liquidatable_usdt": "9041.301693239135833989311237",
+          "max_daily_mark_to_market_loss_pct": 2.744264126349031,
+          "max_drawdown_pct": 20.37030963088493,
+          "modelled_fees_usdt": "1430.084488931206953039126747",
+          "modelled_fills": 358,
+          "modelled_slippage_usdt": "1430.092094844315011670321560",
+          "net_execution_return_pct": -9.586983067608642,
+          "open_position_at_end": false,
+          "profit_factor": 0.819170127498705,
+          "sharpe_zero_risk_free": -0.7036397296999986,
+          "sortino_zero_target": -0.9924795569975037,
+          "turnover_to_starting_capital": 71.50422444656034
+        },
+        "excess_vs_benchmarks_pp": {
+          "ema_12_48_frozen": 2.8535989569945848,
+          "flat": -6.7333841106140575,
+          "passive_hold": -55.379085906330886
+        },
+        "flat": {
+          "annualised_return_pct": 0.0,
+          "annualised_volatility_pct": 0.0,
+          "calmar": null,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 0.0,
+          "final_liquidatable_usdt": "10000.00000000000000",
+          "max_daily_mark_to_market_loss_pct": 0.0,
+          "max_drawdown_pct": 0.0,
+          "modelled_fees_usdt": "0",
+          "modelled_fills": 0,
+          "modelled_slippage_usdt": "0",
+          "net_execution_return_pct": 0.0,
+          "open_position_at_end": false,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": null,
+          "sortino_zero_target": null,
+          "turnover_to_starting_capital": 0.0
+        },
+        "passive_hold": {
+          "annualised_return_pct": 27.396315432623354,
+          "annualised_volatility_pct": 14.830718747643749,
+          "calmar": 2.153506220477314,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 1.0,
+          "final_liquidatable_usdt": "14864.57017957168277868336971",
+          "max_daily_mark_to_market_loss_pct": 4.874145246712623,
+          "max_drawdown_pct": 12.721725701145687,
+          "modelled_fees_usdt": "3.992015968063872255489021956",
+          "modelled_fills": 1,
+          "modelled_slippage_usdt": "3.984047872319233787913195565",
+          "net_execution_return_pct": 48.645701795716825,
+          "open_position_at_end": true,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": 1.7068264604955774,
+          "sortino_zero_target": 2.426678238105864,
+          "turnover_to_starting_capital": 0.1996007984031936
+        }
+      },
+      "end_exclusive_utc": "2024-11-24T14:00:00+00:00",
+      "half_stop_risk_base_friction": {
+        "annualised_return_pct": 0.11856529846641095,
+        "annualised_volatility_pct": 0.8532509214720537,
+        "calmar": 0.10247945347569982,
+        "candidate_after_primary_overhead_pct": -1.7703439433141608,
+        "closed_trades": 215,
+        "expectancy_usdt_per_closed_trade": 0.09031469982839287,
+        "exposure_fraction_of_hours": 0.344118262324803,
+        "final_liquidatable_usdt": "10019.41766046310446621293165",
+        "max_daily_mark_to_market_loss_pct": 0.313552244778737,
+        "max_drawdown_pct": 1.156966537634058,
+        "modelled_fees_usdt": "122.3446735930407343167328743",
+        "modelled_fills": 430,
+        "modelled_slippage_usdt": "122.3449377003124907744241790",
+        "net_execution_return_pct": 0.19417660463104466,
+        "open_position_at_end": false,
+        "profit_factor": 1.040634712286766,
+        "risk": {
+          "daily_suspensions": 0,
+          "drawdown_suspension": false,
+          "entry_rejections": {},
+          "exit_reasons": {
+            "SIGNAL_FLAT": 214,
+            "STOP_AT_CLOSE": 1
+          },
+          "max_planned_stop_risk_pct": 0.125
+        },
+        "sharpe_zero_risk_free": 0.14314076076428411,
+        "sortino_zero_target": 0.2068281178293162,
+        "turnover_to_starting_capital": 12.234467359304073
+      },
+      "hours": 14341,
+      "start_utc": "2023-04-07T01:00:00+00:00"
+    },
+    "test_unsealed": {
+      "base_friction": {
+        "candidate": {
+          "annualised_return_pct": -3.2873301398578025,
+          "annualised_volatility_pct": 0.9815514654046381,
+          "calmar": -1.7438795030741876,
+          "closed_trades": 56,
+          "expectancy_usdt_per_closed_trade": -3.228142036089449,
+          "exposure_fraction_of_hours": 0.25120267726417067,
+          "final_liquidatable_usdt": "9819.224045978990865602921211",
+          "max_daily_mark_to_market_loss_pct": 0.34969146685554253,
+          "max_drawdown_pct": 1.8850672503821233,
+          "modelled_fees_usdt": "63.30950460858815294962911028",
+          "modelled_fills": 112,
+          "modelled_slippage_usdt": "63.30945045158919211783978067",
+          "net_execution_return_pct": -1.8077595402100914,
+          "open_position_at_end": false,
+          "profit_factor": 0.3930943239493838,
+          "risk": {
+            "daily_suspensions": 0,
+            "drawdown_suspension": false,
+            "entry_rejections": {},
+            "exit_reasons": {
+              "SIGNAL_FLAT": 56
+            },
+            "max_planned_stop_risk_pct": 0.25
+          },
+          "sharpe_zero_risk_free": -3.4004881779983624,
+          "sortino_zero_target": -4.528990487286965,
+          "turnover_to_starting_capital": 6.330950460858816
+        },
+        "candidate_after_primary_overhead_pct": -2.4626910470594066,
+        "candidate_operating_cost_sensitivity": {
+          "0": {
+            "modelled_overhead_usdt": "0",
+            "net_pnl_usdt": "-180.775954021009134397078789",
+            "net_return_pct": -1.8077595402100914
+          },
+          "120": {
+            "modelled_overhead_usdt": "65.49315068493150684931506849",
+            "net_pnl_usdt": "-246.2691047059406412463938575",
+            "net_return_pct": -2.4626910470594066
+          },
+          "360": {
+            "modelled_overhead_usdt": "196.4794520547945205479452055",
+            "net_pnl_usdt": "-377.2554060758036549450239945",
+            "net_return_pct": -3.7725540607580363
+          }
+        },
+        "ema_12_48_frozen": {
+          "annualised_return_pct": -19.246203147628314,
+          "annualised_volatility_pct": 5.261236543211334,
+          "calmar": -1.534012344084954,
+          "closed_trades": 65,
+          "expectancy_usdt_per_closed_trade": -16.941444881532377,
+          "exposure_fraction_of_hours": 0.4888098724116294,
+          "final_liquidatable_usdt": "8898.806082700395498927405309",
+          "max_daily_mark_to_market_loss_pct": 1.5661921166478157,
+          "max_drawdown_pct": 12.546315694160057,
+          "modelled_fees_usdt": "258.8979637867468826413089740",
+          "modelled_fills": 130,
+          "modelled_slippage_usdt": "258.8973803881737579574485008",
+          "net_execution_return_pct": -11.011939172996046,
+          "open_position_at_end": false,
+          "profit_factor": 0.3499310517721314,
+          "sharpe_zero_risk_free": -4.036658353794102,
+          "sortino_zero_target": -5.250160415111263,
+          "turnover_to_starting_capital": 25.88979637867469
+        },
+        "excess_vs_benchmarks_pp": {
+          "ema_12_48_frozen": 8.54924812593664,
+          "flat": -2.4626910470594066,
+          "passive_hold": 0.9855551955433333
+        },
+        "flat": {
+          "annualised_return_pct": 0.0,
+          "annualised_volatility_pct": 0.0,
+          "calmar": null,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 0.0,
+          "final_liquidatable_usdt": "10000.00000000000000",
+          "max_daily_mark_to_market_loss_pct": 0.0,
+          "max_drawdown_pct": 0.0,
+          "modelled_fees_usdt": "0",
+          "modelled_fills": 0,
+          "modelled_slippage_usdt": "0",
+          "net_execution_return_pct": 0.0,
+          "open_position_at_end": false,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": null,
+          "sortino_zero_target": null,
+          "turnover_to_starting_capital": 0.0
+        },
+        "passive_hold": {
+          "annualised_return_pct": -6.227223585207364,
+          "annualised_volatility_pct": 7.603779405945636,
+          "calmar": -0.7813908425106301,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 1.0,
+          "final_liquidatable_usdt": "9655.175375739725996993626911",
+          "max_daily_mark_to_market_loss_pct": 1.6299259674819404,
+          "max_drawdown_pct": 7.96940947656761,
+          "modelled_fees_usdt": "1.998001998001998001998001998",
+          "modelled_fills": 1,
+          "modelled_slippage_usdt": "1.996005992009988013984017980",
+          "net_execution_return_pct": -3.44824624260274,
+          "open_position_at_end": true,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": -0.8075568637996651,
+          "sortino_zero_target": -1.113258640072051,
+          "turnover_to_starting_capital": 0.1998001998001998
+        }
+      },
+      "double_friction": {
+        "candidate": {
+          "annualised_return_pct": -5.078492857210792,
+          "annualised_volatility_pct": 0.9712380884617728,
+          "calmar": -1.8108359723750616,
+          "closed_trades": 56,
+          "expectancy_usdt_per_closed_trade": -5.008039040181465,
+          "exposure_fraction_of_hours": 0.25120267726417067,
+          "final_liquidatable_usdt": "9719.549813749837924143604842",
+          "max_daily_mark_to_market_loss_pct": 0.3413560503313669,
+          "max_drawdown_pct": 2.80450186250162,
+          "modelled_fees_usdt": "115.6377312398508542377403468",
+          "modelled_fills": 112,
+          "modelled_slippage_usdt": "115.6375345401689736687485472",
+          "net_execution_return_pct": -2.804501862501621,
+          "open_position_at_end": false,
+          "profit_factor": 0.24175506016479242,
+          "risk": {
+            "daily_suspensions": 0,
+            "drawdown_suspension": false,
+            "entry_rejections": {},
+            "exit_reasons": {
+              "SIGNAL_FLAT": 56
+            },
+            "max_planned_stop_risk_pct": 0.25
+          },
+          "sharpe_zero_risk_free": -5.361462074811549,
+          "sortino_zero_target": -6.760341169788139,
+          "turnover_to_starting_capital": 5.781886561992542
+        },
+        "candidate_after_primary_overhead_pct": -3.459433369350936,
+        "candidate_operating_cost_sensitivity": {
+          "0": {
+            "modelled_overhead_usdt": "0",
+            "net_pnl_usdt": "-280.450186250162075856395158",
+            "net_return_pct": -2.804501862501621
+          },
+          "120": {
+            "modelled_overhead_usdt": "65.49315068493150684931506849",
+            "net_pnl_usdt": "-345.9433369350935827057102265",
+            "net_return_pct": -3.459433369350936
+          },
+          "360": {
+            "modelled_overhead_usdt": "196.4794520547945205479452055",
+            "net_pnl_usdt": "-476.9296383049565964043403635",
+            "net_return_pct": -4.769296383049566
+          }
+        },
+        "ema_12_48_frozen": {
+          "annualised_return_pct": -27.595407533025263,
+          "annualised_volatility_pct": 5.666873564534625,
+          "calmar": -1.622093636317616,
+          "closed_trades": 65,
+          "expectancy_usdt_per_closed_trade": -24.85785419976327,
+          "exposure_fraction_of_hours": 0.4888098724116294,
+          "final_liquidatable_usdt": "8384.239477015387383424227100",
+          "max_daily_mark_to_market_loss_pct": 1.696824241599257,
+          "max_drawdown_pct": 17.012216135482028,
+          "modelled_fees_usdt": "516.7640829682707093992197501",
+          "modelled_fills": 130,
+          "modelled_slippage_usdt": "516.7617540295267621386395981",
+          "net_execution_return_pct": -16.157605229846126,
+          "open_position_at_end": false,
+          "profit_factor": 0.2457451057982174,
+          "sharpe_zero_risk_free": -5.669581345117762,
+          "sortino_zero_target": -7.112188767758251,
+          "turnover_to_starting_capital": 25.838204148413535
+        },
+        "excess_vs_benchmarks_pp": {
+          "ema_12_48_frozen": 12.69817186049519,
+          "flat": -3.459433369350936,
+          "passive_hold": 0.05488780449370845
+        },
+        "flat": {
+          "annualised_return_pct": 0.0,
+          "annualised_volatility_pct": 0.0,
+          "calmar": null,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 0.0,
+          "final_liquidatable_usdt": "10000.00000000000000",
+          "max_daily_mark_to_market_loss_pct": 0.0,
+          "max_drawdown_pct": 0.0,
+          "modelled_fees_usdt": "0",
+          "modelled_fills": 0,
+          "modelled_slippage_usdt": "0",
+          "net_execution_return_pct": 0.0,
+          "open_position_at_end": false,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": null,
+          "sortino_zero_target": null,
+          "turnover_to_starting_capital": 0.0
+        },
+        "passive_hold": {
+          "annualised_return_pct": -6.344771516889935,
+          "annualised_volatility_pct": 7.582425062655111,
+          "calmar": -0.7986001266145665,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 1.0,
+          "final_liquidatable_usdt": "9648.567882615535564692500760",
+          "max_daily_mark_to_market_loss_pct": 1.6248664935963766,
+          "max_drawdown_pct": 7.944866655339454,
+          "modelled_fees_usdt": "3.992015968063872255489021956",
+          "modelled_fills": 1,
+          "modelled_slippage_usdt": "3.984047872319233787913195565",
+          "net_execution_return_pct": -3.5143211738446443,
+          "open_position_at_end": true,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": -0.8265874002369201,
+          "sortino_zero_target": -1.1390864679235655,
+          "turnover_to_starting_capital": 0.1996007984031936
+        }
+      },
+      "end_exclusive_utc": "2026-01-01T00:00:00+00:00",
+      "half_stop_risk_base_friction": {
+        "annualised_return_pct": -1.6558592095292313,
+        "annualised_volatility_pct": 0.4909893058229301,
+        "calmar": -1.7493153117470848,
+        "candidate_after_primary_overhead_pct": -1.562086315638903,
+        "closed_trades": 56,
+        "expectancy_usdt_per_closed_trade": -1.6199193014099786,
+        "exposure_fraction_of_hours": 0.25120267726417067,
+        "final_liquidatable_usdt": "9909.284519121041197458354309",
+        "max_daily_mark_to_market_loss_pct": 0.17490004553055405,
+        "max_drawdown_pct": 0.9465756107030718,
+        "modelled_fees_usdt": "31.75166048904431095519184939",
+        "modelled_fills": 112,
+        "modelled_slippage_usdt": "31.75163327685719789789816084",
+        "net_execution_return_pct": -0.907154808789588,
+        "open_position_at_end": false,
+        "profit_factor": 0.3929384813048348,
+        "risk": {
+          "daily_suspensions": 0,
+          "drawdown_suspension": false,
+          "entry_rejections": {},
+          "exit_reasons": {
+            "SIGNAL_FLAT": 56
+          },
+          "max_planned_stop_risk_pct": 0.125
+        },
+        "sharpe_zero_risk_free": -3.3982717346570093,
+        "sortino_zero_target": -4.526507695450763,
+        "turnover_to_starting_capital": 3.175166048904431
+      },
+      "hours": 4781,
+      "start_utc": "2025-06-15T19:00:00+00:00"
+    },
+    "validation": {
+      "base_friction": {
+        "candidate": {
+          "annualised_return_pct": -6.62744758601066,
+          "annualised_volatility_pct": 1.6643208008706833,
+          "calmar": -1.7312840836534782,
+          "closed_trades": 99,
+          "expectancy_usdt_per_closed_trade": -3.7104755159509564,
+          "exposure_fraction_of_hours": 0.31771595900439237,
+          "final_liquidatable_usdt": "9632.662923920855316763562808",
+          "max_daily_mark_to_market_loss_pct": 0.47461472324792814,
+          "max_drawdown_pct": 3.828053205471023,
+          "modelled_fees_usdt": "109.9998516129482553057115074",
+          "modelled_fills": 198,
+          "modelled_slippage_usdt": "109.9997042754280645373481138",
+          "net_execution_return_pct": -3.673370760791447,
+          "open_position_at_end": false,
+          "profit_factor": 0.3029760935376973,
+          "risk": {
+            "daily_suspensions": 0,
+            "drawdown_suspension": false,
+            "entry_rejections": {},
+            "exit_reasons": {
+              "SIGNAL_FLAT": 97,
+              "STOP_AT_CLOSE": 2
+            },
+            "max_planned_stop_risk_pct": 0.25
+          },
+          "sharpe_zero_risk_free": -4.111825176480174,
+          "sortino_zero_target": -5.050187737002106,
+          "turnover_to_starting_capital": 10.999985161294825
+        },
+        "candidate_after_primary_overhead_pct": -4.328302267640762,
+        "candidate_operating_cost_sensitivity": {
+          "0": {
+            "modelled_overhead_usdt": "0",
+            "net_pnl_usdt": "-367.337076079144683236437192",
+            "net_return_pct": -3.673370760791447
+          },
+          "120": {
+            "modelled_overhead_usdt": "65.49315068493150684931506849",
+            "net_pnl_usdt": "-432.8302267640761900857522605",
+            "net_return_pct": -4.328302267640762
+          },
+          "360": {
+            "modelled_overhead_usdt": "196.4794520547945205479452055",
+            "net_pnl_usdt": "-563.8165281339392037843823975",
+            "net_return_pct": -5.638165281339392
+          }
+        },
+        "ema_12_48_frozen": {
+          "annualised_return_pct": -15.025527004977324,
+          "annualised_volatility_pct": 7.551499101664956,
+          "calmar": -1.3306470510185722,
+          "closed_trades": 63,
+          "expectancy_usdt_per_closed_trade": -13.496666015262187,
+          "exposure_fraction_of_hours": 0.5369169629784564,
+          "final_liquidatable_usdt": "9149.710041038482244198376603",
+          "max_daily_mark_to_market_loss_pct": 2.1457515139350885,
+          "max_drawdown_pct": 11.291895167449335,
+          "modelled_fees_usdt": "251.1491109001904209168634920",
+          "modelled_fills": 126,
+          "modelled_slippage_usdt": "251.1487629081052676947963026",
+          "net_execution_return_pct": -8.502899589615177,
+          "open_position_at_end": false,
+          "profit_factor": 0.4931514676197243,
+          "sharpe_zero_risk_free": -2.1183224643694385,
+          "sortino_zero_target": -2.7976464340476253,
+          "turnover_to_starting_capital": 25.114911090019042
+        },
+        "excess_vs_benchmarks_pp": {
+          "ema_12_48_frozen": 4.1745973219744155,
+          "flat": -4.328302267640762,
+          "passive_hold": -7.063341164448947
+        },
+        "flat": {
+          "annualised_return_pct": 0.0,
+          "annualised_volatility_pct": 0.0,
+          "calmar": null,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 0.0,
+          "final_liquidatable_usdt": "10000.00000000000000",
+          "max_daily_mark_to_market_loss_pct": 0.0,
+          "max_drawdown_pct": 0.0,
+          "modelled_fees_usdt": "0",
+          "modelled_fills": 0,
+          "modelled_slippage_usdt": "0",
+          "net_execution_return_pct": 0.0,
+          "open_position_at_end": false,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": null,
+          "sortino_zero_target": null,
+          "turnover_to_starting_capital": 0.0
+        },
+        "passive_hold": {
+          "annualised_return_pct": 5.068230268750318,
+          "annualised_volatility_pct": 10.33295314367534,
+          "calmar": 0.7236680004382564,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 1.0,
+          "final_liquidatable_usdt": "10273.50388968081853478661372",
+          "max_daily_mark_to_market_loss_pct": 1.915424022380327,
+          "max_drawdown_pct": 7.003529609822428,
+          "modelled_fees_usdt": "1.998001998001998001998001998",
+          "modelled_fills": 1,
+          "modelled_slippage_usdt": "1.996005992009988013984017980",
+          "net_execution_return_pct": 2.7350388968081853,
+          "open_position_at_end": true,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": 0.5301307861967589,
+          "sortino_zero_target": 0.7351630402128138,
+          "turnover_to_starting_capital": 0.1998001998001998
+        }
+      },
+      "double_friction": {
+        "candidate": {
+          "annualised_return_pct": -8.936668098643285,
+          "annualised_volatility_pct": 1.5292281618637587,
+          "calmar": -1.7868852059062288,
+          "closed_trades": 87,
+          "expectancy_usdt_per_closed_trade": -5.725234009253035,
+          "exposure_fraction_of_hours": 0.2769295126542564,
+          "final_liquidatable_usdt": "9501.904641194985975360590365",
+          "max_daily_mark_to_market_loss_pct": 0.46879669895300735,
+          "max_drawdown_pct": 5.001254735953228,
+          "modelled_fees_usdt": "176.4850536680611507206815238",
+          "modelled_fills": 174,
+          "modelled_slippage_usdt": "176.4844731647332618422332180",
+          "net_execution_return_pct": -4.9809535880501405,
+          "open_position_at_end": false,
+          "profit_factor": 0.18110303556719146,
+          "risk": {
+            "daily_suspensions": 0,
+            "drawdown_suspension": true,
+            "entry_rejections": {
+              "DRAWDOWN_LIMIT": 194
+            },
+            "exit_reasons": {
+              "DRAWDOWN_LIMIT": 1,
+              "SIGNAL_FLAT": 84,
+              "STOP_AT_CLOSE": 2
+            },
+            "max_planned_stop_risk_pct": 0.25
+          },
+          "sharpe_zero_risk_free": -6.114032971416688,
+          "sortino_zero_target": -7.222563285209365,
+          "turnover_to_starting_capital": 8.824252683403058
+        },
+        "candidate_after_primary_overhead_pct": -5.635885094899455,
+        "candidate_operating_cost_sensitivity": {
+          "0": {
+            "modelled_overhead_usdt": "0",
+            "net_pnl_usdt": "-498.095358805014024639409635",
+            "net_return_pct": -4.9809535880501405
+          },
+          "120": {
+            "modelled_overhead_usdt": "65.49315068493150684931506849",
+            "net_pnl_usdt": "-563.5885094899455314887247035",
+            "net_return_pct": -5.635885094899455
+          },
+          "360": {
+            "modelled_overhead_usdt": "196.4794520547945205479452055",
+            "net_pnl_usdt": "-694.5748108598085451873548405",
+            "net_return_pct": -6.945748108598085
+          }
+        },
+        "ema_12_48_frozen": {
+          "annualised_return_pct": -23.333134961109447,
+          "annualised_volatility_pct": 7.8771683970004815,
+          "calmar": -1.5969709688351463,
+          "closed_trades": 63,
+          "expectancy_usdt_per_closed_trade": -21.42682695945783,
+          "exposure_fraction_of_hours": 0.5369169629784564,
+          "final_liquidatable_usdt": "8650.109901554156684293206727",
+          "max_daily_mark_to_market_loss_pct": 2.1942163303991906,
+          "max_drawdown_pct": 14.610869838246948,
+          "modelled_fees_usdt": "501.2968254300162500603238297",
+          "modelled_fills": 126,
+          "modelled_slippage_usdt": "501.2954362386691414286269580",
+          "net_execution_return_pct": -13.498900984458434,
+          "open_position_at_end": false,
+          "profit_factor": 0.3479127839020102,
+          "sharpe_zero_risk_free": -3.333587816559328,
+          "sortino_zero_target": -4.333836346978091,
+          "turnover_to_starting_capital": 25.064841271500814
+        },
+        "excess_vs_benchmarks_pp": {
+          "ema_12_48_frozen": 7.863015889558978,
+          "flat": -5.635885094899455,
+          "passive_hold": -8.280165262819636
+        },
+        "flat": {
+          "annualised_return_pct": 0.0,
+          "annualised_volatility_pct": 0.0,
+          "calmar": null,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 0.0,
+          "final_liquidatable_usdt": "10000.00000000000000",
+          "max_daily_mark_to_market_loss_pct": 0.0,
+          "max_drawdown_pct": 0.0,
+          "modelled_fees_usdt": "0",
+          "modelled_fills": 0,
+          "modelled_slippage_usdt": "0",
+          "net_execution_return_pct": 0.0,
+          "open_position_at_end": false,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": null,
+          "sortino_zero_target": null,
+          "turnover_to_starting_capital": 0.0
+        },
+        "passive_hold": {
+          "annualised_return_pct": 4.898223229607335,
+          "annualised_volatility_pct": 10.298394738164673,
+          "calmar": 0.701562099853683,
+          "closed_trades": 0,
+          "expectancy_usdt_per_closed_trade": null,
+          "exposure_fraction_of_hours": 1.0,
+          "final_liquidatable_usdt": "10264.42801679201812444981170",
+          "max_daily_mark_to_market_loss_pct": 1.9093247609659283,
+          "max_drawdown_pct": 6.981881191456754,
+          "modelled_fees_usdt": "3.992015968063872255489021956",
+          "modelled_fills": 1,
+          "modelled_slippage_usdt": "3.984047872319233787913195565",
+          "net_execution_return_pct": 2.644280167920181,
+          "open_position_at_end": true,
+          "profit_factor": null,
+          "sharpe_zero_risk_free": 0.5158389770888867,
+          "sortino_zero_target": 0.7152242140893909,
+          "turnover_to_starting_capital": 0.1996007984031936
+        }
+      },
+      "end_exclusive_utc": "2025-06-13T19:00:00+00:00",
+      "half_stop_risk_base_friction": {
+        "annualised_return_pct": -3.367926149180911,
+        "annualised_volatility_pct": 0.8324920930044156,
+        "calmar": -1.7438808829117773,
+        "candidate_after_primary_overhead_pct": -2.5073598377355406,
+        "closed_trades": 99,
+        "expectancy_usdt_per_closed_trade": -1.8711397281679045,
+        "exposure_fraction_of_hours": 0.31771595900439237,
+        "final_liquidatable_usdt": "9814.757166911377450337720670",
+        "max_daily_mark_to_market_loss_pct": 0.23742272843737436,
+        "max_drawdown_pct": 1.9312822235641731,
+        "modelled_fees_usdt": "55.63476406441888531218545769",
+        "modelled_fills": 198,
+        "modelled_slippage_usdt": "55.63469009103995214847325604",
+        "net_execution_return_pct": -1.8524283308862255,
+        "open_position_at_end": false,
+        "profit_factor": 0.3040855166082196,
+        "risk": {
+          "daily_suspensions": 0,
+          "drawdown_suspension": false,
+          "entry_rejections": {},
+          "exit_reasons": {
+            "SIGNAL_FLAT": 97,
+            "STOP_AT_CLOSE": 2
+          },
+          "max_planned_stop_risk_pct": 0.125
+        },
+        "sharpe_zero_risk_free": -4.111120553571904,
+        "sortino_zero_target": -5.049601070835405,
+        "turnover_to_starting_capital": 5.563476406441889
+      },
+      "hours": 4781,
+      "start_utc": "2024-11-26T14:00:00+00:00"
+    }
+  },
+  "quote_currency": "USDT",
+  "registry_sha256": "50b1475aadf7f9290fa435e7632dbde56199a94744758b0b554ee0d24c0c2811",
+  "screen": {
+    "closed_trade_minimum_met": true,
+    "decision": "FAIL",
+    "historical_rejections": [
+      "NON_POSITIVE_AFTER_BASE_COSTS_AND_OVERHEAD",
+      "NON_POSITIVE_AFTER_DOUBLE_COSTS_AND_OVERHEAD",
+      "DID_NOT_BEAT_FLAT",
+      "TOO_FEW_POSITIVE_WALK_FORWARD_FOLDS"
+    ],
+    "positive_walk_forward_folds": 1,
+    "prospective_validation_complete": false,
+    "walk_forward_folds": 14
+  },
+  "source_archive_months": 33,
+  "test_unsealed_descriptive_bootstrap": {
+    "ema_12_48_frozen": {
+      "complete_utc_days": 199,
+      "lower_daily_excess_bps": -1.1854614348866057,
+      "mean_daily_excess_bps": 4.238193426329796,
+      "per_comparison_alpha": 0.005555555555555556,
+      "whole_blocks_in_sample": 14
+    },
+    "flat": {
+      "complete_utc_days": 199,
+      "lower_daily_excess_bps": -2.3909719192738454,
+      "mean_daily_excess_bps": -1.2371890027902297,
+      "per_comparison_alpha": 0.005555555555555556,
+      "whole_blocks_in_sample": 14
+    },
+    "passive_hold": {
+      "complete_utc_days": 199,
+      "lower_daily_excess_bps": -5.091858194888198,
+      "mean_daily_excess_bps": 0.4657944218621192,
+      "per_comparison_alpha": 0.005555555555555556,
+      "whole_blocks_in_sample": 14
+    }
+  },
+  "trading_enabled": false,
+  "walk_forward": [
+    {
+      "candidate_after_primary_overhead_pct": -0.7634607389306989,
+      "candidate_closed_trades": 16,
+      "candidate_double_friction_after_primary_overhead_pct": -1.039987570531893,
+      "candidate_max_drawdown_pct": 0.7175641393154953,
+      "end_exclusive_utc": "2024-12-24T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": -0.4093855202166804,
+        "flat": -0.7634607389306989,
+        "passive_hold": -1.5300120915733493
+      },
+      "hours": 672,
+      "start_utc": "2024-11-26T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.5438960158557576,
+      "candidate_closed_trades": 13,
+      "candidate_double_friction_after_primary_overhead_pct": -0.7769757954468863,
+      "candidate_max_drawdown_pct": 0.8492789778944481,
+      "end_exclusive_utc": "2025-01-23T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 0.5410111913628618,
+        "flat": -0.5438960158557576,
+        "passive_hold": -1.8810542670615873
+      },
+      "hours": 672,
+      "start_utc": "2024-12-26T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.49881342368637843,
+      "candidate_closed_trades": 3,
+      "candidate_double_friction_after_primary_overhead_pct": -0.527437677843989,
+      "candidate_max_drawdown_pct": 0.40675862916583355,
+      "end_exclusive_utc": "2025-02-22T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 4.209312730447181,
+        "flat": -0.49881342368637843,
+        "passive_hold": 1.1315825336117373
+      },
+      "hours": 672,
+      "start_utc": "2025-01-25T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -1.2789348476729963,
+      "candidate_closed_trades": 12,
+      "candidate_double_friction_after_primary_overhead_pct": -1.4491468791164932,
+      "candidate_max_drawdown_pct": 1.3536162346003295,
+      "end_exclusive_utc": "2025-03-24T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": -0.5526674637904586,
+        "flat": -1.2789348476729963,
+        "passive_hold": 0.4450599891408522
+      },
+      "hours": 672,
+      "start_utc": "2025-02-24T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.12232190139093231,
+      "candidate_closed_trades": 11,
+      "candidate_double_friction_after_primary_overhead_pct": -0.3706793148530217,
+      "candidate_max_drawdown_pct": 0.6094140786774012,
+      "end_exclusive_utc": "2025-04-23T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 0.2463175652189603,
+        "flat": -0.12232190139093231,
+        "passive_hold": -1.459838075608459
+      },
+      "hours": 672,
+      "start_utc": "2025-03-26T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.5356243153418879,
+      "candidate_closed_trades": 28,
+      "candidate_double_friction_after_primary_overhead_pct": -1.1016882725813981,
+      "candidate_max_drawdown_pct": 0.7563676733949024,
+      "end_exclusive_utc": "2025-05-23T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": -0.8348843959407671,
+        "flat": -0.5356243153418879,
+        "passive_hold": -3.670648518422394
+      },
+      "hours": 672,
+      "start_utc": "2025-04-25T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.49173996165037304,
+      "candidate_closed_trades": 10,
+      "candidate_double_friction_after_primary_overhead_pct": -0.6668632959588366,
+      "candidate_max_drawdown_pct": 0.39968516712982816,
+      "end_exclusive_utc": "2025-06-22T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 0.47140668826807264,
+        "flat": -0.49173996165037304,
+        "passive_hold": 0.8212478905730163
+      },
+      "hours": 672,
+      "start_utc": "2025-05-25T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.19569359380916013,
+      "candidate_closed_trades": 14,
+      "candidate_double_friction_after_primary_overhead_pct": -0.47953331752687967,
+      "candidate_max_drawdown_pct": 0.4783999535242289,
+      "end_exclusive_utc": "2025-07-22T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 0.0948330929098386,
+        "flat": -0.19569359380916013,
+        "passive_hold": -2.5962396318595684
+      },
+      "hours": 672,
+      "start_utc": "2025-06-24T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.018874781200057394,
+      "candidate_closed_trades": 6,
+      "candidate_double_friction_after_primary_overhead_pct": -0.1506666777958098,
+      "candidate_max_drawdown_pct": 0.19314525905874266,
+      "end_exclusive_utc": "2025-08-21T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 1.2045829000261583,
+        "flat": -0.018874781200057394,
+        "passive_hold": 0.8596927708090416
+      },
+      "hours": 672,
+      "start_utc": "2025-07-24T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.568414527635675,
+      "candidate_closed_trades": 13,
+      "candidate_double_friction_after_primary_overhead_pct": -0.799423086614293,
+      "candidate_max_drawdown_pct": 0.5071803325135218,
+      "end_exclusive_utc": "2025-09-20T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 0.3979975335487722,
+        "flat": -0.568414527635675,
+        "passive_hold": -0.6708205080277281
+      },
+      "hours": 672,
+      "start_utc": "2025-08-23T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": 0.361709040378099,
+      "candidate_closed_trades": 1,
+      "candidate_double_friction_after_primary_overhead_pct": 0.3027483624596661,
+      "candidate_max_drawdown_pct": 0.16384099030506072,
+      "end_exclusive_utc": "2025-10-20T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": -1.010390591243884,
+        "flat": 0.361709040378099,
+        "passive_hold": 0.7883021639839409
+      },
+      "hours": 672,
+      "start_utc": "2025-09-22T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.2713403341182126,
+      "candidate_closed_trades": 4,
+      "candidate_double_friction_after_primary_overhead_pct": -0.33996836126257585,
+      "candidate_max_drawdown_pct": 0.3414021395025199,
+      "end_exclusive_utc": "2025-11-19T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 0.5559045259819462,
+        "flat": -0.2713403341182126,
+        "passive_hold": 2.990780189884695
+      },
+      "hours": 672,
+      "start_utc": "2025-10-22T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.8311029747358387,
+      "candidate_closed_trades": 9,
+      "candidate_double_friction_after_primary_overhead_pct": -0.956563153598726,
+      "candidate_max_drawdown_pct": 0.8526694802475562,
+      "end_exclusive_utc": "2025-12-19T14:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 3.6137545167426866,
+        "flat": -0.8311029747358387,
+        "passive_hold": -1.670561380588215
+      },
+      "hours": 672,
+      "start_utc": "2025-11-21T14:00:00+00:00"
+    },
+    {
+      "candidate_after_primary_overhead_pct": -0.17426267871175918,
+      "candidate_closed_trades": 3,
+      "candidate_double_friction_after_primary_overhead_pct": -0.225304112928882,
+      "candidate_max_drawdown_pct": 0.20013947110612598,
+      "end_exclusive_utc": "2026-01-01T00:00:00+00:00",
+      "excess_vs_benchmarks_pp": {
+        "ema_12_48_frozen": 1.4519798636815835,
+        "flat": -0.17426267871175918,
+        "passive_hold": -0.08945092541889894
+      },
+      "hours": 250,
+      "start_utc": "2025-12-21T14:00:00+00:00"
+    }
+  ]
+}

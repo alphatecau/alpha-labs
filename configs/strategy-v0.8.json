@@ -1,0 +1,80 @@
+{
+  "schema": "alpha-labs.strategy-research.v0.8",
+  "hypothesis": "A positive 72-hour return in a confirmed uptrend with subdued realised volatility produces positive net spot returns and beats frozen EMA(12,48), passive hold and FLAT across BTC, ETH and SOL.",
+  "candidate_budget": 1,
+  "candidates": [
+    {
+      "id": "regime_filtered_momentum_01",
+      "fast_hours": 24,
+      "slow_hours": 120,
+      "slope_hours": 24,
+      "momentum_hours": 72,
+      "volatility_hours": 72,
+      "min_trend_spread_fraction": "0.005",
+      "entry_momentum_fraction": "0.01",
+      "max_hourly_volatility_fraction": "0.015"
+    }
+  ],
+  "data": {
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "first_month": "2023-04",
+    "last_month": "2025-12",
+    "evidence_class": "previously_examined_historical_development"
+  },
+  "protocol": {
+    "development_pct": 60,
+    "validation_pct": 20,
+    "embargo_hours": 48,
+    "walk_forward_step_hours": 720,
+    "minimum_final_fold_hours": 168,
+    "warmup": "The slow EMA must have its full warm-up before computing its 24-hour slope. Prior and embargo bars may update features, while trade state and equity reset in each scored window.",
+    "signals": "At each completed hourly close calculate EMA spread (fast/slow - 1), slow-EMA slope sign versus 24 hours ago, trailing price momentum and sample standard deviation of the last 72 simple hourly returns. Warm-up and conflicting directional readings are UNCERTAIN. Volatility >= cap is HIGH_VOLATILITY. Absolute spread below minimum is RANGING. Otherwise agree with the nonzero slope to classify UP or DOWN. LONG only when UP and momentum >= entry threshold. All other states target FLAT. Use the next hourly open to model fills.",
+    "comparators": "Frozen EMA(12,48), passive buy-and-hold and FLAT use identical dates, starting equity, friction and the legacy 20% starting-capital allocation for risky comparators. Risk-limited candidate exposure is deliberately smaller. Compare total portfolio outcomes."
+  },
+  "costs": {
+    "capital_usdt": "10000",
+    "comparator_allocation_fraction": "0.20",
+    "fee_bps_each_side": "10",
+    "adverse_slippage_bps_each_side": "10",
+    "friction_stress_multiplier": 2,
+    "annual_candidate_overhead_usdt": [
+      "0",
+      "120",
+      "360"
+    ],
+    "primary_annual_candidate_overhead_usdt": "120",
+    "note": "Flat adverse price concession proxies spread and slippage. Overhead is a prorated scenario debit after the run, applied to the candidate only. Zero overhead for benchmarks is a deliberately tougher hurdle and preserves frozen EMA."
+  },
+  "risk": {
+    "stop_distance_fraction": "0.04",
+    "max_position_stop_risk_fraction": "0.0025",
+    "half_risk_sensitivity_fraction": "0.00125",
+    "max_aggregate_stop_risk_fraction": "0.01",
+    "daily_loss_suspension_fraction": "0.02",
+    "drawdown_suspension_fraction": "0.05",
+    "note": "One independent cash-funded position per market simulation. Size at the modelled entry open using equity and full round-trip friction at a stop reference 4% below that open. Trigger exits from completed closes and fill at next open, including on gaps. Suspend new entries until next UTC day after a 2% loss from day-start NAV and through end of window after 5% drawdown from the high-water mark. Never re-enter at the same open as an exit. These are planned limits and hourly observations."
+  },
+  "rejection": {
+    "minimum_closed_trades_per_market": 30,
+    "minimum_positive_walk_forward_fraction": "0.50",
+    "rule": "FAIL a market if final unsealed test return is non-positive at the primary overhead under base or doubled friction, is no greater than any comparator at base friction, reaches the 5% drawdown limit at base or doubled friction, or fewer than half of scored forward folds are positive at base friction and primary overhead. Fewer than 30 closed trades without an economic failure gives INSUFFICIENT EVIDENCE. All three markets must clear descriptive hurdles and a future independent review for PASS. Retain all results."
+  },
+  "uncertainty": {
+    "block_days": 14,
+    "minimum_blocks": 6,
+    "replicates": 4096,
+    "seed": 808,
+    "family_alpha": "0.05",
+    "primary_comparisons": 9,
+    "note": "Paired moving-block bootstrap of daily change in liquidation NAV divided by starting equity, less prorated candidate overhead. Complete UTC days only. Use one-sided lower empirical quantile with Bonferroni correction across three comparators and three markets. Historical bounds are descriptive and do not validate alpha."
+  },
+  "prospective": {
+    "start_utc": "2027-01-01T00:00:00Z",
+    "end_exclusive_utc": "2028-01-01T00:00:00Z",
+    "requirement": "Freeze registry, code, instruments and scoring before the start. An independent custodian collects timestamped inputs and checksums, disallows interim candidate review and releases the full year once. PASS requires the same market-level economic/drawdown/sample thresholds, forward folds starting at the first eligible unseen bar, all nine paired lower bounds above zero, an independent reproduction and calibrated executable cost and data checks. Any adaptation requires a new future window."
+  }
+}

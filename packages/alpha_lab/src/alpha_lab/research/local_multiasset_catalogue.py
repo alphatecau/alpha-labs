@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import re
 
 _ALLOWED_ASSETS = {"crypto", "equity", "etf", "index", "forex"}
-_ALLOWED_VENUES = {"CRYPTO", "NASDAQ", "NYSE", "AMEX", "ASX", "LSE", "TSX", "XETRA", "TSE", "FX"}
+_ALLOWED_VENUES = {"CRYPTO", "NASDAQ", "NYSE", "NYSE ARCA", "AMEX", "ASX", "LSE", "TSX", "XETRA", "TSE", "FX"}
 _SYMBOL = re.compile(r"[A-Z0-9][A-Z0-9.\-]{0,19}\Z")
 
 
@@ -46,11 +46,12 @@ def catalogue():
                    "WMT", "COST", "PLTR", "COIN", "MSTR"):
         rows.append(Instrument(symbol, "NASDAQ" if symbol in
                                {"AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA",
-                                "AMD", "INTC", "NFLX", "COST", "PLTR", "MSTR"} else "NYSE",
+                                "AMD", "INTC", "NFLX", "COST", "PLTR", "COIN", "MSTR"} else "NYSE",
                                "equity", "USD"))
     for symbol in ("SPY", "QQQ", "IWM", "DIA", "VTI", "VOO", "XLF", "XLE",
                    "XLK", "GLD", "SLV", "TLT", "ARKK"):
-        rows.append(Instrument(symbol, "AMEX", "etf", "USD"))
+        venue = "NASDAQ" if symbol == "QQQ" else "NYSE ARCA"
+        rows.append(Instrument(symbol, venue, "etf", "USD"))
     for symbol in ("BHP", "CBA", "CSL", "WBC", "NAB", "ANZ", "WES", "WOW",
                    "MQG", "RIO", "FMG", "TLS", "XRO", "REA", "ALL", "VAS", "A200", "VGS"):
         rows.append(Instrument(symbol, "ASX",

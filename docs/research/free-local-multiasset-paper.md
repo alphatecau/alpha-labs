@@ -35,3 +35,32 @@ Caveats: A SQLite backup is NOT an independently authenticated checkpoint. The e
 
 ## Current readiness
 Catalogue, CLI, targeted tests and CI workflow committed. Tests are NOT yet confirmed passed; physical Android Termux test not performed. Inherited runtime requires end-to-end local acceptance. All non-Coinbase instruments remain UNVERIFIED/DISABLED. No merge, deployment or real-money execution.
+
+## Follow-up candidate · 13 November 2026
+
+The terminal has two explicit USD profiles. Both use the same PaperRuntime, SQLite journal, order state, FIFO accounting and risk checks.
+
+| Profile | Instruments | Data | Session policy |
+|---|---|---|---|
+| Default Coinbase spot | BTC-USD, ETH-USD, SOL-USD | Timestamped Coinbase Exchange public level-one quotes | All three books must be fresh and causal |
+| --synthetic-etfs | SPY, QQQ, IWM, XLF, XLE | Deterministic synthetic quotes only | Explicit UTC windows, whole shares, no trades at or beyond the configured close |
+
+The other catalogue entries are discovery-only. Live US and ASX quotes, corporate actions, FX conversion and additional crypto pairs require separate provider and data-quality acceptance. The fixture starts pre-open and advances when you type advance. On reopening, it starts halted and resumes at the last executed synthetic sequence if one exists.
+
+From the root of the checked-out follow-up branch, start the local terminal on Termux or Linux with Python 3.12 or newer.
+
+~~~sh
+PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.research.local_paper_terminal
+~~~
+
+For the separate offline ETF journal:
+
+~~~sh
+PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.research.local_paper_terminal --synthetic-etfs
+~~~
+
+Type help for commands. In the ETF fixture, type advance, then arm. Submit limit buy SPY 2 100.50 90 --id sample_spy_limit_0001 for a partial fill at the fixture's displayed depth. Type advance again to match the remainder at the next book. A separate pending order can be cancelled with cancel ID. Use the same --id on a retry. Market orders require sufficient available top-of-book depth. Limit fills use the estimated price after slippage and observe the order's limit price. Fees are simulated separately. Remaining quantity persists until filled, cancelled or rejected. Reopening a journal always requires manual arming.
+
+Fee and slippage default to 10 and 5 bps. Set --fee-bps and --slippage-bps for a new journal and use the same settings to reopen it. The journal pins market profile and cost policy. Keep separate profiles and policy versions in separate directories.
+
+Backup publishes a verified SQLite copy in a separate existing directory. The local terminal has no independent checkpoint authority. Use private Termux storage for the journal and backup destination. A matching protected PostgreSQL restore is covered by the separate owner-staging rehearsal.

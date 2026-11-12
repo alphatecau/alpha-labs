@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 name = "alpha-labs"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["cryptography>=44,<47"]
+dependencies = ["cryptography>=50.0.0,<51"]
 description = "Alpha Labs offline, cost-aware quantitative research foundation (no execution)"
 [tool.setuptools.packages.find]
 where = ["packages/alpha_lab/src"]

@@ -40,7 +40,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install cryptographic verification dependency
-        run: python -m pip install 'cryptography>=44,<47'
+        run: python -m pip install 'cryptography>=50.0.0,<51'
       - name: Require signed archive tests to execute
         env:
           PYTHONPATH: packages/alpha_lab/src

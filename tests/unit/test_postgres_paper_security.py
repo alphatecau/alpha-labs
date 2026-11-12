@@ -23,9 +23,9 @@ class FakeConnection:
         elif sql.startswith("SELECT active"):
             self.row = (self.state["owners"][args],) if args in self.state["owners"] else None
         elif "INSERT INTO public.identity_rate_limit" in sql:
-            key, bucket, window, limit = args
+            key, bucket, _, _, limit, store_window_start = args
             old_bucket, count = self.state["limits"].get(key, (bucket, 0))
-            if bucket < old_bucket or (bucket == old_bucket and count >= limit):
+            if (store_window_start and bucket < old_bucket) or (bucket == old_bucket and count >= limit):
                 self.row = None
             else:
                 count = count + 1 if old_bucket == bucket else 1

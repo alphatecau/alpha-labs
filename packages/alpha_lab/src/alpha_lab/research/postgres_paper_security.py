@@ -89,12 +89,12 @@ class PostgresIdentityLimiter:
     _ACCOUNT = """
         INSERT INTO public.identity_rate_limit AS quota (identity, bucket, count)
         VALUES (%s, COALESCE(%s::bigint,
-            floor(extract(epoch FROM statement_timestamp()) / %s::bigint)::bigint), 1)
+            floor(extract(epoch FROM statement_timestamp()) / %s::bigint)::bigint * %s::bigint), 1)
         ON CONFLICT (identity) DO UPDATE SET
             bucket = EXCLUDED.bucket,
             count = CASE WHEN quota.bucket = EXCLUDED.bucket THEN quota.count + 1 ELSE 1 END
-        WHERE quota.bucket < EXCLUDED.bucket
-           OR (quota.bucket = EXCLUDED.bucket AND quota.count < %s)
+        WHERE CASE WHEN quota.bucket = EXCLUDED.bucket THEN quota.count < %s
+                   WHEN %s THEN quota.bucket < EXCLUDED.bucket ELSE true END
         RETURNING quota.count
     """
 
@@ -107,21 +107,25 @@ class PostgresIdentityLimiter:
         self.clock = clock
 
     def allow(self, issuer, subject):
-        return self._allow(_identity(issuer, subject))
+        # Preserve the existing paper-status bucket representation.
+        return self._allow(_identity(issuer, subject), store_window_start=False)
 
     def allow_owner(self, owner):
         """Use the owner from a verified, currently authorised BFF session."""
         if not isinstance(owner, str) or not re.fullmatch(r"oidc_[a-f0-9]{64}", owner):
             raise PermissionError("Invalid verified identity")
-        return self._allow("research_bff:" + owner[5:])
+        return self._allow("research_bff:" + owner[5:], store_window_start=True)
 
-    def _allow(self, identity):
+    def _allow(self, identity, *, store_window_start):
         try:
-            # Normal callers share the database clock. A test clock can exercise rollover.
-            bucket = None if self.clock is None else int(self.clock()) // self.window
+            # Store absolute window starts for the BFF so an older statement cannot
+            # reopen a window and a coordinated window-size change can recover.
+            scale = self.window if store_window_start else 1
+            bucket = None if self.clock is None else int(self.clock()) // self.window * scale
             with self._connect() as conn:
                 with conn.cursor() as cur:
-                    cur.execute(self._ACCOUNT, (identity, bucket, self.window, self.limit))
+                    cur.execute(self._ACCOUNT, (identity, bucket, self.window, scale,
+                                                self.limit, store_window_start))
                     row = cur.fetchone()
         except Exception as exc:
             raise RateLimitUnavailable("Shared rate limiter unavailable") from exc

@@ -64,10 +64,10 @@ class SharedBFFRateLimitTests(unittest.TestCase):
     def limiter(self, limit=3, window=60):
         return PostgresIdentityLimiter(self.quota_connect, limit=limit, window=window, clock=lambda: self.now)
 
-    def staging(self, limit=3):
+    def staging(self, limit=3, window=60):
         return StagingResearchBFF(
             object(), object(), PostgresOpaqueSessions(self.connect), self.reader,
-            origin="https://staging.example", rate_limiter=self.limiter(limit),
+            origin="https://staging.example", rate_limiter=self.limiter(limit, window),
             authorize_owner=lambda owner: self.ownership.require_owner_id(owner, "primary"))
 
     def legacy(self):
@@ -118,7 +118,7 @@ class SharedBFFRateLimitTests(unittest.TestCase):
             self.assertEqual(headers["Cache-Control"], "no-store")
             self.assertNotIn(b"private-", body)
             self.assertNotIn(b"oidc_", body)
-        self.assertEqual(self.counters(), [(10, 3)])
+        self.assertEqual(self.counters(), [(600, 3)])
         self.assertEqual(self.request(self.second, self.tokens[self.bob])[0], 200)
 
     def test_concurrent_reads_cannot_exceed_quota(self):
@@ -134,7 +134,7 @@ class SharedBFFRateLimitTests(unittest.TestCase):
         with ThreadPoolExecutor(max_workers=workers) as pool:
             statuses = list(pool.map(request_at_once, range(workers)))
         self.assertEqual(sorted(statuses), [200] * limit + [429] * (workers - limit))
-        self.assertEqual(self.counters(), [(10, limit)])
+        self.assertEqual(self.counters(), [(600, limit)])
         self.assertEqual(self.reader.list_runs.call_count + self.reader.summary.call_count, limit)
 
     def test_unavailable_table_returns_503_without_reading_data_and_recovers(self):
@@ -181,7 +181,16 @@ class SharedBFFRateLimitTests(unittest.TestCase):
         self.assertEqual(self.request(self.second, self.tokens[self.alice])[0], 200)
         self.now = 659
         self.assertEqual(self.request(self.first, self.tokens[self.alice])[0], 429)
-        self.assertEqual(self.counters(), [(11, 1)])
+        self.assertEqual(self.counters(), [(660, 1)])
+
+    def test_coordinated_larger_window_recovers_at_new_boundary(self):
+        self.now = 660
+        self.assertEqual(self.request(self.first, self.tokens[self.alice])[0], 200)
+        restarted = self.staging(window=120)
+        self.assertEqual(self.request(restarted, self.tokens[self.alice])[0], 429)
+        self.now = 720
+        self.assertEqual(self.request(restarted, self.tokens[self.alice])[0], 200)
+        self.assertEqual(self.counters(), [(720, 1)])
 
     def test_restricted_store_readiness_and_database_clock(self):
         limiter = PostgresIdentityLimiter(self.quota_connect, limit=2, window=120)
@@ -190,9 +199,9 @@ class SharedBFFRateLimitTests(unittest.TestCase):
         with self.quota_connect() as connection:
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                 connection.execute("SELECT * FROM public.alpha_oidc_sessions")
-        lower = self.admin.execute("SELECT floor(extract(epoch FROM statement_timestamp()) / 120)").fetchone()[0]
+        lower = self.admin.execute("SELECT floor(extract(epoch FROM statement_timestamp()) / 120) * 120").fetchone()[0]
         self.assertTrue(limiter.allow_owner(self.sessions.resolve_owner(self.tokens[self.alice])))
-        upper = self.admin.execute("SELECT floor(extract(epoch FROM statement_timestamp()) / 120)").fetchone()[0]
+        upper = self.admin.execute("SELECT floor(extract(epoch FROM statement_timestamp()) / 120) * 120").fetchone()[0]
         bucket, count = self.counters()[0]
         self.assertTrue(lower <= bucket <= upper)
         self.assertEqual(count, 1)

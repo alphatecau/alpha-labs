@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "title": "Alpha Labs quote v1",
+  "required": [
+    "instrument",
+    "venue",
+    "currency",
+    "event_time",
+    "received_time",
+    "bid",
+    "ask",
+    "bid_size",
+    "ask_size",
+    "source_ref",
+    "synthetic"
+  ],
+  "properties": {
+    "instrument": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:/-]{1,100}$"
+    },
+    "venue": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:/-]{1,100}$"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:/-]{1,100}$"
+    },
+    "source_ref": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:/-]{1,100}$"
+    },
+    "event_time": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?Z$"
+    },
+    "received_time": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,6})?Z$"
+    },
+    "bid": {
+      "oneOf": [
+        {
+          "type": "string",
+          "maxLength": 40,
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?$"
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ]
+    },
+    "ask": {
+      "oneOf": [
+        {
+          "type": "string",
+          "maxLength": 40,
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?$"
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ]
+    },
+    "bid_size": {
+      "oneOf": [
+        {
+          "type": "string",
+          "maxLength": 40,
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?$"
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ]
+    },
+    "ask_size": {
+      "oneOf": [
+        {
+          "type": "string",
+          "maxLength": 40,
+          "pattern": "^[0-9]+(?:\\.[0-9]+)?$"
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ]
+    },
+    "schema": {
+      "const": "alpha-labs.paper.v1"
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "asset_class": {
+      "enum": [
+        "crypto_spot",
+        "us_equity",
+        "us_etf",
+        "forex",
+        "futures"
+      ]
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "schema": "alpha-labs.github-ci.v1",
+  "source_commit": "f8bb445d953a7dc67a5a430e9ef3bed40bcb5690",
+  "base_commit": "9d705bd1982396b19006b9abd3ec8b6a254f2972",
+  "pull_request": "https://github.com/alphatecau/alpha-labs/pull/12",
+  "checks": [
+    {
+      "name": "paper",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/42379740866/job/128424639076"
+    },
+    {
+      "name": "tests",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/42379740822/job/128424638984"
+    },
+    {
+      "name": "research",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/42379740804/job/128424638771"
+    },
+    {
+      "name": "research",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/42379691435/job/128424493690"
+    },
+    {
+      "name": "paper",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/42379691463/job/128424493684"
+    },
+    {
+      "name": "tests",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/42379691382/job/128424493448"
+    }
+  ],
+  "paper_job_steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 1
+    },
+    {
+      "name": "Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 2
+    },
+    {
+      "name": "Run actions/setup-python@v5",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 3
+    },
+    {
+      "name": "Contract, accounting, tenant, risk and API adversarial tests",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 4
+    },
+    {
+      "name": "Repeat deterministic synthetic replay",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 5
+    },
+    {
+      "name": "Compile new Python modules",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 6
+    },
+    {
+      "name": "Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 7
+    },
+    {
+      "name": "Check local dashboard script",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 8
+    },
+    {
+      "name": "Install browser test runner",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 9
+    },
+    {
+      "name": "Install browser",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 10
+    },
+    {
+      "name": "Browser integration at mobile, tablet and desktop widths",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 11
+    },
+    {
+      "name": "Post Run actions/setup-node@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 20
+    },
+    {
+      "name": "Post Run actions/setup-python@v5",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 21
+    },
+    {
+      "name": "Post Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 22
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 23
+    }
+  ],
+  "verified_paper_log": {
+    "tests": 81,
+    "outcome": "OK",
+    "playwright": "1.62.1",
+    "browser": "151.0.7922.34",
+    "viewports": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "all_pass": true
+  },
+  "note": "Verified GitHub metadata, job steps and decoded paper-job log for this exact source. Later documentation-only heads require their own check metadata. CI is not profitability or executable-fill evidence."
+}

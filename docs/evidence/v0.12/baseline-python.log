@@ -1,0 +1,123 @@
+test_2025_millisecond_error_rejected (test_binance_archive.ArchiveResearchTests.test_2025_millisecond_error_rejected) ... ok
+test_bad_price_rejected (test_binance_archive.ArchiveResearchTests.test_bad_price_rejected) ... ok
+test_changed_csv_rejected (test_binance_archive.ArchiveResearchTests.test_changed_csv_rejected) ... ok
+test_changed_raw_archive_rejected (test_binance_archive.ArchiveResearchTests.test_changed_raw_archive_rejected) ... ok
+test_checksum_fails_on_bad_hash_or_filename (test_binance_archive.ArchiveResearchTests.test_checksum_fails_on_bad_hash_or_filename) ... ok
+test_missing_candle_rejected (test_binance_archive.ArchiveResearchTests.test_missing_candle_rejected) ... ok
+test_missing_checksum_fails_closed (test_binance_archive.ArchiveResearchTests.test_missing_checksum_fails_closed) ... ok
+test_month_range_inclusive_and_bad_date (test_binance_archive.ArchiveResearchTests.test_month_range_inclusive_and_bad_date) ... ok
+test_offline_assembly_and_reverification (test_binance_archive.ArchiveResearchTests.test_offline_assembly_and_reverification) ... ok
+test_rehashed_csv_must_still_match_source_candles (test_binance_archive.ArchiveResearchTests.test_rehashed_csv_must_still_match_source_candles) ... ok
+test_rehashed_source_metadata_cannot_relabel_archive (test_binance_archive.ArchiveResearchTests.test_rehashed_source_metadata_cannot_relabel_archive) ... ok
+test_timestamp_conversion_pre_and_post_2025 (test_binance_archive.ArchiveResearchTests.test_timestamp_conversion_pre_and_post_2025) ... ok
+test_zip_member_enforcement (test_binance_archive.ArchiveResearchTests.test_zip_member_enforcement) ... ok
+test_checksum_verified_archive_kept_when_contents_invalid (test_binance_close_metadata.BinanceCloseMetadataTests.test_checksum_verified_archive_kept_when_contents_invalid) ... ok
+test_dataset_reports_anomalies_and_verifies_source (test_binance_close_metadata.BinanceCloseMetadataTests.test_dataset_reports_anomalies_and_verifies_source) ... ok
+test_early_close_is_explicitly_logged_at_row_565 (test_binance_close_metadata.BinanceCloseMetadataTests.test_early_close_is_explicitly_logged_at_row_565) ... ok
+test_early_microsecond_close_in_2025_is_recorded (test_binance_close_metadata.BinanceCloseMetadataTests.test_early_microsecond_close_in_2025_is_recorded) ... ok
+test_missing_candle_still_rejected (test_binance_close_metadata.BinanceCloseMetadataTests.test_missing_candle_still_rejected) ... ok
+test_outside_interval_and_mixed_units_rejected (test_binance_close_metadata.BinanceCloseMetadataTests.test_outside_interval_and_mixed_units_rejected) ... ok
+test_correct_file_verifies (test_dataset_manifests.DatasetManifestTests.test_correct_file_verifies) ... ok
+test_injection_like_source_id_rejected (test_dataset_manifests.DatasetManifestTests.test_injection_like_source_id_rejected) ... ok
+test_misleading_authentication_claims_rejected (test_dataset_manifests.DatasetManifestTests.test_misleading_authentication_claims_rejected) ... ok
+test_mismatched_symbol_rejected (test_dataset_manifests.DatasetManifestTests.test_mismatched_symbol_rejected) ... ok
+test_missing_hour_rejected (test_dataset_manifests.DatasetManifestTests.test_missing_hour_rejected) ... ok
+test_missing_timezone_rejected (test_dataset_manifests.DatasetManifestTests.test_missing_timezone_rejected) ... ok
+test_retrieval_before_history_rejected (test_dataset_manifests.DatasetManifestTests.test_retrieval_before_history_rejected) ... ok
+test_tampering_rejected (test_dataset_manifests.DatasetManifestTests.test_tampering_rejected) ... ok
+test_unfinished_last_candle_rejected (test_dataset_manifests.DatasetManifestTests.test_unfinished_last_candle_rejected) ... ok
+test_unknown_source_class_rejected (test_dataset_manifests.DatasetManifestTests.test_unknown_source_class_rejected) ... ok
+test_complete_bundle_contains_reproducible_inputs_and_source (test_evidence_export.EvidenceExportTests.test_complete_bundle_contains_reproducible_inputs_and_source) ... ok
+test_existing_bundle_is_preserved (test_evidence_export.EvidenceExportTests.test_existing_bundle_is_preserved) ... ok
+test_missing_archive_prevents_export (test_evidence_export.EvidenceExportTests.test_missing_archive_prevents_export) ... ok
+test_modified_report_is_rejected_without_output (test_evidence_export.EvidenceExportTests.test_modified_report_is_rejected_without_output) ... ok
+test_rejected_forensic_archive_is_retained_with_its_error (test_evidence_export.EvidenceExportTests.test_rejected_forensic_archive_is_retained_with_its_error) ... ok
+test_short_history_cannot_bypass_production_gate (test_evidence_export.EvidenceExportTests.test_short_history_cannot_bypass_production_gate) ... ok
+test_unsupported_or_repeated_symbols_are_rejected (test_evidence_export.EvidenceExportTests.test_unsupported_or_repeated_symbols_are_rejected) ... ok
+test_even_positive_returns_do_not_authorise_trading (test_evidence_gate.EvidenceGateTests.test_even_positive_returns_do_not_authorise_trading) ... ok
+test_extra_period_rejected (test_evidence_gate.EvidenceGateTests.test_extra_period_rejected) ... ok
+test_false_validated_status_rejected (test_evidence_gate.EvidenceGateTests.test_false_validated_status_rejected) ... ok
+test_missing_comparator_rejected (test_evidence_gate.EvidenceGateTests.test_missing_comparator_rejected) ... ok
+test_missing_provenance_rejected (test_evidence_gate.EvidenceGateTests.test_missing_provenance_rejected) ... ok
+test_nan_return_rejected (test_evidence_gate.EvidenceGateTests.test_nan_return_rejected) ... ok
+test_truthful_output (test_evidence_gate.EvidenceGateTests.test_truthful_output) ... ok
+test_721_accepted_722_rejected (test_kraken_721.Kraken721Tests.test_721_accepted_722_rejected) ... ok
+test_bad_pair (test_kraken_ohlc_adapter.KrakenAdapterTests.test_bad_pair) ... ok
+test_drop_unfinished_last (test_kraken_ohlc_adapter.KrakenAdapterTests.test_drop_unfinished_last) ... ok
+test_exchange_error (test_kraken_ohlc_adapter.KrakenAdapterTests.test_exchange_error) ... ok
+test_fail_closed_on_gaps (test_kraken_ohlc_adapter.KrakenAdapterTests.test_fail_closed_on_gaps) ... ok
+test_no_series (test_kraken_ohlc_adapter.KrakenAdapterTests.test_no_series) ... ok
+test_write_manifest_and_validate (test_kraken_ohlc_adapter.KrakenAdapterTests.test_write_manifest_and_validate) ... ok
+test_bad_hash_fails_closed (test_local_research_server.LocalResearchServerTests.test_bad_hash_fails_closed) ... ok
+test_stale_data_not_claimed_live (test_local_research_server.LocalResearchServerTests.test_stale_data_not_claimed_live) ... ok
+test_valid_snapshot_and_strict_read_only (test_local_research_server.LocalResearchServerTests.test_valid_snapshot_and_strict_read_only) ... 127.0.0.1 - - [07/Nov/2026 13:58:00] "GET /api/v1/research/solusd HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2026 13:58:00] "POST /api/v1/research/solusd HTTP/1.1" 405 -
+127.0.0.1 - - [07/Nov/2026 13:58:00] "GET / HTTP/1.1" 200 -
+ok
+test_wrong_pair_fails_closed (test_local_research_server.LocalResearchServerTests.test_wrong_pair_fails_closed) ... ok
+test_evaluate_spec_rejects_under_two_years (test_long_history.HistoricalResearchTests.test_evaluate_spec_rejects_under_two_years) ... ok
+test_frozen_spec_tampering_and_no_overwrite (test_long_history.HistoricalResearchTests.test_frozen_spec_tampering_and_no_overwrite) ... ok
+test_future_prices_cannot_affect_training (test_long_history.HistoricalResearchTests.test_future_prices_cannot_affect_training) ... ok
+test_higher_costs_do_not_improve_modelled_nav (test_long_history.HistoricalResearchTests.test_higher_costs_do_not_improve_modelled_nav) ... ok
+test_invalid_frozen_config_rejected (test_long_history.HistoricalResearchTests.test_invalid_frozen_config_rejected) ... ok
+test_operating_cost_reduces_after_overhead_return (test_long_history.HistoricalResearchTests.test_operating_cost_reduces_after_overhead_return) ... ok
+test_replay_parity_and_split (test_long_history.HistoricalResearchTests.test_replay_parity_and_split) ... ok
+test_risk_stats_are_null_when_undefined (test_long_history.HistoricalResearchTests.test_risk_stats_are_null_when_undefined) ... ok
+test_short_fixture_cannot_clear_production_gate (test_long_history.HistoricalResearchTests.test_short_fixture_cannot_clear_production_gate) ... ok
+test_allocation_ceiling (test_research_foundation.ResearchFoundationTests.test_allocation_ceiling) ... ok
+test_cost_model_is_adverse (test_research_foundation.ResearchFoundationTests.test_cost_model_is_adverse) ... ok
+test_currency_explicit (test_research_foundation.ResearchFoundationTests.test_currency_explicit) ... ok
+test_duplicate_timestamp_rejected (test_research_foundation.ResearchFoundationTests.test_duplicate_timestamp_rejected) ... ok
+test_gap_rejected (test_research_foundation.ResearchFoundationTests.test_gap_rejected) ... ok
+test_larger_cost_reduces_constant_price_nav (test_research_foundation.ResearchFoundationTests.test_larger_cost_reduces_constant_price_nav) ... ok
+test_naive_timestamp_rejected (test_research_foundation.ResearchFoundationTests.test_naive_timestamp_rejected) ... ok
+test_negative_price_rejected (test_research_foundation.ResearchFoundationTests.test_negative_price_rejected) ... ok
+test_no_same_candle_entry (test_research_foundation.ResearchFoundationTests.test_no_same_candle_entry) ... ok
+test_position_mark_is_cost_adjusted (test_research_foundation.ResearchFoundationTests.test_position_mark_is_cost_adjusted) ... ok
+test_reject_invalid_allocation (test_research_foundation.ResearchFoundationTests.test_reject_invalid_allocation) ... ok
+test_replay_is_deterministic (test_research_foundation.ResearchFoundationTests.test_replay_is_deterministic) ... ok
+test_signal_is_past_only (test_research_foundation.ResearchFoundationTests.test_signal_is_past_only) ... ok
+test_split_and_provenance (test_research_foundation.ResearchFoundationTests.test_split_and_provenance) ... ok
+test_valid_dataset (test_research_foundation.ResearchFoundationTests.test_valid_dataset) ... ok
+test_daily_loss_rejected_at_threshold (test_risk_policy.RiskPolicyTests.test_daily_loss_rejected_at_threshold) ... ok
+test_data_integrity_rejected (test_risk_policy.RiskPolicyTests.test_data_integrity_rejected) ... ok
+test_drawdown_rejected_at_threshold (test_risk_policy.RiskPolicyTests.test_drawdown_rejected_at_threshold) ... ok
+test_invalid_equity_rejected (test_risk_policy.RiskPolicyTests.test_invalid_equity_rejected) ... ok
+test_invalid_policy_rejected (test_risk_policy.RiskPolicyTests.test_invalid_policy_rejected) ... ok
+test_invalid_quote_age_rejected (test_risk_policy.RiskPolicyTests.test_invalid_quote_age_rejected) ... ok
+test_kill_switch_rejected (test_risk_policy.RiskPolicyTests.test_kill_switch_rejected) ... ok
+test_negative_position_rejected (test_risk_policy.RiskPolicyTests.test_negative_position_rejected) ... ok
+test_nonfinite_price_rejected (test_risk_policy.RiskPolicyTests.test_nonfinite_price_rejected) ... ok
+test_portfolio_exposure_rejected (test_risk_policy.RiskPolicyTests.test_portfolio_exposure_rejected) ... ok
+test_position_size_rejected (test_risk_policy.RiskPolicyTests.test_position_size_rejected) ... ok
+test_short_side_rejected (test_risk_policy.RiskPolicyTests.test_short_side_rejected) ... ok
+test_stale_quote_rejected (test_risk_policy.RiskPolicyTests.test_stale_quote_rejected) ... ok
+test_unknown_boolean_fails_closed (test_risk_policy.RiskPolicyTests.test_unknown_boolean_fails_closed) ... ok
+test_valid_proposal_is_research_only (test_risk_policy.RiskPolicyTests.test_valid_proposal_is_research_only) ... ok
+test_all_three_markets_read_only (test_three_market_api.ThreeMarketAPITests.test_all_three_markets_read_only) ... 127.0.0.1 - - [07/Nov/2026 13:58:01] "GET /api/v1/research/xbtusd HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2026 13:58:01] "POST /api/v1/research/xbtusd HTTP/1.1" 405 -
+127.0.0.1 - - [07/Nov/2026 13:58:01] "GET /api/v1/research/ethusd HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2026 13:58:01] "POST /api/v1/research/ethusd HTTP/1.1" 405 -
+127.0.0.1 - - [07/Nov/2026 13:58:01] "GET /api/v1/research/solusd HTTP/1.1" 200 -
+127.0.0.1 - - [07/Nov/2026 13:58:01] "POST /api/v1/research/solusd HTTP/1.1" 405 -
+ok
+test_invalid_requests (test_three_market_api.ThreeMarketAPITests.test_invalid_requests) ... 127.0.0.1 - - [07/Nov/2026 13:58:01] "GET /api/v1/research/unknown HTTP/1.1" 404 -
+127.0.0.1 - - [07/Nov/2026 13:58:01] "GET /api/v1/research/solusd?trade=true HTTP/1.1" 400 -
+ok
+test_missing_market_data_fails_closed (test_three_market_api.ThreeMarketAPITests.test_missing_market_data_fails_closed) ... 127.0.0.1 - - [07/Nov/2026 13:58:02] "GET /api/v1/research/ethusd HTTP/1.1" 503 -
+ok
+test_stale_market_data (test_three_market_api.ThreeMarketAPITests.test_stale_market_data) ... 127.0.0.1 - - [07/Nov/2026 13:58:02] "GET /api/v1/research/solusd HTTP/1.1" 200 -
+ok
+test_tampered_data_fails_closed (test_three_market_api.ThreeMarketAPITests.test_tampered_data_fails_closed) ... 127.0.0.1 - - [07/Nov/2026 13:58:03] "GET /api/v1/research/xbtusd HTTP/1.1" 503 -
+ok
+test_deterministic (test_walk_forward.WalkForwardTests.test_deterministic) ... ok
+test_future_candles_do_not_change_first_window (test_walk_forward.WalkForwardTests.test_future_candles_do_not_change_first_window) ... ok
+test_insufficient_history_rejected (test_walk_forward.WalkForwardTests.test_insufficient_history_rejected) ... ok
+test_research_only (test_walk_forward.WalkForwardTests.test_research_only) ... ok
+
+----------------------------------------------------------------------
+Ran 102 tests in 14.539s
+
+OK
+Read-only research unavailable: FileNotFoundError
+Read-only research unavailable: ValueError

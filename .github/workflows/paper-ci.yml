@@ -1,0 +1,37 @@
+name: Alpha Labs local simulation foundation
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Contract, accounting, tenant, risk and API adversarial tests
+        run: PYTHONPATH=packages/alpha_lab/src python -m unittest discover -s tests/paper -p 'test_*.py' -v
+      - name: Repeat deterministic synthetic replay
+        run: |
+          PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.paper.cli replay > /tmp/replay-a.json
+          PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.paper.cli replay > /tmp/replay-b.json
+          cmp /tmp/replay-a.json /tmp/replay-b.json
+      - name: Compile new Python modules
+        run: python -m compileall -q packages/alpha_lab/src/alpha_lab/paper
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check local dashboard script
+        run: node --check apps/dashboard/paper/app.js
+      - name: Install browser test runner
+        run: npm install --no-save --prefix /tmp/alpha-browser playwright@1.62.1
+      - name: Install browser
+        run: /tmp/alpha-browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Browser integration at mobile, tablet and desktop widths
+        env:
+          CODEX_PRIMARY_RUNTIME_NODE_MODULES: /tmp/alpha-browser/node_modules
+        run: node tests/browser/paper-terminal.cjs

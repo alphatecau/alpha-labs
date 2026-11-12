@@ -22,7 +22,7 @@ class TestCoinbaseFutureClockTolerance(unittest.TestCase):
             "asks": [["100.01", "2.0", 1]],
         }
 
-    def test_bounded_future_clock_lead_is_accepted_for_parse_and_execution(self):
+    def test_bounded_future_clock_lead_is_accepted_by_the_adapter(self):
         for offset in (0, 136, 220, 500):
             with self.subTest(offset=offset):
                 quote = parse_book("BTC-USD", self.book(offset), self.now)
@@ -54,8 +54,8 @@ class TestCoinbaseFutureClockTolerance(unittest.TestCase):
         self.assertEqual(MAX_FUTURE_SKEW, timedelta(milliseconds=500))
         self.assertEqual(MAX_AGE, timedelta(seconds=10))
 
-    def test_clock_lead_defers_risk_and_orders_until_the_quote_is_causal(self):
-        books = {symbol: parse_book(symbol, self.book(220), self.now) for symbol in PRODUCTS}
+    def test_clock_lead_halts_an_armed_session_until_explicit_rearm(self):
+        books = {symbol: parse_book(symbol, self.book(0), self.now) for symbol in PRODUCTS}
         now = self.now
 
         class Feed:
@@ -65,16 +65,23 @@ class TestCoinbaseFutureClockTolerance(unittest.TestCase):
         with TemporaryDirectory() as path:
             paper = LivePaperSession(path, "clock_skew_test_account", Feed(), clock=lambda: now)
             try:
+                order = {"order_id": "clock_skew_book_order_01", "symbol": "SOL-USD",
+                         "side": "BUY", "quantity": "1", "stop_price": "90"}
+                paper.control("arm", expected_revision=paper.state()["risk"]["revision"])
+                books["SOL-USD"] = parse_book("SOL-USD", self.book(220), self.now)
                 state = paper.state()
                 self.assertFalse(state["risk"]["data_healthy"])
+                self.assertFalse(state["risk"]["armed"])
+                self.assertEqual(state["risk"]["reason"], "MARKET_DATA_HALT")
                 with self.assertRaisesRegex(PaperRejection, "Fresh books"):
                     paper.control("arm", expected_revision=state["risk"]["revision"])
-                self.assertEqual(paper.runtime.ledger.sequence, 0)
                 now += timedelta(milliseconds=220)
+                paper.on_market_update()
+                with self.assertRaisesRegex(PaperRejection, "execution is halted"):
+                    paper.order(order)
+                self.assertEqual(paper.runtime.ledger.sequence, 0)
                 paper.control("arm", expected_revision=paper.state()["risk"]["revision"])
-                fill = paper.order({"order_id": "clock_skew_book_order_01", "symbol": "SOL-USD",
-                                    "side": "BUY", "quantity": "1", "stop_price": "90"})
-                self.assertEqual(fill["status"], "SIMULATED_FILL")
+                self.assertEqual(paper.order(order)["status"], "SIMULATED_FILL")
             finally:
                 paper.close()
 

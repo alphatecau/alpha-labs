@@ -99,7 +99,6 @@ class LivePaperSession:
         self.owner_id = account_id
         self.checkpoint_store = checkpoint_store
         self._last_checkpoint = None
-        self._armed_session = None
         self.lock = RLock()
         self.fault = False
         self.file_lock = (Path(directory) / "alpha-paper.lock").open("a+b")
@@ -225,7 +224,7 @@ class LivePaperSession:
     def fail_closed(self):
         with self.lock:
             self.fault = True
-            self._armed_session = None
+            self.runtime.recovery_verified = False
             self.runtime.ledger.halt()
             if self.checkpoint_store is None:
                 try:
@@ -292,8 +291,9 @@ class LivePaperSession:
     def _operation(self):
         with self.lock:
             protected = self.checkpoint_store is not None
-            if protected and self.fault:
-                raise PaperRejection("CHECKPOINT_HALT", "Protected paper state requires recovery", 503)
+            if self.fault:
+                code = "CHECKPOINT_HALT" if protected else "LEDGER_HALT"
+                raise PaperRejection(code, "Paper state requires verified recovery", 503)
             rejection = None
             current = None
             try:
@@ -309,13 +309,12 @@ class LivePaperSession:
                         current = self._state_commitment()
                 if current is not None:
                     self._record_checkpoint(current, previous)
-            except Exception as exc:
-                # SQLite and PostgreSQL commit separately. An unmatched local
-                # commit is never acknowledged or adopted at the next startup.
+            except BaseException as exc:
+                # A failed commit can leave the in-memory ledger ahead of the journal.
                 self.fail_closed()
-                if not protected:
-                    raise
-                raise PaperRejection("CHECKPOINT_HALT", "Protected paper state requires recovery", 503) from exc
+                if protected and isinstance(exc, Exception):
+                    raise PaperRejection("CHECKPOINT_HALT", "Protected paper state requires recovery", 503) from exc
+                raise
             if rejection is not None:
                 raise rejection
 
@@ -330,8 +329,6 @@ class LivePaperSession:
 
     def _refresh(self, now, quotes, healthy):
         guard = self._guard()
-        if self.fault:
-            raise PaperRejection("LEDGER_HALT", "Ledger requires recovery", 503)
         symbols = set(self.market.symbols)
         seen = set()
         for fill in reversed(self.runtime.events):
@@ -359,6 +356,8 @@ class LivePaperSession:
         future = {symbol for symbol, quote in quotes.items() if quote.exchange_at > now}
         if future:
             healthy.update(dict.fromkeys(future, False))
+            if guard["enabled"]:
+                self._set_control(False, "MARKET_DATA_HALT")
             return None
         marks = {symbol: quote.bid for symbol, quote in quotes.items()}
         account = self._account(marks)
@@ -598,6 +597,7 @@ class LivePaperSession:
         current, healthy, _ = self.feed.snapshot(now)
         if (set(current) != set(quotes) or set(healthy) != set(quotes)
                 or not all(healthy[symbol] is True and self.market.accepts(current[symbol], now)
+                           and current[symbol].symbol == symbol and current[symbol].exchange_at <= now
                            for symbol in quotes)):
             self._set_control(False, "MARKET_DATA_HALT")
             raise PaperRejection("MARKET_DATA_HALT", "Market data became unavailable before fill")

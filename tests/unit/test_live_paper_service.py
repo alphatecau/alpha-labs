@@ -345,6 +345,21 @@ class LivePaperServiceTests(unittest.TestCase):
         self.arm()
         self.assertEqual(self.session.order(self.order())["status"], "SIMULATED_FILL")
 
+    def test_future_quote_on_final_order_check_latches_market_data_halt(self):
+        self.arm()
+        healthy = self.session.feed.snapshot(self.now)
+        future = self.now + timedelta(milliseconds=220)
+        quotes, health, history = self.session.feed.snapshot(self.now)
+        quotes["SOL-USD"] = parse_book("SOL-USD", book(future, sequence=self.sequence + 1), self.now)
+        with patch.object(self.session.feed, "snapshot", side_effect=[healthy, (quotes, health, history)]):
+            with self.assertRaises(PaperRejection) as denied:
+                self.session.order(self.order())
+        self.assertEqual(denied.exception.code, "MARKET_DATA_HALT")
+        self.assertEqual(self.session.runtime.ledger.sequence, 0)
+        self.move("100")
+        self.session.on_market_update()
+        self.assertFalse(self.session.state()["risk"]["armed"])
+
     def test_restarted_journal_detects_conflicting_depth_at_the_filled_sequence(self):
         self.arm()
         self.session.order(self.order())

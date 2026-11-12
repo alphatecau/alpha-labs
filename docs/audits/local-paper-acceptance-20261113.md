@@ -1,10 +1,10 @@
 # Local paper acceptance · 13 November 2026
 
-**CONDITIONAL GO for limited local simulated research on a disposable or verified working journal.** The operator verified the original Android journal and existing backup read-only. On-device publication of a new backup remains pending on the repaired candidate. Private staging and real-money operation are NO-GO.
+**CONDITIONAL GO for limited local simulated research on a disposable or verified working journal.** The original Android journal passed read-only verification. Publication and a disposable restore of backup 002 passed on `2928092`. The latest storage and risk changes have Linux evidence and await an Android regression run. Private staging and real-money operation are NO-GO.
 
 ## Reproducibility
 
-- Baseline main commit b9098035638d45fddd7dcbab9a784d034ad80def. Tested candidate application tree e7103702ec2de3dd1df35a3f49a537566a44ba23. The acceptance documentation commit adds evidence. The draft PR links exact remote commit and CI receipts.
+- Baseline main commit b9098035638d45fddd7dcbab9a784d034ad80def. Earlier candidate application tree e7103702ec2de3dd1df35a3f49a537566a44ba23. Draft PR #116 records the exact commits and CI receipts for each repair.
 - Managed Linux CPython 3.12.14 and 3.13.5, pytest 9.2.0, Python 3.13 SQLite 3.46.1, Node 24.22.1, Ruff 0.15.22, Bandit 1.9.4 and resolved cryptography 50.0.2.
 - Separate hosted-source tests used cfef52790c6905182e97ba4df1a72fef82e0b6b8 with disposable PostgreSQL 16.2. PostgreSQL is outside the local terminal dependency path.
 
@@ -24,9 +24,8 @@ Generate runtime-requirements.txt from pyproject.toml project.dependencies. The 
 
 | Area | Result | Evidence |
 |---|---|---|
-| Full Python suite | PASS | 330 tests and 97 subtests on CPython 3.12.14, and the same on 3.13.5. |
-| Local Python 3.13 selection | PASS | 75 tests and 49 subtests. |
-| Existing project commands | PASS | make verify ran 317 unittest cases and 36 website tests. The named synthetic research fixture also ran successfully. |
+| Full Python suite | PASS | The storage and risk follow-up passed 336 tests and 100 subtests on each of CPython 3.12.14 and 3.13.5. |
+| Existing project commands | PASS | make verify ran 323 unittest cases and 36 website tests after the storage and risk repairs. The named synthetic research fixture also passed on the earlier application tree. |
 | Structural, chain and accounting checks | PASS on disposable data | Fresh and normal restart, open/closed positions, duplicate or missing events, sequence/hash/payload tamper, invalid checkpoint, rollback, corruption and alias rejection. |
 | Legacy schema compatibility | PASS on disposable data | Exact #108 checkout ab21e1f generated a two-fill BTC journal and separate backup. Migration of its verified copy recovered USD 9999.789989984995 and HALT. SHA-256 of both source files matched before and after. |
 | Recovery and crash handling | PASS on disposable data | Process termination before/after commit, same-ID retry, multi-asset replay, active-writer and sidecar denial, independent backup receipt restore and repeated restart. |
@@ -35,8 +34,9 @@ Generate runtime-requirements.txt from pyproject.toml project.dependencies. The 
 | Public Coinbase connectivity | PASS with transient failure recorded | A SOL timeout stopped the first final-source execution attempt before order submission. A new request passed all three books without changing the 10-second freshness limit. |
 | Live-quote simulated execution | PASS on disposable Linux | A BTC, ETH and SOL buy and sell each produced six simulated fills total. Independent replay reconciled closing cash and zero open positions. Restart recovered all six fills and startup HALT. |
 | Android read-only journal and disposable smoke | PASS | Operator-provided Termux output on `0e5385484fc3527ee13eb69f5ff681c9c16f00e4`, CPython 3.13.13 and SQLite 3.53.2. The original journal had two events and backup 001 had one verified prefix event. The disposable live smoke recorded six simulated fills and startup HALT. |
-| Android new backup publication | FAIL on the original command. NOT TESTED on the repair. | The operator's run reached publication and failed because Python did not expose `os.link`. The [updated runbook](../operations/android-paper-recovery.md) saves a verified backup to a new path. |
+| Android backup 002 publication and restore | PASS | Operator-provided Termux output on `2928092e4f6d703ab3dba2ee13bba8a33f253321`. The new backup contained two fills and `EXACT_FILL_HISTORY`. A separate disposable restore recovered two fills and reported `startup_halt: true`. The restore took its expected fill sequence and digest from the current journal. Independent rollback detection remains unverified on Android. |
 | Portable publication regression | PASS on disposable Linux | CPython 3.12.14 and 3.13.5 each passed 333 tests and 97 subtests with the backup repair. With `os.link` removed, the targeted backup, prepare and restore tests passed 18 tests and 3 subtests. The hard-link alias fixture was skipped. |
+| Commit uncertainty and future quotes | PASS on disposable Linux | Tests covered a real SQLite busy commit, injected errors before and after commit, interruption, retry and backup rejection before replay, and causal quote recovery requiring explicit re-arming. With `os.link` removed from Linux CPython 3.13.5, the combined storage and risk selection passed 53 tests and 33 subtests with one hard-link alias fixture skipped. |
 | Hosted Auth0, TLS and custody | BLOCKED | Public issuer metadata and health-only probe were observable. Hosted app login, owner/tenant and independent trust custody remain open. |
 | Static and dependency security | PASS in scoped checks | Ruff, Bandit medium/high and strict runtime dependency audit. Draft PR carries the exact-head Actions receipts. |
 

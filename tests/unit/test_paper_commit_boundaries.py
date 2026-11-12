@@ -8,14 +8,18 @@ import tempfile
 import threading
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 from pathlib import Path
+from unittest.mock import patch
 
 from alpha_lab.research.coinbase_paper_book import PRODUCTS, parse_book
 from alpha_lab.research.live_paper_session import LivePaperSession, PaperRejection
+from alpha_lab.research.local_paper_terminal import backup_journal
 from alpha_lab.research.paper_journal import PaperJournal
 from alpha_lab.research.paper_market_feed import PaperMarketFeed
+from alpha_lab.research.paper_runtime import PaperRuntime
 
 NOW = datetime(2026, 11, 12, tzinfo=timezone.utc)
 ACCOUNT = "synthetic_paper_account"
@@ -102,6 +106,85 @@ class PaperCommitBoundaryTests(unittest.TestCase):
                             recovered.order(ORDER)
                 finally:
                     recovered.close()
+
+    def test_commit_error_blocks_retries_until_durable_replay(self):
+        cases = ((False, sqlite3.OperationalError), (True, sqlite3.OperationalError), (True, KeyboardInterrupt))
+        for committed, error in cases:
+            with self.subTest(committed=committed, error=error), tempfile.TemporaryDirectory() as directory:
+                source = Path(directory) / "source"
+                source.mkdir()
+                paper = LivePaperSession(source, ACCOUNT, FixedFeed(), clock=lambda: NOW)
+                try:
+                    revision = paper.state()["risk"]["revision"]
+                    paper.control("arm", expected_revision=revision)
+                    connection = paper.runtime.journal.connection
+
+                    def fail_commit():
+                        if committed:
+                            connection.commit()
+                        raise error("simulated loss of SQLite commit confirmation")
+
+                    with patch.object(paper.runtime.journal, "connection", wraps=connection) as wrapped:
+                        wrapped.commit.side_effect = fail_commit
+                        with self.assertRaises(error):
+                            paper.order(ORDER)
+                    self.assertFalse(paper.runtime.recovery_verified)
+                    self.assertTrue(paper.runtime.ledger.halted)
+                    for operation in (lambda: paper.order(ORDER), paper.state,
+                                      lambda: paper.control("arm", expected_revision=revision)):
+                        with self.assertRaises(PaperRejection) as rejected:
+                            operation()
+                        self.assertEqual((rejected.exception.code, rejected.exception.status), ("LEDGER_HALT", 503))
+                    backup = Path(directory) / "uncertain.sqlite3"
+                    with self.assertRaisesRegex(ValueError, "verified recovery before backup"):
+                        backup_journal(paper, backup)
+                    self.assertFalse(backup.exists())
+                    with closing(sqlite3.connect(source / "alpha-paper.sqlite3")) as db:
+                        self.assertEqual(db.execute("SELECT COUNT(*) FROM events").fetchone()[0], int(committed))
+                finally:
+                    paper.close()
+                recovered = LivePaperSession(source, ACCOUNT, FixedFeed(), clock=lambda: NOW)
+                try:
+                    self.assertFalse(recovered.state()["risk"]["armed"])
+                    self.assertEqual(recovered.runtime.ledger.sequence, int(committed))
+                    if committed:
+                        self.assertEqual(recovered.order(ORDER)["status"], "ALREADY_COMMITTED")
+                    else:
+                        with self.assertRaisesRegex(PaperRejection, "execution is halted"):
+                            recovered.order(ORDER)
+                    self.assertEqual(recovered.runtime.ledger.sequence, int(committed))
+                finally:
+                    recovered.close()
+
+    def test_standalone_runtime_cannot_rearm_after_sqlite_busy_commit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "standalone.sqlite3"
+            runtime = PaperRuntime(path)
+            try:
+                runtime.journal.connection.execute("PRAGMA busy_timeout=0")
+                runtime.enable(operator_approved=True)
+                with closing(sqlite3.connect(path)) as reader:
+                    reader.execute("BEGIN")
+                    reader.execute("SELECT COUNT(*) FROM events").fetchone()
+                    with self.assertRaises(sqlite3.OperationalError) as failure:
+                        runtime.execute(symbol="SOL-USD", side="BUY", quantity="1", reference_mid="100",
+                                        executed_price="100", fee="0", quote_timestamp=NOW, now=NOW,
+                                        marks={}, proposed_loss="10", aggregate_open_risk="0", gross_notional="0",
+                                        peak_nav="10000", day_start_nav="10000", operator_approved=True,
+                                        order_id=ORDER["order_id"])
+                    self.assertEqual(failure.exception.sqlite_errorcode, sqlite3.SQLITE_BUSY)
+                self.assertFalse(runtime.recovery_verified)
+                self.assertTrue(runtime.ledger.halted)
+                with self.assertRaisesRegex(PermissionError, "recovery not verified"):
+                    runtime.enable(operator_approved=True)
+            finally:
+                runtime.close()
+            reopened = PaperRuntime(path)
+            try:
+                self.assertTrue(reopened.ledger.halted)
+                self.assertEqual(reopened.ledger.sequence, 0)
+            finally:
+                reopened.close()
 
     def test_database_unique_constraint_survives_concurrent_raw_connections(self):
         with tempfile.TemporaryDirectory() as directory:

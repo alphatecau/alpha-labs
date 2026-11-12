@@ -6,7 +6,7 @@
 |---|---|
 | Main-based scope and deterministic risk | Pass on tested Linux source. Keep explicit arming, 0.25% planned loss, 1% aggregate stop-risk, 2% daily loss, 5% drawdown and 1× exposure. |
 | Local write and restart integrity | Pass on disposable Linux and historical-schema fixtures. A changed or missing journal requires recovery and a verified working path. |
-| Existing Android data | Operator-provided read-only verification and disposable live smoke passed on `0e53854` with Android Python 3.13.13. Verify new backup publication and disposable recovery on the repaired candidate. |
+| Existing Android data | Operator-provided read-only verification and disposable live smoke passed on `0e53854` with Android Python 3.13.13. Backup publication and disposable restore with startup HALT passed on `2928092`. Re-run the storage and risk regressions on the candidate commit. |
 | Independent rollback | Local SQLite alone is unanchored. Use separately held receipts for fill verification and independent custody for protected full-state recovery. |
 | Live equities and additional symbols | Research-only until permitted data access, instrument metadata, regular sessions, holidays, corporate actions and currency handling are independently verified. |
 | Hosted paper | NO-GO. Real Auth0, TLS ingress, tenant store, durable checkpoints and representative restore acceptance remain open. |

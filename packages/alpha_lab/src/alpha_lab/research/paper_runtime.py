@@ -94,7 +94,8 @@ class PaperRuntime:
         try:
             new_head = self.journal.append(event, expected_seq=self.ledger.sequence,
                                            expected_head=self.journal_head)
-        except Exception:
+        except BaseException:
+            self.recovery_verified = False
             self.ledger.halt()
             raise
         self.journal_head = new_head

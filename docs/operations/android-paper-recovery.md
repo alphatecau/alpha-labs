@@ -36,7 +36,7 @@ Launch the verified copy after confirming the reported path and account. The ter
 PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.research.local_paper_terminal --directory "$HOME/.alpha-labs-paper-working"
 ~~~
 
-Use state for risk, source times, cash, positions, NAV, P&L, fees, recent fills and the last backup receipt in this session. If live valuation is unavailable, review the health flags and keep the runtime halted. Use new-id before a submission and retain the ID. Repeat the exact terms and ID after an uncertain response. Use backup with a new path in a separate existing Termux private directory. The tool publishes the backup only after structural and independent replay checks pass.
+Use state for risk, source times, cash, positions, NAV, P&L, fees, recent fills and the last backup receipt in this session. After market-data HALT, wait for fresh causal quotes and explicitly re-arm. Use new-id before a submission and retain the ID. If the journal commit is uncertain, quit and reopen the same verified working journal before checking the order with its original ID and terms. Recovery starts halted. Use backup with a new path in a separate existing Termux private directory. The tool publishes the backup only after structural and independent replay checks pass.
 
 ## Recover when the journal is damaged
 

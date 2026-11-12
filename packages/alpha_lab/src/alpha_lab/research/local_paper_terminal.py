@@ -20,16 +20,19 @@ DEFAULT_ACCOUNT = "localpaperowner0001"
 
 
 def backup_journal(session, destination):
-    source = Path(session.db.execute("PRAGMA database_list").fetchone()[2]).resolve()
-    target = backup_destination(source, destination)
-    with session.lock, TemporaryDirectory(dir=target.parent, prefix=".alpha-backup-") as temporary:
-        path = Path(temporary) / "backup.sqlite3"
-        with closing(sqlite3.connect(path)) as copy:
-            session.db.backup(copy)
-            checked = inspect_journal(copy)
-            if (checked["events"], checked["head"]) != (session.runtime.ledger.sequence, session.runtime.journal_head):
-                raise ValueError("backup differs from the active journal: HALT")
-        publish_verified_file(path, target)
+    with session.lock:
+        if session.fault:
+            raise ValueError("paper state requires verified recovery before backup")
+        source = Path(session.db.execute("PRAGMA database_list").fetchone()[2]).resolve()
+        target = backup_destination(source, destination)
+        with TemporaryDirectory(dir=target.parent, prefix=".alpha-backup-") as temporary:
+            path = Path(temporary) / "backup.sqlite3"
+            with closing(sqlite3.connect(path)) as copy:
+                session.db.backup(copy)
+                checked = inspect_journal(copy)
+                if (checked["events"], checked["head"]) != (session.runtime.ledger.sequence, session.runtime.journal_head):
+                    raise ValueError("backup differs from the active journal: HALT")
+            publish_verified_file(path, target)
     return {"backup": str(target), "integrity": "PASS", "replay": "PASS",
             "events": checked["events"], "head": checked["head"], "recovery": checked["checkpoint"]}
 

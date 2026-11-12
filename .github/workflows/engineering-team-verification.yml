@@ -50,7 +50,7 @@ jobs:
           date -u +%Y-%m-%dT%H:%M:%SZ >> engineering-verification.md
           echo "Research-only; no trading or deployment" >> engineering-verification.md
           echo "Job outcome: ${{ job.status }}" >> engineering-verification.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: engineering-verification

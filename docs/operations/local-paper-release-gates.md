@@ -1,6 +1,6 @@
 # Local paper release gates
 
-**CONDITIONAL GO for limited local simulated research.** Use a fresh disposable journal or a separately verified working copy. The default Coinbase profile uses observed public BTC-USD, ETH-USD and SOL-USD books. The synthetic ETF profile runs in its own journal. Its data source and calendar are rehearsal fixtures.
+**CONDITIONAL GO for limited local simulated research.** Use a fresh disposable journal or a separately verified working copy. The default Coinbase profile uses observed public BTC-USD, ETH-USD and SOL-USD books. The synthetic ETF profile runs in its own journal. Its data source and calendar are rehearsal fixtures. Limit the Coinbase profile to permitted personal or internal research and verify provider rights before redistribution. [Coinbase market-data terms](https://www.coinbase.com/en-au/legal/market_data)
 
 | Gate | Decision |
 |---|---|

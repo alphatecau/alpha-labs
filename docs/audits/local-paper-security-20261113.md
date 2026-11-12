@@ -19,4 +19,8 @@ The actual Auth0 application audience, allowlisted callback, owner/second identi
 
 Free local execution meets the A$0 requirement and keeps data in user-controlled SQLite storage. Render's free web tier can spin down and has ephemeral local storage. The free Postgres tier has a 30-day lifetime. These constraints rule out treating the present free service as verified durable journal or checkpoint custody. [Render free-tier documentation](https://render.com/docs/free)
 
+## Market-data usage
+
+Coinbase limits market-data use to the individual or the organisation's internal personal or research scope and restricts third-party distribution of data and derived works. The live terminal profile is limited to that scope. Store its detailed diagnostic output privately and obtain the required provider rights before any wider dashboard or service rollout. [Coinbase market-data terms](https://www.coinbase.com/en-au/legal/market_data)
+
 See [release gates](../operations/local-paper-release-gates.md).

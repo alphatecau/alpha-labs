@@ -33,14 +33,14 @@ Generate runtime-requirements.txt from pyproject.toml project.dependencies. The 
 | Deterministic risk | PASS on fixtures | Startup HALT, stale/outage HALT, last-check outage, no auto-rearm, manual halt, limits, buy stop, partial fill and gap/slippage paths. |
 | Quote integrity | PASS on fixtures | Out-of-order and same-sequence conflicting depth, restart watermark, bounded timestamp lead, 429 recovery, redirect, size/framing, non-finite and crossed books. |
 | Public Coinbase connectivity | PASS with transient failure recorded | A SOL timeout stopped the first final-source execution attempt before order submission. A new request passed all three books without changing the 10-second freshness limit. |
-| Live-quote simulated execution | PASS on disposable Linux | A BTC, ETH and SOL buy and sell each produced six simulated fills total. Restart recovered USD 9999.96866379775272355, zero open positions and startup HALT. |
+| Live-quote simulated execution | PASS on disposable Linux | A BTC, ETH and SOL buy and sell each produced six simulated fills total. Independent replay reconciled closing cash and zero open positions. Restart recovered all six fills and startup HALT. |
 | Android original and backup | NOT TESTED | Neither file was accessible in the Linux executor. Historical device evidence is retained below. Execute the [read-only Termux runbook](../operations/android-paper-recovery.md). |
 | Hosted Auth0, TLS and custody | BLOCKED | Public issuer metadata and health-only probe were observable. Hosted app login, owner/tenant and independent trust custody remain open. |
 | Static and dependency security | PASS in scoped checks | Ruff, Bandit medium/high and strict runtime dependency audit. Draft PR carries the exact-head Actions receipts. |
 
 ### Live sample and timing
 
-The passing final-source sample recorded BTC, ETH and SOL at exchange sequence 139225549773, 104970365973 and 33746624467. Exchange-to-receipt ages were 2.233381 s, 0.828865 s and 1.039550 s, respectively. The receipt timestamps are around 01:48:48 AEST on 13 November. Request duration was approximately four seconds for the three parallel calls. The observed timeout and different request/quote ages are separately recorded. The earlier Android clock lead was not reproduced on Linux. These results support keeping the existing bounded clock-lead tolerance and improving diagnostics rather than increasing freshness.
+The passing final-source probe validated source timestamps, receipt timestamps, causal freshness and sequence for all three products. The observed timeout and the differences between request duration and quote age are recorded separately in the local diagnostic output. The earlier Android clock lead was not reproduced on Linux. Keep the provider and simulated-account diagnostics private. The freshness limit and bounded clock-lead tolerance remain unchanged.
 
 ## Instrument matrix
 

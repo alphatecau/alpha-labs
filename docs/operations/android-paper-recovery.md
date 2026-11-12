@@ -10,7 +10,7 @@ python -c 'import sqlite3,sys; print("Python",sys.version.split()[0],"SQLite",sq
 
 The recovery command takes read-only file snapshots and prints the canonical paths, owner binding, event counts, chain digests, replay results, cash, fees, positions and backup lineage. An exact fill-history match or valid prefix must be established. The two-fill floor catches the previously observed incorrect empty-path selection. A file with an active writer or SQLite sidecar requires a cleanly stopped snapshot. Offline valuation uses the last recorded simulated fills. An independent checkpoint comparison is reported as NOT TESTED unless separately held sequence and digest are supplied.
 
-The opt-in live smoke uses three public Coinbase books and a disposable working journal. It prints source and receipt times and simulates a small buy and sell per pair when all books are fresh. The two historical files are outside its write paths. Save the output with the candidate Git SHA and device version. A quote failure reports simulated execution as NOT TESTED.
+The opt-in live smoke uses three public Coinbase books and a disposable working journal. It prints source and receipt times and simulates a small buy and sell per pair when all books are fresh. The two historical files are outside its write paths. Retain detailed provider and journal output privately with the candidate Git SHA and device version. A quote failure reports simulated execution as NOT TESTED.
 
 ## Prepare a working copy
 

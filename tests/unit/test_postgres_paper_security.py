@@ -2,7 +2,9 @@ import unittest
 import hashlib
 
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
-from alpha_lab.research.postgres_paper_security import PostgresPaperOwnership, PostgresIdentityLimiter, SCHEMA
+from alpha_lab.research.postgres_paper_security import (
+    PostgresPaperOwnership, PostgresIdentityLimiter, RateLimitExceeded, RateLimitUnavailable, SCHEMA,
+)
 
 
 class FakeConnection:
@@ -20,12 +22,15 @@ class FakeConnection:
             self.state["owners"][args] = False
         elif sql.startswith("SELECT active"):
             self.row = (self.state["owners"][args],) if args in self.state["owners"] else None
-        elif sql.startswith("INSERT INTO identity_rate_limit"):
-            key, bucket = args
-            old_bucket, count = self.state["limits"].get(key, (None, 0))
-            count = count + 1 if old_bucket == bucket else 1
-            self.state["limits"][key] = (bucket, count)
-            self.row = (count,)
+        elif "INSERT INTO public.identity_rate_limit" in sql:
+            key, bucket, window, limit = args
+            old_bucket, count = self.state["limits"].get(key, (bucket, 0))
+            if bucket < old_bucket or (bucket == old_bucket and count >= limit):
+                self.row = None
+            else:
+                count = count + 1 if old_bucket == bucket else 1
+                self.state["limits"][key] = (bucket, count)
+                self.row = (count,)
         else:
             raise AssertionError(sql)
     def fetchone(self): return self.row
@@ -52,11 +57,20 @@ class PostgresSecurityContractTests(unittest.TestCase):
         limiter = PostgresIdentityLimiter(self.connect, limit=2, window=60, clock=lambda: now[0])
         self.assertTrue(limiter.allow(self.owner.issuer, self.owner.subject))
         self.assertTrue(limiter.allow(self.owner.issuer, self.owner.subject))
-        with self.assertRaises(PermissionError): limiter.allow(self.owner.issuer, self.owner.subject)
+        with self.assertRaises(RateLimitExceeded): limiter.allow(self.owner.issuer, self.owner.subject)
         self.assertTrue(limiter.allow(self.other.issuer, self.other.subject))
         now[0] = 180
         self.assertTrue(limiter.allow(self.owner.issuer, self.owner.subject))
-        self.assertTrue(any("ON CONFLICT(identity) DO UPDATE" in sql for sql in self.state["sql"]))
+        self.assertTrue(any("ON CONFLICT (identity) DO UPDATE" in sql for sql in self.state["sql"]))
+
+    def test_commit_failure_does_not_admit_request(self):
+        class CommitFailure(FakeConnection):
+            def __exit__(self, *args):
+                raise OSError("synthetic commit failure")
+
+        limiter = PostgresIdentityLimiter(lambda: CommitFailure(self.state), clock=lambda: 120)
+        with self.assertRaises(RateLimitUnavailable):
+            limiter.allow_owner("oidc_" + "a" * 64)
 
     def test_owner_id_lookup_tracks_current_authorization(self):
         registry = PostgresPaperOwnership(self.connect)

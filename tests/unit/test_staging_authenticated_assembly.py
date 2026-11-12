@@ -7,7 +7,7 @@ class AssemblyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             assemble(verify_token=lambda t: None, ownership=object(),
                      principal_factory=lambda **kw: kw, state_store=object(),
-                     session_connect=lambda: None, tenant_connect=lambda **kw: None,
+                     session_connect=lambda: None, tenant_connect=lambda **kw: None, rate_limiter=None,
                      environ={})
     def test_missing_confidential_secret_denied(self):
         config={"AUTH0_ISSUER":"https://tenant.auth0.com/",
@@ -17,7 +17,7 @@ class AssemblyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             assemble(verify_token=lambda t: None, ownership=object(),
                      principal_factory=lambda **kw: kw, state_store=object(),
-                     session_connect=lambda: None, tenant_connect=lambda **kw: None,
+                     session_connect=lambda: None, tenant_connect=lambda **kw: None, rate_limiter=None,
                      environ=config)
 
 if __name__=="__main__": unittest.main()

@@ -5,14 +5,15 @@ ownership, rate limits, and outbound fixed-origin TLS transport are injected.
 No Auth0 callback, database access, or trade execution is implemented here.
 """
 import json
+from alpha_lab.research.postgres_paper_security import RateLimitExceeded, RateLimitUnavailable
 from deployment.bff_session_bridge import SessionOwnershipVerifier
 from deployment.trusted_site_relay import TrustedSiteRelay
 
 
 class ResearchDashboardBFF:
     def __init__(self, *, relay):
-        if not isinstance(relay, TrustedSiteRelay):
-            raise ValueError("trusted relay required")
+        if not isinstance(relay, TrustedSiteRelay) or not isinstance(relay.verify_session, SessionOwnershipVerifier):
+            raise ValueError("trusted relay with a shared-limited session verifier required")
         self.relay = relay
 
     def __call__(self, env, start_response):
@@ -42,6 +43,10 @@ class ResearchDashboardBFF:
             return reply("404 Not Found", {"error": "unavailable"})
         try:
             result = self.relay.fetch(env.get("HTTP_COOKIE", ""), resource)
+        except RateLimitExceeded:
+            return reply("429 Too Many Requests", {"error": "rate_limited"})
+        except RateLimitUnavailable:
+            return reply("503 Service Unavailable", {"error": "research_unavailable"})
         except PermissionError:
             return reply("401 Unauthorized", {"error": "authentication_required"})
         except Exception:

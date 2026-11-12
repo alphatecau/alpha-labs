@@ -5,7 +5,6 @@ factory. No connection strings, migrations or deployment are performed here.
 """
 import hashlib
 import re
-import time
 
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 
@@ -78,29 +77,73 @@ class PostgresPaperOwnership:
         return True
 
 
+class RateLimitExceeded(PermissionError):
+    """The shared bucket has no remaining allowance."""
+
+
+class RateLimitUnavailable(PermissionError):
+    """The shared store could not confirm an admission."""
+
+
 class PostgresIdentityLimiter:
+    _ACCOUNT = """
+        INSERT INTO public.identity_rate_limit AS quota (identity, bucket, count)
+        VALUES (%s, COALESCE(%s::bigint,
+            floor(extract(epoch FROM statement_timestamp()) / %s::bigint)::bigint), 1)
+        ON CONFLICT (identity) DO UPDATE SET
+            bucket = EXCLUDED.bucket,
+            count = CASE WHEN quota.bucket = EXCLUDED.bucket THEN quota.count + 1 ELSE 1 END
+        WHERE quota.bucket < EXCLUDED.bucket
+           OR (quota.bucket = EXCLUDED.bucket AND quota.count < %s)
+        RETURNING quota.count
+    """
+
     def __init__(self, connect, *, limit=30, window=60, clock=None):
-        if not callable(connect) or type(limit) is not int or limit < 1 or type(window) is not int or window < 1:
+        if (not callable(connect) or type(limit) is not int or not 1 <= limit < 2**63
+                or type(window) is not int or not 1 <= window < 2**63
+                or (clock is not None and not callable(clock))):
             raise ValueError("Valid shared limiter configuration required")
         self._connect, self.limit, self.window = connect, limit, window
-        self.clock = clock or time.time
+        self.clock = clock
 
     def allow(self, issuer, subject):
-        identity = _identity(issuer, subject)
-        bucket = int(self.clock()) // self.window
+        return self._allow(_identity(issuer, subject))
+
+    def allow_owner(self, owner):
+        """Use the owner from a verified, currently authorised BFF session."""
+        if not isinstance(owner, str) or not re.fullmatch(r"oidc_[a-f0-9]{64}", owner):
+            raise PermissionError("Invalid verified identity")
+        return self._allow("research_bff:" + owner[5:])
+
+    def _allow(self, identity):
         try:
+            # Normal callers share the database clock. A test clock can exercise rollover.
+            bucket = None if self.clock is None else int(self.clock()) // self.window
             with self._connect() as conn:
                 with conn.cursor() as cur:
-                    cur.execute("INSERT INTO identity_rate_limit(identity,bucket,count) VALUES(%s,%s,1) "
-                                "ON CONFLICT(identity) DO UPDATE SET "
-                                "count=CASE WHEN identity_rate_limit.bucket=EXCLUDED.bucket "
-                                "THEN identity_rate_limit.count+1 ELSE 1 END, bucket=EXCLUDED.bucket "
-                                "RETURNING count", (identity, bucket))
+                    cur.execute(self._ACCOUNT, (identity, bucket, self.window, self.limit))
                     row = cur.fetchone()
-            if row is None or not isinstance(row[0], int) or row[0] > self.limit:
-                raise PermissionError("Rate limit exceeded")
-            return True
-        except PermissionError:
-            raise
         except Exception as exc:
-            raise PermissionError("Shared rate limiter unavailable") from exc
+            raise RateLimitUnavailable("Shared rate limiter unavailable") from exc
+        if row is None:
+            raise RateLimitExceeded("Rate limit exceeded")
+        if len(row) != 1 or type(row[0]) is not int or not 1 <= row[0] <= self.limit:
+            raise RateLimitUnavailable("Shared rate limiter unavailable")
+        return True
+
+    def ready(self):
+        """Check the dedicated limiter login and its required grants without writing."""
+        with self._connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT session_user = current_user AND rolcanlogin
+                           AND NOT (rolsuper OR rolbypassrls OR rolcreaterole OR rolcreatedb OR rolreplication)
+                           AND NOT EXISTS (SELECT 1 FROM pg_catalog.pg_auth_members WHERE member = r.oid)
+                           AND NOT has_schema_privilege(current_user, 'public', 'CREATE')
+                           AND has_table_privilege(current_user, 'public.identity_rate_limit', 'SELECT')
+                           AND has_table_privilege(current_user, 'public.identity_rate_limit', 'INSERT')
+                           AND has_table_privilege(current_user, 'public.identity_rate_limit', 'UPDATE')
+                           AND NOT has_table_privilege(current_user, 'public.identity_rate_limit', 'DELETE,TRUNCATE')
+                    FROM pg_catalog.pg_roles AS r WHERE rolname = current_user
+                """)
+                return cur.fetchone() == (True,)

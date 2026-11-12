@@ -4,12 +4,11 @@ import tempfile
 import unittest
 from unittest.mock import Mock
 
-from deployment.account_role_research_reader import AccountRoleResearchReader
-
 from alpha_lab.research.oidc_durable_store import DurableOIDCStore
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
-from alpha_lab.research.identity_rate_limit import SQLiteIdentityLimiter
+from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter
+from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.bff_session_bridge import SessionOwnershipVerifier
 from deployment.trusted_site_relay import TrustedSiteRelay
 from deployment.research_dashboard_bff import ResearchDashboardBFF
@@ -28,7 +27,8 @@ class BFFBoundaryTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.sessions = DurableOIDCStore(self.temp.name + "/sessions.sqlite")
         self.ownership = PaperOwnershipRegistry(self.temp.name + "/owners.sqlite")
-        self.limiter = SQLiteIdentityLimiter(self.temp.name + "/limiter.sqlite", limit=20, window=60)
+        self.limiter = Mock(spec=PostgresIdentityLimiter)
+        self.limiter.allow_owner.return_value = True
         verifier = SessionOwnershipVerifier(sessions=self.sessions, ownership=self.ownership, limiter=self.limiter)
         secret = "synthetic-only-" + "z" * 48
         api = ResearchReadOnlyAPI(reader=Mock(spec=AccountRoleResearchReader, wraps=Reader()), secret=secret)
@@ -53,7 +53,6 @@ class BFFBoundaryTests(unittest.TestCase):
     def tearDown(self):
         self.sessions.close()
         self.ownership.close()
-        self.limiter.close()
         self.temp.cleanup()
 
     def request(self, cookie="", *, path="/api/research/runs", method="GET", scheme="https", query="", extra=None):

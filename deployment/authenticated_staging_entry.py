@@ -10,8 +10,9 @@ from deployment.verified_proxy_ingress import VerifiedProxyIngress
 
 
 def create_application(*, environ, ownership, principal_factory, state_connect,
-                       session_connect, tenant_connect, trusted_peer_cidrs,
-                       readiness_check, verifier_factory=None):
+                       session_connect, tenant_connect, rate_limit_connect, trusted_peer_cidrs,
+                       readiness_check, verifier_factory=None, rate_limit_requests=30,
+                       rate_limit_window=60):
     """Build an authenticated, proxy-guarded app or fail startup."""
     if not callable(readiness_check):
         raise ValueError("independent dependency readiness check required")
@@ -25,7 +26,9 @@ def create_application(*, environ, ownership, principal_factory, state_connect,
     app = build_authenticated_application(
         environ=environ, ownership=ownership, principal_factory=principal_factory,
         state_connect=state_connect, session_connect=session_connect,
-        tenant_connect=tenant_connect, verifier_factory=verifier_factory)
+        tenant_connect=tenant_connect, verifier_factory=verifier_factory,
+        rate_limit_connect=rate_limit_connect, rate_limit_requests=rate_limit_requests,
+        rate_limit_window=rate_limit_window)
 
     def route(env, respond):
         path = env.get("PATH_INFO", "")
@@ -34,7 +37,7 @@ def create_application(*, environ, ownership, principal_factory, state_connect,
             return _reply(respond, "200 OK", {"status": "alive", "authenticated_ready": False})
         if path == "/readyz" and method == "GET":
             try:
-                if readiness_check() is not True:
+                if readiness_check() is not True or app.rate_limiter.ready() is not True:
                     raise RuntimeError("dependencies unavailable")
             except Exception:
                 return _reply(respond, "503 Service Unavailable",

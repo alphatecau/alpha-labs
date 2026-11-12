@@ -5,6 +5,7 @@ These tests use no real Auth0 tenant, credentials or database.
 import unittest
 from unittest.mock import Mock
 
+from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.staging_authenticated_bff import StagingResearchBFF
 
@@ -16,10 +17,13 @@ class ExplodingDependency:
 
 class StagingBoundaryTests(unittest.TestCase):
     def setUp(self):
+        limiter = Mock(spec=PostgresIdentityLimiter)
+        limiter.allow_owner.return_value = True
         self.app = StagingResearchBFF(
             ExplodingDependency(), ExplodingDependency(),
             ExplodingDependency(), Mock(spec=AccountRoleResearchReader, wraps=ExplodingDependency()),
-            origin="https://staging.example", authorize_owner=lambda owner: True
+            origin="https://staging.example", rate_limiter=limiter,
+            authorize_owner=lambda owner: True
         )
 
     def request(self, path, method="GET", **extra):

@@ -3,12 +3,12 @@ import tempfile
 import unittest
 from unittest.mock import Mock
 
-from deployment.account_role_research_reader import AccountRoleResearchReader
-
 from alpha_lab.research.oidc_durable_store import DurableOIDCStore
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 from alpha_lab.research.identity_rate_limit import SQLiteIdentityLimiter
+from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter
+from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.bff_session_bridge import SessionOwnershipVerifier
 from deployment.trusted_site_relay import TrustedSiteRelay
 from deployment.research_readonly_api import ResearchReadOnlyAPI
@@ -26,7 +26,8 @@ class TwoUserBridgeTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.sessions = DurableOIDCStore(self.tmp.name + "/sessions.sqlite", now=lambda: 1000)
         self.owners = PaperOwnershipRegistry(self.tmp.name + "/owners.sqlite")
-        self.limiter = SQLiteIdentityLimiter(self.tmp.name + "/limits.sqlite", limit=20, window=60, clock=__import__("time").time)
+        self.limiter = Mock(spec=PostgresIdentityLimiter)
+        self.limiter.allow_owner.return_value = True
         self.verify = SessionOwnershipVerifier(sessions=self.sessions, ownership=self.owners, limiter=self.limiter)
         self.secret = "test-only-secret-" + "x" * 48
         self.reader = SyntheticReader()
@@ -57,7 +58,6 @@ class TwoUserBridgeTests(unittest.TestCase):
     def tearDown(self):
         self.sessions.close()
         self.owners.close()
-        self.limiter.close()
         self.tmp.cleanup()
 
     def test_two_users_receive_disjoint_research(self):
@@ -80,6 +80,12 @@ class TwoUserBridgeTests(unittest.TestCase):
     def test_no_write_routes(self):
         with self.assertRaises(ValueError):
             self.relay.fetch(self.cookie(self.sid_a), "orders")
+
+    def test_local_sqlite_limiter_rejected_for_bff(self):
+        local = SQLiteIdentityLimiter(self.tmp.name + "/local.sqlite")
+        self.addCleanup(local.close)
+        with self.assertRaises(ValueError):
+            SessionOwnershipVerifier(sessions=self.sessions, ownership=self.owners, limiter=local)
 
 
 if __name__ == "__main__":

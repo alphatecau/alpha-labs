@@ -5,6 +5,7 @@ No Auth0, PostgreSQL, network, or Render resources are accessed.
 import unittest
 from unittest.mock import Mock
 
+from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.staging_authenticated_bff import StagingResearchBFF
 
@@ -17,9 +18,12 @@ class NeverCall:
 class HttpBoundaryTests(unittest.TestCase):
     def setUp(self):
         sentinel = NeverCall()
+        limiter = Mock(spec=PostgresIdentityLimiter)
+        limiter.allow_owner.return_value = True
         self.app = StagingResearchBFF(
             sentinel, sentinel, sentinel, Mock(spec=AccountRoleResearchReader, wraps=sentinel),
-            origin="https://staging.example", authorize_owner=lambda owner: True)
+            origin="https://staging.example", rate_limiter=limiter,
+            authorize_owner=lambda owner: True)
 
     def request(self, path, method="GET", **kwargs):
         responses = []

@@ -19,7 +19,7 @@ class BootstrapTests(unittest.TestCase):
             build_authenticated_application(
                 environ=self.env, ownership=None, principal_factory=lambda **k: k,
                 state_connect=self.connect, session_connect=self.connect,
-                tenant_connect=self.connect,
+                tenant_connect=self.connect, rate_limit_connect=self.connect,
                 verifier_factory=lambda *a: self.fail("unexpected verifier fetch"))
 
     def test_missing_connection_denied_before_verifier_fetch(self):
@@ -32,7 +32,22 @@ class BootstrapTests(unittest.TestCase):
             build_authenticated_application(
                 environ=self.env, ownership=Ownership(), principal_factory=lambda **k: k,
                 state_connect=None, session_connect=self.connect,
-                tenant_connect=self.connect,
+                tenant_connect=self.connect, rate_limit_connect=self.connect,
+                verifier_factory=lambda *a: self.fail("unexpected verifier fetch"))
+
+    def test_missing_shared_limiter_denied_before_verifier_fetch(self):
+        class Ownership:
+            def require_owner_id(self, owner, account):
+                return True
+
+            def require(self, principal, scope):
+                return True
+
+        with self.assertRaisesRegex(ValueError, "shared limiter configuration"):
+            build_authenticated_application(
+                environ=self.env, ownership=Ownership(), principal_factory=lambda **k: k,
+                state_connect=self.connect, session_connect=self.connect,
+                tenant_connect=self.connect, rate_limit_connect=None,
                 verifier_factory=lambda *a: self.fail("unexpected verifier fetch"))
 
     def test_verified_dependencies_construct_wsgi_without_network(self):
@@ -44,7 +59,7 @@ class BootstrapTests(unittest.TestCase):
         app = build_authenticated_application(
             environ=self.env, ownership=Ownership(), principal_factory=lambda **k: k,
             state_connect=self.connect, session_connect=self.connect,
-            tenant_connect=self.connect, verifier_factory=lambda *a: lambda token: None)
+            tenant_connect=self.connect, rate_limit_connect=self.connect, verifier_factory=lambda *a: lambda token: None)
         captured = []
         body = b"".join(app({"PATH_INFO": "/healthz", "REQUEST_METHOD": "GET"},
                             lambda status, headers: captured.append(status)))
@@ -64,7 +79,7 @@ class BootstrapTests(unittest.TestCase):
             build_authenticated_application(
                 environ=env, ownership=Ownership(), principal_factory=lambda **k: k,
                 state_connect=self.connect, session_connect=self.connect,
-                tenant_connect=self.connect, verifier_factory=lambda *a: lambda token: None)
+                tenant_connect=self.connect, rate_limit_connect=self.connect, verifier_factory=lambda *a: lambda token: None)
 
     def test_untrusted_verifier_fails_closed(self):
         class Ownership:
@@ -76,7 +91,7 @@ class BootstrapTests(unittest.TestCase):
             build_authenticated_application(
                 environ=self.env, ownership=Ownership(), principal_factory=lambda **k: k,
                 state_connect=self.connect, session_connect=self.connect,
-                tenant_connect=self.connect, verifier_factory=lambda *a: None)
+                tenant_connect=self.connect, rate_limit_connect=self.connect, verifier_factory=lambda *a: None)
 
     def test_invalid_principal_factory_fails_before_verifier(self):
         class Ownership:
@@ -88,7 +103,7 @@ class BootstrapTests(unittest.TestCase):
             build_authenticated_application(
                 environ=self.env, ownership=Ownership(), principal_factory=None,
                 state_connect=self.connect, session_connect=self.connect,
-                tenant_connect=self.connect,
+                tenant_connect=self.connect, rate_limit_connect=self.connect,
                 verifier_factory=lambda *a: self.fail("unexpected verifier fetch"))
 
     def test_authenticated_routes_not_public_without_session(self):
@@ -100,7 +115,7 @@ class BootstrapTests(unittest.TestCase):
         app = build_authenticated_application(
             environ=self.env, ownership=Ownership(), principal_factory=lambda **k: k,
             state_connect=self.connect, session_connect=self.connect,
-            tenant_connect=self.connect, verifier_factory=lambda *a: lambda token: None)
+            tenant_connect=self.connect, rate_limit_connect=self.connect, verifier_factory=lambda *a: lambda token: None)
         for path in ("/api/v1/research/runs", "/api/v1/research/summary"):
             with self.subTest(path=path):
                 status = []

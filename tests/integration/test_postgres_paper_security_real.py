@@ -61,7 +61,7 @@ class RealPostgresSecurityTests(unittest.TestCase):
         self.assertEqual(sum(outcomes), limit)
         with self.connect() as conn:
             count = conn.execute("SELECT count FROM identity_rate_limit").fetchone()[0]
-        self.assertEqual(count, workers)
+        self.assertEqual(count, limit)
 
     def test_explicit_migration_is_idempotent_and_verifiable(self):
         apply_schema(self.connect)

@@ -13,7 +13,7 @@ from disposable_pg_guard import require_disposable_ci_database
 from alpha_lab.research.oidc_durable_store import DurableOIDCStore
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
-from alpha_lab.research.identity_rate_limit import SQLiteIdentityLimiter
+from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter, SCHEMA
 from deployment.bff_session_bridge import SessionOwnershipVerifier
 from deployment.trusted_site_relay import TrustedSiteRelay
 from deployment.research_dashboard_bff import ResearchDashboardBFF
@@ -30,7 +30,9 @@ class FullChainPostgresTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.sessions = DurableOIDCStore(self.tmp.name + "/sessions.sqlite")
         self.owners = PaperOwnershipRegistry(self.tmp.name + "/owners.sqlite")
-        self.limiter = SQLiteIdentityLimiter(self.tmp.name + "/limits.sqlite", limit=30, window=60)
+        with psycopg.connect(self.dsn) as conn:
+            conn.execute(SCHEMA)
+        self.limiter = PostgresIdentityLimiter(lambda: psycopg.connect(self.dsn), limit=30, window=60)
         self.principals = [VerifiedPrincipal(subject=s, issuer="https://issuer.example/")
                            for s in ("alice", "bob")]
         verifier = SessionOwnershipVerifier(sessions=self.sessions, ownership=self.owners, limiter=self.limiter)
@@ -79,13 +81,13 @@ class FullChainPostgresTests(unittest.TestCase):
 
     def tearDown(self):
         if hasattr(self, "admin"):
+            self.admin.execute("DROP TABLE public.identity_rate_limit, public.paper_ownership")
             self.admin.execute("DROP TABLE IF EXISTS public.research_run_registry")
             # Disposable test database only: remove grants before dropping role.
             self.admin.execute("DROP OWNED BY alpha_chain_reader")
             self.admin.execute("DROP ROLE IF EXISTS alpha_chain_reader")
         self.sessions.close()
         self.owners.close()
-        self.limiter.close()
         self.tmp.cleanup()
 
     def request(self, cookie="", path="/api/research/runs", method="GET"):

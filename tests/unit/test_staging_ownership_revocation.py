@@ -7,6 +7,7 @@ from unittest.mock import Mock
 
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
+from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.postgres_opaque_sessions import PostgresOpaqueSessions
 from deployment.staging_authenticated_bff import StagingResearchBFF
@@ -32,8 +33,10 @@ class OwnershipRevocationTests(unittest.TestCase):
         self.folder.cleanup()
 
     def build(self, authorize):
+        limiter = Mock(spec=PostgresIdentityLimiter)
+        limiter.allow_owner.return_value = True
         return StagingResearchBFF(object(), object(), self.sessions, self.reader,
-                                 origin="https://staging.example", authorize_owner=authorize)
+                                 origin="https://staging.example", rate_limiter=limiter, authorize_owner=authorize)
 
     def request(self, path="/api/v1/research/runs", **extra):
         response = {}

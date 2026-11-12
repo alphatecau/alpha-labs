@@ -7,15 +7,21 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation
 
 def D(value):
+    if isinstance(value, bool):
+        raise ValueError("Boolean is not an accounting number")
     try:
         x=Decimal(str(value))
     except (InvalidOperation,TypeError,ValueError) as exc:
         raise ValueError("Invalid numeric ledger value") from exc
     if not x.is_finite():
         raise ValueError("Nonfinite ledger value")
+    if len(x.as_tuple().digits) > 28:
+        raise ValueError("Excessive decimal precision")
+    if x != 0 and abs(x.adjusted()) > 18:
+        raise ValueError("Accounting magnitude out of bounds")
     return x
 
-def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bps="0"):
+def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bps="0", require_fill_ids=False):
     cash=D(starting_cash)
     if cash<=0:raise ValueError("Invalid initial cash")
     bps=D(liquidation_bps)
@@ -27,6 +33,8 @@ def reconstruct(orders, closing_prices, *, starting_cash="10000", liquidation_bp
     for index,order in enumerate(orders):
         if "fee_currency" in order:
             raise ValueError("Fee currency unsupported by single-currency ledger")
+        if require_fill_ids and "fill_id" not in order:
+            raise ValueError("Missing required fill identifier")
         if "fill_id" in order:
             fill_id=order["fill_id"]
             if not isinstance(fill_id,str) or not fill_id.strip():

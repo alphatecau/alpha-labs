@@ -18,6 +18,7 @@ from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.owner_paper_bff import OwnerPaperBFF, create_owner_paper_application
 from deployment.postgres_paper_checkpoints import PostgresPaperCheckpoints
 from deployment.staging_authenticated_bff import StagingResearchBFF
+from test_trade_intelligence import candle_batch, rules
 
 OWNER = "oidc_" + "a" * 64
 OTHER = "oidc_" + "b" * 64
@@ -105,6 +106,44 @@ class OwnerPaperBoundaryTests(unittest.TestCase):
             OwnerPaperBFF(self.research, self.paper, owner_id=OTHER, csrf_key=KEY)
         with self.assertRaises(RuntimeError):
             create_app()
+
+    def test_recommendations_reuse_owner_quota_and_never_mutate_the_paper_journal(self):
+        candles = Mock(timeframe="4h")
+        candles.snapshot.return_value = (
+            {s: candle_batch(s, self.now) for s in PRODUCTS}, {s: rules(s) for s in PRODUCTS}, "PUBLIC")
+        self.app.candle_feed = candles
+        for sid, status in ((None, 401), ("other-session", 403)):
+            self.assertEqual(self.request("recommendations", sid=sid, HTTP_X_OWNER_ID=OWNER)[0], status)
+            self.assertEqual(self.request("/owner-paper/intelligence.js", sid=sid)[0], status)
+        candles.snapshot.assert_not_called()
+        self.limiter.allow_owner.assert_not_called()
+        self.assertEqual(self.request("recommendations", {"symbol": "BTC-USD"})[0], 405)
+        self.assertEqual(self.request("recommendations", QUERY_STRING="symbol=BTC-USD")[0], 400)
+        before = self.paper._state_commitment()
+        self.paper.on_market_update = Mock(side_effect=AssertionError("read route must not execute"))
+        code, headers, response = self.request("recommendations")
+        self.assertEqual(code, 200)
+        self.assertEqual(headers["Cache-Control"], "no-store")
+        data = json.loads(response)
+        self.assertEqual(data["decision"], "NO TRADE")
+        self.assertEqual(data["portfolio_risk"]["status"], "RECONCILED")
+        self.assertEqual([m["product"] for m in data["markets"]], list(PRODUCTS))
+        self.assertFalse(data["automated_paper_execution"])
+        self.assertTrue(self.paper.runtime.ledger.halted)
+        self.assertEqual(self.paper._state_commitment(), before)
+        self.limiter.allow_owner.assert_called_once_with(OWNER)
+        self.limiter.allow_owner.side_effect = RateLimitExceeded("quota")
+        self.assertEqual(self.request("recommendations")[0], 429)
+
+    def test_recommendation_recovery_uncertainty_remains_halted(self):
+        self.app.candle_feed = Mock(timeframe="4h")
+        self.app.candle_feed.snapshot.return_value = ({}, {}, "PUBLIC")
+        self.checkpoints.load.side_effect = OSError("checkpoint authority unavailable")
+        code, _, body = self.request("recommendations")
+        self.assertEqual(code, 200)
+        self.assertEqual(json.loads(body)["portfolio_risk"]["status"], "UNAVAILABLE")
+        self.assertTrue(self.paper.runtime.ledger.halted)
+        self.assertTrue(self.paper.fault)
 
     def test_post_requires_same_origin_session_bound_csrf_and_bounded_json(self):
         for headers in ({"HTTP_ORIGIN": "https://attacker.example"}, {"HTTP_X_ALPHA_CSRF": ""},

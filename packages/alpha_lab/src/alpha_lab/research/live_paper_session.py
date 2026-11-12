@@ -18,6 +18,7 @@ from alpha_lab.research.paper_checkpoint import read_state_checkpoint
 from alpha_lab.research.paper_market import COINBASE_MARKET, DEFAULT_COSTS, PaperCosts, PaperMarket
 from alpha_lab.research.paper_risk import PaperRiskLimits, authorise_simulated_order
 from alpha_lab.research.paper_runtime import PaperRuntime
+from alpha_lab.research.trade_risk import ResearchRisk
 
 LIMITS = PaperRiskLimits()
 RISK_POLICY_VERSION = 2
@@ -317,10 +318,7 @@ class LivePaperSession:
             raise ValueError("independent reconciliation mismatch")
         return account
 
-    def _refresh(self, now, quotes, healthy):
-        guard = self._guard()
-        if self.fault:
-            raise PaperRejection("LEDGER_HALT", "Ledger requires recovery", 503)
+    def _books_reconciled(self, now, quotes, healthy):
         symbols = set(self.market.symbols)
         seen = set()
         for fill in reversed(self.runtime.events):
@@ -335,9 +333,15 @@ class LivePaperSession:
                 healthy[symbol] = False
             if seen == symbols:
                 break
-        if (set(quotes) != symbols or set(healthy) != symbols
-                or not all(healthy[s] is True and quotes[s].symbol == s
-                           and self.market.accepts(quotes[s], now) for s in symbols)):
+        return (set(quotes) == symbols and set(healthy) == symbols
+                and all(healthy[s] is True and quotes[s].symbol == s
+                        and self.market.accepts(quotes[s], now) for s in symbols))
+
+    def _refresh(self, now, quotes, healthy):
+        guard = self._guard()
+        if self.fault:
+            raise PaperRejection("LEDGER_HALT", "Ledger requires recovery", 503)
+        if not self._books_reconciled(now, quotes, healthy):
             if guard["enabled"]:
                 self._set_control(False, "MARKET_DATA_HALT")
             return None
@@ -646,6 +650,50 @@ class LivePaperSession:
                                   "checkpoint_sequence": self._last_checkpoint[0] if self._last_checkpoint else None,
                                   "journal_sequence": self.runtime.ledger.sequence}
             return result
+
+    def recommendation_context(self, now, quotes, healthy):
+        """Reconcile a protected, causal research snapshot without changing the journal."""
+        with self.lock:
+            if self.fault or self.checkpoint_store is None:
+                return None
+            try:
+                if (not self._books_reconciled(now, quotes, dict(healthy))
+                        or any(q.exchange_at > now for q in quotes.values())):
+                    return None
+                with self.runtime.journal.transaction(read_only=True):
+                    self._verify_checkpoint()
+                    guard = self._guard()
+                    if bool(guard["enabled"]) == self.runtime.ledger.halted:
+                        raise ValueError("runtime and durable guard disagree")
+                    marks = {symbol: quote.bid for symbol, quote in quotes.items()}
+                    account = self._account(marks)
+                    nav = account["nav"]
+                    day = now.date().isoformat()
+                    day_start = Decimal(guard["day_start"])
+                    if guard["day"] and day < guard["day"]:
+                        raise ValueError("UTC risk clock moved backwards")
+                    if guard["day"] != day:
+                        day_start = max(Decimal(guard["last_nav"]), nav)
+                    peak = max(Decimal(guard["peak"]), nav)
+                    halt = None
+                    if guard["reason"] not in ("ARMED", "STARTUP_HALTED"):
+                        halt = guard["reason"]
+                    if guard["daily_breach"] == day or day_start - nav >= day_start * LIMITS.daily_loss_halt_pct:
+                        halt = "DAILY_LOSS_HALT"
+                    elif peak - nav >= peak * LIMITS.drawdown_halt_pct:
+                        halt = "DRAWDOWN_HALT"
+                    pending = self.db.execute(
+                        "SELECT 1 FROM paper_orders WHERE status IN ('PENDING','PARTIALLY_FILLED') LIMIT 1"
+                    ).fetchone()
+                    if pending and halt is None:
+                        halt = "PENDING_PAPER_ORDERS"
+                    exposure = tuple((s, quantity * marks[s]) for s, quantity in account["positions"].items()
+                                     if quantity)
+                    return ResearchRisk(account["cash"], nav, self.runtime.ledger.starting_cash, peak,
+                                        day_start, self._open_risk(self._lots(), quotes), exposure, halt)
+            except (ValueError, ArithmeticError, sqlite3.Error):
+                self.fail_closed()
+                return None
 
     def checkpoint_history(self):
         if self.checkpoint_store is None:

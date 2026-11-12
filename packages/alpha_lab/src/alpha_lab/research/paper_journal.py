@@ -119,9 +119,9 @@ class PaperJournal:
         return actual_head
 
     @contextmanager
-    def transaction(self):
-        """Keep journal events and caller-owned control writes in one SQLite commit."""
-        self.connection.execute("BEGIN IMMEDIATE")
+    def transaction(self, *, read_only=False):
+        """Keep journal operations in a consistent SQLite snapshot."""
+        self.connection.execute("BEGIN" if read_only else "BEGIN IMMEDIATE")
         self._transaction_thread = get_ident()
         try:
             yield

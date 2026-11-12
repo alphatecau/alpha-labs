@@ -27,6 +27,7 @@ from deployment.staging_authenticated_bff import StagingResearchBFF
 from deployment.verified_proxy_ingress import VerifiedProxyIngress
 from protected_paper_recovery import DisposablePostgres
 from test_paper_commit_boundaries import FixedFeed, NOW
+from test_trade_intelligence import candle_batch, rules
 
 
 class BrowserFeed(FixedFeed):
@@ -68,11 +69,16 @@ def browser_checks(chromium, origin, token, feed):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     assert page.goto(origin + "/api/v1/paper/state").status == 401
+    assert page.goto(origin + "/api/v1/paper/recommendations").status == 401
     context.add_cookies([{"name": "__Host-alpha_session", "value": token, "url": origin,
                           "secure": True, "httpOnly": True, "sameSite": "Lax"}])
     page.on("dialog", lambda dialog: dialog.accept())
     assert page.goto(origin + "/owner-paper/").status == 200
     expect(page.locator("#risk-status")).to_have_text("HALTED")
+    expect(page.locator("#intelligence-status")).to_have_text("NO TRADE")
+    expect(page.locator("#intelligence-markets")).to_contain_text("BTC-USD")
+    expect(page.locator("#intelligence-markets")).to_contain_text("Replay data rejected")
+    expect(page.locator("#intelligence-markets > article")).to_have_count(3)
     assert page.evaluate("document.documentElement.scrollWidth === window.innerWidth")
     page.locator("#arm").tap()
     expect(page.locator("#risk-status")).to_have_text("ARMED · PAPER ONLY")
@@ -132,7 +138,13 @@ def verify(pg, root, executable):
         research = StagingResearchBFF(object(), object(), sessions, Mock(spec=AccountRoleResearchReader),
                                       origin=origin, rate_limiter=limiter,
                                       authorize_owner=lambda value: ownership.require_owner_id(value, "primary"))
-        owner_app = OwnerPaperBFF(research, paper, owner_id=owner, csrf_key=b"browser-fixture-csrf-key-material")
+        candles = Mock(timeframe="4h")
+        candles.snapshot.return_value = (
+            {symbol: candle_batch(symbol, NOW, source="Synthetic browser fixture")
+             for symbol in paper.market.symbols},
+            {symbol: rules(symbol) for symbol in paper.market.symbols}, "PUBLIC")
+        owner_app = OwnerPaperBFF(research, paper, owner_id=owner,
+                                  csrf_key=b"browser-fixture-csrf-key-material", candle_feed=candles)
         ingress = VerifiedProxyIngress(owner_app, origin, trusted_peer_cidrs=["127.0.0.1/32"])
 
         def fixture_proxy(env, start):

@@ -51,11 +51,11 @@ def parse_book(product, body, received):
                       bid_size=bid_size, ask_size=ask_size)
 
 
-def fetch_book(product, *, clock=lambda: datetime.now(timezone.utc), opener=None):
+def fetch_book(product, *, clock=lambda: datetime.now(timezone.utc), opener=None, timeout=HTTP_TIMEOUT_SECONDS):
     if product not in PRODUCTS:
         raise ValueError("unsupported product")
     url = f"{BASE_URL}/products/{product}/book?level=1"
-    payload = read_public_https(url, origin=BASE_URL, max_bytes=8192, timeout=HTTP_TIMEOUT_SECONDS,
+    payload = read_public_https(url, origin=BASE_URL, max_bytes=8192, timeout=timeout,
                                content_types=("application/json",), opener=opener,
                                headers={"Cache-Control": "no-cache, no-store, max-age=0"})
     return parse_book(product, decode_public_json(payload), clock())

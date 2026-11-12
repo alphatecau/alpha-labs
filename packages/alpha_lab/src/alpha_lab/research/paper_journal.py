@@ -15,18 +15,48 @@ class PaperJournal:
 
     def verify(self):
         previous = "0" * 64
+        expected_seq = 1
         for seq, prior, payload, digest in self.connection.execute(
                 "SELECT seq,previous_hash,payload,digest FROM events ORDER BY seq"):
+            if seq != expected_seq:
+                raise ValueError("journal sequence gap: HALT")
+            expected_seq += 1
             expected = sha256((previous + payload).encode()).hexdigest()
             if prior != previous or digest != expected:
                 raise ValueError("journal integrity failure: HALT")
             previous = digest
         return previous
 
-    def append(self, event):
+    def verify_checkpoint(self, *, trusted_sequence, trusted_head):
+        """Compare against a checkpoint supplied by an independent trusted channel.
+
+        The caller must authenticate and protect the checkpoint separately.
+        This method does not establish trust in the supplied values.
+        """
+        if not isinstance(trusted_sequence, int) or isinstance(trusted_sequence, bool) or trusted_sequence < 0:
+            raise ValueError("invalid trusted checkpoint: HALT")
+        if not isinstance(trusted_head, str) or len(trusted_head) != 64 or any(
+                character not in "0123456789abcdef" for character in trusted_head):
+            raise ValueError("invalid trusted checkpoint: HALT")
+        actual_head = self.verify()
+        actual_sequence = self.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+        if actual_sequence != trusted_sequence or actual_head != trusted_head:
+            raise ValueError("journal checkpoint mismatch: HALT")
+        return actual_head
+
+    def append(self, event, *, expected_seq=None, expected_head=None):
         self.connection.execute("BEGIN IMMEDIATE")
         try:
             previous = self.verify()
+            if expected_seq is not None:
+                current_seq = self.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+                if current_seq != expected_seq or previous != expected_head:
+                    raise ValueError("stale journal state: HALT")
+            order_id = event.get("order_id")
+            if order_id is not None:
+                for (existing_payload,) in self.connection.execute("SELECT payload FROM events"):
+                    if json.loads(existing_payload).get("order_id") == order_id:
+                        raise ValueError("duplicate simulated order ID: HALT")
             payload = json.dumps(event, sort_keys=True, separators=(",", ":"), allow_nan=False)
             digest = sha256((previous + payload).encode()).hexdigest()
             self.connection.execute("INSERT INTO events(previous_hash,payload,digest) VALUES(?,?,?)",

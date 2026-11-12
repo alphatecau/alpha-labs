@@ -11,6 +11,7 @@ SCHEMA = """CREATE TABLE alpha_oauth_state (
  payload jsonb NOT NULL,
  expires_at timestamptz NOT NULL
 );"""
+MAX_ACTIVE_STATES = 256
 
 class PostgresPKCEStateStore:
     def __init__(self, connect, *, clock=None):
@@ -24,10 +25,19 @@ class PostgresPKCEStateStore:
             raise ValueError("invalid state")
         if not isinstance(record,dict) or set(record) != {"nonce","verifier","created_at"}:
             raise ValueError("invalid state payload")
+        now = self.clock()
         with self.connect() as conn:
             with conn.cursor() as cur:
-                cur.execute("INSERT INTO alpha_oauth_state(digest,payload,expires_at) VALUES (%s,%s,to_timestamp(%s))",
-                            (digest,json.dumps(record),self.clock()+ttl))
+                cur.execute("SET LOCAL lock_timeout = '2s'")
+                cur.execute("SELECT pg_advisory_xact_lock(622121730)")
+                cur.execute("DELETE FROM alpha_oauth_state WHERE expires_at <= to_timestamp(%s)", (now,))
+                cur.execute("""
+                    INSERT INTO alpha_oauth_state(digest,payload,expires_at)
+                    SELECT %s,%s::jsonb,to_timestamp(%s)
+                    WHERE (SELECT COUNT(*) FROM alpha_oauth_state) < %s
+                    """, (digest, json.dumps(record), now + ttl, MAX_ACTIVE_STATES))
+                if cur.rowcount != 1:
+                    raise PermissionError("login state capacity exhausted")
 
     def consume(self,digest):
         if not isinstance(digest,str) or not re.fullmatch(r"[0-9a-f]{64}",digest):

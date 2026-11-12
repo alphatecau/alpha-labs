@@ -19,6 +19,7 @@ from alpha_lab.research.coinbase_paper_book import parse_book
 from alpha_lab.research.live_paper_session import LivePaperSession
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
 from alpha_lab.research.paper_market_feed import PaperMarketFeed
+from alpha_lab.research.paper_checkpoint import read_state_checkpoint
 from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter, PostgresPaperOwnership, SCHEMA
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.owner_paper_bff import OwnerPaperBFF
@@ -61,7 +62,7 @@ class OwnerPaperPostgresTests(unittest.TestCase):
         with ThreadPoolExecutor(3) as pool:
             self.feed.poll(pool)
         self.paper = LivePaperSession(self.directory.name, self.owner, self.feed, clock=lambda: self.now,
-                                      checkpoint_store=self.checkpoints)
+                                      checkpoint_store=self.checkpoints, provision=True)
         self.addCleanup(self.paper.close)
         self.app = self.build()
 
@@ -91,7 +92,7 @@ class OwnerPaperPostgresTests(unittest.TestCase):
         research = StagingResearchBFF(object(), object(), self.sessions, reader,
             origin="https://owner.example", rate_limiter=limiter,
             authorize_owner=lambda owner: self.ownership.require_owner_id(owner, "primary"))
-        return OwnerPaperBFF(research, self.paper, owner_id=self.owner, csrf_key=bytes(range(32)))
+        return OwnerPaperBFF(research, self.paper, owner_id=self.owner, csrf_key=bytes(reversed(range(32))))
 
     def request(self, path="state", payload=None, *, sid=None, app=None):
         sid, app = sid or self.sid, app or self.app
@@ -180,6 +181,12 @@ class OwnerPaperPostgresTests(unittest.TestCase):
                 self.checkpoints.ready()
         finally:
             self.admin.execute("REVOKE UPDATE ON public.paper_journal_checkpoints FROM alpha_owner_checkpoint")
+        self.admin.execute("GRANT UPDATE (head) ON public.paper_journal_checkpoints TO alpha_owner_checkpoint")
+        try:
+            with self.assertRaises(PermissionError):
+                self.checkpoints.ready()
+        finally:
+            self.admin.execute("REVOKE UPDATE (head) ON public.paper_journal_checkpoints FROM alpha_owner_checkpoint")
 
     def test_protected_checkpoint_rejects_deleted_committed_fill_on_restart(self):
         self.arm()
@@ -205,13 +212,42 @@ class OwnerPaperPostgresTests(unittest.TestCase):
         finally:
             recovered.close()
 
+    def test_order_cancel_is_owner_only_idempotent_and_visible_in_checkpoint_history(self):
+        self.arm()
+        intent = {**self.order(), "order_type": "LIMIT", "limit_price": "99"}
+        self.assertEqual(self.request("orders", intent)[1]["status"], "PENDING")
+        cancel = {"order_id": intent["order_id"]}
+        self.assertEqual(self.request("cancel", cancel, sid=self.other)[0], 403)
+        self.assertEqual(self.request("cancel", cancel)[1]["status"], "CANCELLED")
+        self.assertEqual(self.request("cancel", cancel)[1]["status"], "CANCELLED")
+        code, history = self.request("checkpoints")
+        self.assertEqual(code, 200)
+        latest = history["checkpoints"][0]
+        self.assertEqual((latest["sequence"], latest["head"]), self.paper._last_checkpoint)
+        self.assertEqual(self.paper.runtime.ledger.sequence, 0)
+
+    def test_stale_authority_restore_is_rejected_by_running_process_and_restart(self):
+        self.arm()
+        self.paper.control("halt")
+        self.admin.execute("DELETE FROM paper_journal_checkpoints WHERE sequence=(SELECT max(sequence) "
+                           "FROM paper_journal_checkpoints)")
+        code, response = self.request()
+        self.assertEqual((code, response["error"]), (503, "CHECKPOINT_HALT"))
+        self.paper.close()
+        with self.assertRaisesRegex(ValueError, "checkpoint mismatch"):
+            LivePaperSession(self.directory.name, self.owner, self.feed, clock=lambda: self.now,
+                             checkpoint_store=self.checkpoints)
+
     def test_concurrent_checkpoint_cas_has_one_winner_and_owner_is_immutable(self):
         barrier = threading.Barrier(2)
+        sequence, original_head = read_state_checkpoint(self.checkpoints.load(), owner=self.owner,
+                                                        secret=self.checkpoints.verification_key)
 
         def advance(head):
             barrier.wait(timeout=5)
             try:
-                self.checkpoints.record(sequence=1, head=head, expected_sequence=0, expected_head="0" * 64)
+                self.checkpoints.record(sequence=sequence + 1, head=head,
+                                        expected_sequence=sequence, expected_head=original_head)
                 return "recorded"
             except PermissionError:
                 return "rejected"

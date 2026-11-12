@@ -9,11 +9,11 @@ import hmac
 import json
 import re
 from pathlib import Path
-from threading import RLock
 from urllib.parse import urlsplit
 
 from alpha_lab.research.live_paper_api import ROUTES, _json_object, _read_body
 from alpha_lab.research.live_paper_session import LivePaperSession, PaperRejection
+from alpha_lab.research.paper_market import COINBASE_MARKET
 from alpha_lab.research.postgres_paper_security import RateLimitExceeded
 from deployment.staging_authenticated_bff import StagingResearchBFF
 from deployment.postgres_paper_checkpoints import PostgresPaperCheckpoints
@@ -23,6 +23,11 @@ _ASSETS = {"/owner-paper/": ("index.html", "text/html; charset=utf-8"),
            "/owner-paper/paper.css": ("paper.css", "text/css; charset=utf-8"),
            "/owner-paper/paper.js": ("paper.js", "text/javascript; charset=utf-8")}
 _ROOT = Path(__file__).resolve().parents[1] / "apps/sites/owner-paper"
+_OWNER_ROUTES = {**ROUTES, "/api/v1/paper/checkpoints": "GET"}
+_SIGNED_OUT = (b'<!doctype html><html lang="en"><meta charset="utf-8">'
+               b'<meta name="viewport" content="width=device-width,initial-scale=1">'
+               b'<title>Alpha Labs</title><main><h1>Signed out</h1>'
+               b'<p><a href="/auth/login">Sign in to the paper desk</a></p></main></html>')
 _STATUS = {200: "OK", 400: "Bad Request", 401: "Unauthorized", 403: "Forbidden",
            404: "Not Found", 405: "Method Not Allowed", 409: "Conflict",
            429: "Too Many Requests", 503: "Service Unavailable"}
@@ -39,23 +44,24 @@ class OwnerPaperBFF:
         if (p.scheme != "https" or not p.hostname or p.username or p.password
                 or p.path or p.query or p.fragment):
             raise ValueError("canonical HTTPS origin required")
-        if paper._guard()["account"] != owner_id:
+        if paper.owner_id != owner_id or paper.market is not COINBASE_MARKET:
             raise ValueError("paper journal must be bound to the pinned internal owner")
         if (not isinstance(paper.checkpoint_store, PostgresPaperCheckpoints)
                 or paper.checkpoint_store.owner_id != owner_id
                 or paper.checkpoint_store.ready() is not True):
             raise ValueError("separate protected checkpoint authority required for owner API")
+        if hmac.compare_digest(csrf_key, paper.checkpoint_store.verification_key):
+            raise ValueError("independent checkpoint and CSRF keys required")
         self.research, self.paper, self.owner_id = research, paper, owner_id
         self.csrf_key = csrf_key
-        self.lock = RLock()
-        self._armed_sid = None
+        self.lock = paper.lock
 
     def _csrf(self, sid):
         message = ("owner-paper-v1\0" + self.owner_id + "\0" + sid).encode()
         return hmac.new(self.csrf_key, message, hashlib.sha256).hexdigest()
 
     def _halt(self, *, fault=False):
-        self._armed_sid = None
+        self.paper._armed_session = None
         try:
             if fault:
                 self.paper.fail_closed()
@@ -70,9 +76,9 @@ class OwnerPaperBFF:
     def on_market_update(self):
         """Health watchdog also checks the session that armed this paper process."""
         with self.lock:
-            if self._armed_sid is not None:
+            if self.paper._armed_session is not None:
                 try:
-                    owner = self.research.sessions.resolve_owner(self._armed_sid)
+                    owner = self.research.sessions.resolve_owner(self.paper._armed_session)
                     if owner != self.owner_id or self.research.authorize_owner(owner) is not True:
                         raise PermissionError("paper authority revoked")
                     if self.research.rate_limiter.ready() is not True:
@@ -98,17 +104,19 @@ class OwnerPaperBFF:
 
     def __call__(self, env, respond):
         path, method = env.get("PATH_INFO", ""), env.get("REQUEST_METHOD", "")
-        if path not in ROUTES and path not in _ASSETS:
+        if path == "/owner-paper/signed-out" and method == "GET" and not env.get("QUERY_STRING"):
+            return self._reply(respond, 200, _SIGNED_OUT, "text/html; charset=utf-8")
+        if path not in _OWNER_ROUTES and path not in _ASSETS:
             # Never expose alternate paper aliases or the legacy relay factory.
             if path.startswith(("/api/v1/paper", "/api/paper", "/owner-paper")):
                 return self._reply(respond, 404, {"error": "NOT_FOUND"})
-            result = self.research(env, respond)
+            result = self.research(env, respond, login_redirect_path="/owner-paper/")
             if path == "/auth/logout" and method == "POST":
                 self.on_market_update()
             return result
         if env.get("QUERY_STRING"):
             return self._reply(respond, 400, {"error": "QUERY_FORBIDDEN"})
-        if method != (ROUTES[path] if path in ROUTES else "GET"):
+        if method != _OWNER_ROUTES.get(path, "GET"):
             return self._reply(respond, 405, {"error": "METHOD_NOT_ALLOWED"})
         sid = self.research._cookie(env, "__Host-alpha_session")
         if not sid:
@@ -121,7 +129,7 @@ class OwnerPaperBFF:
                 if self.research.authorize_owner(owner) is not True:
                     raise PermissionError("current ownership required")
             except PermissionError:
-                if sid == self._armed_sid:
+                if sid == self.paper._armed_session:
                     self._halt()
                 return self._reply(respond, 403, {"error": "OWNER_REQUIRED"})
             except Exception:
@@ -158,16 +166,21 @@ class OwnerPaperBFF:
                         raise RuntimeError("shared quota unavailable")
                 except RateLimitExceeded:
                     return self._reply(respond, 429, {"error": "RATE_LIMITED"})
-                self.on_market_update()
-                if method == "GET":
+                if not path.endswith("/cancel"):
+                    self.on_market_update()
+                if path.endswith("/checkpoints"):
+                    data = self.paper.checkpoint_history()
+                elif method == "GET":
                     data = self.paper.state()
                 elif path.endswith("/orders"):
                     data = self.paper.order(payload)
+                elif path.endswith("/cancel"):
+                    data = self.paper.cancel(payload)
                 elif (isinstance(payload, dict) and set(payload) == {"action", "revision"}
                       and payload["action"] == "arm" and type(payload["revision"]) is int
                       and payload["revision"] >= 0):
                     data = self.paper.control("arm", expected_revision=payload["revision"])
-                    self._armed_sid = sid
+                    self.paper._armed_session = sid
                 else:
                     return self._reply(respond, 400, {"error": "INVALID_CONTROL"})
                 return self._reply(respond, 200, {**data, "mode": "SIMULATION_ONLY"})

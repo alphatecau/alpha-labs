@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hmac
 import io
+from email.message import Message
+from urllib.error import HTTPError
 import json
 import sqlite3
 import tempfile
@@ -71,6 +73,8 @@ class PaperMarketTests(unittest.TestCase):
             self.assertIsNone(request.get_header("Authorization"))
             response = Response(json.dumps(book(self.now)).encode())
             response.url = request.full_url
+            response.headers = Message()
+            response.headers["Content-Type"] = "application/json"
             return response
 
         quote = fetch_book("BTC-USD", opener=opener, clock=lambda: self.now)
@@ -97,6 +101,34 @@ class PaperMarketTests(unittest.TestCase):
         self.assertFalse(any(healthy.values()))
         self.assertEqual(quotes["SOL-USD"].source_sequence, 100)
         self.assertEqual(len(history["SOL-USD"]), 1)
+
+    def test_provider_429_immediately_invalidates_all_books_and_backs_off(self):
+        now = 100
+        throttle = False
+        calls = []
+
+        def fetch(product):
+            calls.append(product)
+            if throttle and product == "SOL-USD":
+                headers = Message()
+                headers["Retry-After"] = "45"
+                raise HTTPError("https://provider.example", 429, "limited", headers, None)
+            return parse_book(product, book(self.now), self.now)
+
+        feed = PaperMarketFeed(fetch=fetch, clock=lambda: self.now, retry_clock=lambda: now)
+        with ThreadPoolExecutor(3) as pool:
+            feed.poll(pool)
+            self.assertTrue(all(feed.snapshot(self.now)[1].values()))
+            throttle = True
+            feed.poll(pool)
+            self.assertFalse(any(feed.snapshot(self.now)[1].values()))
+            count = len(calls)
+            now = 144
+            feed.poll(pool)
+            self.assertEqual(len(calls), count)
+            now, throttle = 145, False
+            feed.poll(pool)
+        self.assertTrue(all(feed.snapshot(self.now)[1].values()))
 
 
 class LivePaperServiceTests(unittest.TestCase):
@@ -177,6 +209,42 @@ class LivePaperServiceTests(unittest.TestCase):
             results = list(pool.map(lambda _: self.session.order(self.order()), range(2)))
         self.assertEqual({r["status"] for r in results}, {"SIMULATED_FILL", "ALREADY_COMMITTED"})
         self.assertEqual(len(self.session.runtime.events), 1)
+
+    def test_limit_partial_fill_cancellation_and_restart(self):
+        self.arm()
+        self.depth = "0.5"
+        self.move("101")
+        terms = self.order(order_type="LIMIT", limit_price="100.5", quantity="1")
+        self.assertEqual(self.session.order(terms)["status"], "PENDING")
+        self.move("100")
+        self.session.on_market_update()
+        order = self.session.order(terms)
+        self.assertEqual(order["status"], "PARTIALLY_FILLED")
+        self.assertEqual(Decimal(order["order"]["remaining"]), Decimal("0.5"))
+        self.assertEqual(self.session.runtime.events[0]["details"]["parent_order_id"], terms["order_id"])
+        self.session.on_market_update()
+        self.assertEqual(len(self.session.runtime.events), 1)
+        self.restart()
+        self.assertFalse(self.session.state()["risk"]["armed"])
+        self.assertEqual(self.session.cancel({"order_id": terms["order_id"]})["status"], "CANCELLED")
+        self.assertEqual(self.session.cancel({"order_id": terms["order_id"]})["status"], "CANCELLED")
+        self.arm()
+        self.move("99")
+        self.session.on_market_update()
+        self.assertEqual(len(self.session.runtime.events), 1)
+        self.assertEqual(self.session.order(terms)["status"], "CANCELLED")
+        self.assertEqual([row["status"] for row in reversed(self.session.state()["order_history"])],
+                         ["PENDING", "PARTIALLY_FILLED", "CANCELLED"])
+
+    def test_limit_rejects_full_order_risk_even_with_shallow_depth(self):
+        self.arm()
+        self.depth = "0.25"
+        self.move("100")
+        terms = self.order(order_type="LIMIT", limit_price="101", quantity="20")
+        result = self.session.order(terms)
+        self.assertEqual((result["status"], result["order"]["reason"]), ("REJECTED", "POSITION_RISK_EXCEEDED"))
+        self.assertEqual(self.session.order(terms), result)
+        self.assertEqual(len(self.session.runtime.events), 0)
 
     def test_emergency_halt_wins_over_stale_arm(self):
         revision = self.session.state()["risk"]["revision"]

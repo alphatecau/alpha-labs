@@ -64,8 +64,12 @@ def archive_name(symbol: str, year: int, month: int) -> str:
 
 
 def _read_url(url: str) -> bytes:
+    checksum = url.endswith(".CHECKSUM")
+    content_types = ("text/plain", "application/octet-stream") if checksum else (
+        "application/zip", "application/x-zip-compressed", "application/octet-stream")
     return read_public_https(url, origin="https://data.binance.vision",
-                             max_bytes=MAX_ARCHIVE_BYTES, timeout=35)
+                             max_bytes=4096 if checksum else MAX_ARCHIVE_BYTES, timeout=35,
+                             content_types=content_types)
 
 
 def verify_checksum(

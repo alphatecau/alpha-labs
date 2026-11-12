@@ -6,9 +6,8 @@ The adapter returns verified quotes; it never invokes PaperRuntime.execute.
 from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
 from decimal import Decimal
-import json
 from urllib.parse import urlencode
-from urllib.request import urlopen
+from alpha_lab.data.public_https import decode_public_json, read_public_https
 from alpha_lab.research.paper_simulator import number
 
 ORIGIN = "https://data-api.binance.vision"
@@ -44,15 +43,14 @@ def parse_book_ticker(payload, *, symbol, observed_at):
         raise ValueError("invalid or crossed quote")
     return PaperQuote(symbol, bid, ask, observed_at)
 
-def fetch_public_quote(symbol, *, opener=urlopen, clock=lambda: datetime.now(timezone.utc)):
+def fetch_public_quote(symbol, *, opener=None, clock=lambda: datetime.now(timezone.utc)):
     """GET-only public market data. Response time is NOT exchange event time."""
     if symbol not in SYMBOLS:
         raise ValueError("unsupported symbol")
     url = ORIGIN + "/api/v3/ticker/bookTicker?" + urlencode({"symbol": symbol})
-    with opener(url, timeout=5) as response:
-        if getattr(response, "status", 200) != 200:
-            raise ValueError("market data unavailable")
-        payload = json.load(response)
+    raw = read_public_https(url, origin=ORIGIN, max_bytes=8192, timeout=5,
+                            content_types=("application/json",), opener=opener)
+    payload = decode_public_json(raw)
     return parse_book_ticker(payload, symbol=symbol, observed_at=clock())
 
 def quote_is_fresh(quote, *, now, max_age_seconds=10):
@@ -60,6 +58,27 @@ def quote_is_fresh(quote, *, now, max_age_seconds=10):
         return False
     age = (now - quote.observed_at).total_seconds()
     return 0 <= age <= max_age_seconds
+
+
+def verified_book(quote, now, *, source, products, max_age):
+    if (not isinstance(quote, PaperQuote) or quote.symbol not in products or quote.source != source
+            or quote.simulated_only is not True or type(quote.source_sequence) is not int
+            or not 0 < quote.source_sequence < 2**63):
+        return False
+    stamps = (now, quote.exchange_at, quote.observed_at)
+    if (not all(isinstance(t, datetime) and t.utcoffset() == timedelta(0) for t in stamps)
+            or not isinstance(quote.source_timestamp, str) or len(quote.source_timestamp) > 40
+            or not timedelta(0) <= now - quote.exchange_at <= max_age
+            or not quote.exchange_at <= quote.observed_at <= now):
+        return False
+    try:
+        if datetime.fromisoformat(quote.source_timestamp) != quote.exchange_at:
+            return False
+    except ValueError:
+        return False
+    prices = (quote.bid, quote.ask, quote.bid_size, quote.ask_size)
+    return (all(isinstance(value, Decimal) and value.is_finite() and value > 0 for value in prices)
+            and quote.bid <= quote.ask and quote.ask - quote.bid <= quote.bid * Decimal("0.01"))
 
 def simulated_fill_estimate(quote, *, side, quantity, fee_rate="0.001", slippage_bps="5"):
     """Cost estimate only; does not execute or mutate the paper ledger."""

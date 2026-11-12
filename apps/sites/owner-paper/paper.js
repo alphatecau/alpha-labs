@@ -18,7 +18,10 @@ function healthySnapshot(state, receivedAt, now) {
 function validIntent(value) {
   if (!value || !PAPER_PRODUCTS.includes(value.symbol) || !["BUY", "SELL"].includes(value.side)) return false;
   const decimal = /^[0-9]{1,9}(?:\.[0-9]{1,8})?$/;
-  return typeof value.quantity === "string" && decimal.test(value.quantity) && Number(value.quantity) > 0 &&
+  const limitValid = value.order_type === "LIMIT"
+    ? typeof value.limit_price === "string" && decimal.test(value.limit_price) && Number(value.limit_price) > 0
+    : value.order_type === undefined && value.limit_price === undefined;
+  return limitValid && typeof value.quantity === "string" && decimal.test(value.quantity) && Number(value.quantity) > 0 &&
     (value.side === "SELL" || (typeof value.stop_price === "string" && decimal.test(value.stop_price) && Number(value.stop_price) > 0));
 }
 
@@ -32,7 +35,7 @@ function createIntentStore(storage, randomId) {
     current: () => pending,
     prepare(terms) {
       if (!validIntent(terms)) throw new Error("Enter a positive quantity and a BUY stop price.");
-      const fields = ["symbol", "side", "quantity", "stop_price"];
+      const fields = ["symbol", "side", "quantity", "stop_price", "order_type", "limit_price"];
       if (pending && fields.some(key => pending[key] !== terms[key])) {
         throw new Error("Resolve the pending order before changing its terms.");
       }
@@ -112,9 +115,31 @@ function installPaperConsole(win) {
     }
     for (const values of rows) {
       const tr = doc.createElement("tr");
-      for (const value of values) { const td = doc.createElement("td"); td.textContent = value; tr.append(td); }
+      for (const value of values) {
+        const td = doc.createElement("td");
+        if (typeof value === "string") td.textContent = value;
+        else td.append(value);
+        tr.append(td);
+      }
       body.append(tr);
     }
+  }
+
+  function cancelButton(order) {
+    const button = doc.createElement("button");
+    button.type = "button"; button.className = "secondary"; button.textContent = "Cancel";
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      try {
+        await request("cancel", {order_id: order.order_id});
+        await refresh();
+        text("message", "Unfilled quantity cancelled.");
+      } catch (error) {
+        text("message", "Cancellation unavailable. " + error.message);
+        button.disabled = false;
+      }
+    });
+    return button;
   }
 
   function render() {
@@ -125,10 +150,24 @@ function installPaperConsole(win) {
       text(asset + "-time", q?.source_time || "No verified event timestamp");
     }
     for (const key of ["nav", "cash", "realised", "unrealised", "fees"]) text(key, money(state.portfolio?.[key]));
+    if (state.execution_costs) {
+      text("costs", "Simulated costs · " + Number(state.execution_costs.fee_bps) + " bps fee, " +
+        Number(state.execution_costs.slippage_bps) + " bps slippage.");
+    }
     text("reconciled", state.portfolio?.reconciled ? "RECONCILED" : "VALUATION UNAVAILABLE");
     text("risk-reason", (state.risk?.reason || "UNKNOWN").replaceAll("_", " "));
     text("updated", "Server UTC · " + state.server_time);
-    table("positions", Object.entries(state.portfolio?.positions || {}).map(([symbol, qty]) => [symbol, qty, money(state.market?.[symbol]?.bid)]), 3, "No virtual positions");
+    const recovery = state.recovery;
+    text("recovery", recovery?.status === "VERIFIED"
+      ? "Verified checkpoint " + recovery.checkpoint_sequence + " · Fill sequence " + recovery.journal_sequence
+      : "Protected recovery unverified");
+    table("positions", Object.entries(state.portfolio?.positions || {}).map(([symbol, qty]) =>
+      [symbol, qty, money(state.market?.[symbol]?.bid), money(state.portfolio?.cost_basis?.[symbol])]), 4, "No virtual positions");
+    table("orders", (state.orders || []).map(order => [
+      order.symbol + " / " + order.side, money(order.limit), order.remaining,
+      (order.status + (order.reason ? " · " + order.reason : "")).replaceAll("_", " "),
+      ["PENDING", "PARTIALLY_FILLED"].includes(order.status) ? cancelButton(order) : "—"
+    ]), 5, "No limit orders");
     table("fills", (state.fills || []).map(fill => [fill.details?.filled_at || "—", fill.symbol + " / " + fill.side, fill.quantity, money(fill.price), money(fill.fee), fill.order_id]), 6, "No simulated fills");
     tick();
   }
@@ -143,6 +182,12 @@ function installPaperConsole(win) {
       text("message", healthySnapshot(state, receivedAt, Date.now()) ? "Verified public books · simulated execution only" : "Market evidence unavailable. Paper execution remains halted.");
     } catch (error) {
       state = null; tick();
+      text("recovery", "Protected recovery unverified");
+      for (const key of ["nav", "cash", "realised", "unrealised", "fees"]) text(key, "—");
+      table("positions", [], 4, "Positions unavailable");
+      table("fills", [], 6, "Fill history unavailable");
+      table("checkpoints", [], 2, "Checkpoint history unavailable");
+      table("orders", [], 5, "Order status unavailable");
       text("message", error.message + ". Trading controls disabled. Emergency HALT remains available.");
     } finally { refreshing = false; }
   }
@@ -152,10 +197,13 @@ function installPaperConsole(win) {
     busy = true; tick();
     try {
       const result = await request("orders", payload);
-      if (!["SIMULATED_FILL", "ALREADY_COMMITTED"].includes(result.status)) throw new Error("UNVERIFIED_ORDER_OUTCOME");
+      if (!["SIMULATED_FILL", "ALREADY_COMMITTED", "PENDING", "PARTIALLY_FILLED", "FILLED", "CANCELLED", "REJECTED"].includes(result.status)) {
+        throw new Error("UNVERIFIED_ORDER_OUTCOME");
+      }
       intents.resolve();
-      text("message", result.status === "ALREADY_COMMITTED" ? "This simulated order was already recorded. No duplicate fill." : "Simulated fill recorded. No real order was submitted.");
       await refresh();
+      text("message", result.status === "ALREADY_COMMITTED" ? "This simulated order was already recorded." :
+        "Simulated order · " + result.status.replaceAll("_", " ") + (result.order?.reason ? " · " + result.order.reason : ""));
     } catch (error) {
       // A server rejection below 500 proves this request did not execute. A
       // transport/5xx failure has an unknown outcome: retain exactly the same ID.
@@ -169,14 +217,33 @@ function installPaperConsole(win) {
     if (!healthySnapshot(state, receivedAt, Date.now()) || !state.risk.armed || busy) return;
     const terms = {symbol: el("symbol").value, side: el("side").value, quantity: el("quantity").value.trim()};
     if (terms.side === "BUY") terms.stop_price = el("stop-price").value.trim();
+    if (el("order-type").value === "LIMIT") {
+      terms.order_type = "LIMIT";
+      terms.limit_price = el("limit-price").value.trim();
+    }
     try {
       if (!validIntent(terms)) throw new Error("Enter a positive quantity and a BUY stop price.");
-      if (!win.confirm("SIMULATED " + terms.side + " " + terms.quantity + " " + terms.symbol + "? Fees, slippage and risk checks apply. NO REAL MONEY.")) return;
+      const limit = terms.limit_price ? " with limit USD " + terms.limit_price : "";
+      if (!win.confirm("Simulate " + terms.side + " " + terms.quantity + " " + terms.symbol + limit + "?")) return;
       await submit(intents.prepare(terms));
     } catch (error) { text("message", error.message); }
   });
   el("retry-pending").addEventListener("click", () => { const pending = intents.current(); if (pending) submit(pending); });
   el("side").addEventListener("change", () => { el("stop-label").hidden = el("side").value === "SELL"; });
+  el("order-type").addEventListener("change", () => { el("limit-label").hidden = el("order-type").value !== "LIMIT"; });
+  el("load-checkpoints").addEventListener("click", async () => {
+    try {
+      const data = await request("checkpoints");
+      table("checkpoints", data.checkpoints.map(item => [String(item.sequence), item.head]), 2, "No checkpoints");
+    } catch (error) { text("message", "Checkpoint history unavailable. " + error.message); }
+  });
+  el("sign-out").addEventListener("click", async () => {
+    try {
+      const response = await win.fetch("/auth/logout", {method: "POST", credentials: "same-origin", redirect: "error"});
+      if (!response.ok) throw new Error("SIGN_OUT_UNAVAILABLE");
+      win.location.replace("/owner-paper/signed-out");
+    } catch (error) { text("message", error.message); }
+  });
   el("halt").addEventListener("click", async () => {
     try { await request("control", {action: "halt"}); text("message", "Emergency HALT recorded."); }
     catch (error) { text("message", "HALT acknowledgement unavailable: " + error.message + ". Execution status is unknown."); }

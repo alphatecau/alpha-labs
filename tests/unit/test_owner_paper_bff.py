@@ -12,7 +12,7 @@ from alpha_lab.research.coinbase_paper_book import PRODUCTS, parse_book
 from alpha_lab.research.live_paper_api import create_app
 from alpha_lab.research.live_paper_session import LivePaperSession
 from alpha_lab.research.paper_market_feed import PaperMarketFeed
-from alpha_lab.research.paper_checkpoint import seal_checkpoint
+from alpha_lab.research.paper_checkpoint import seal_state_checkpoint
 from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter, RateLimitExceeded
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.owner_paper_bff import OwnerPaperBFF, create_owner_paper_application
@@ -24,6 +24,7 @@ OTHER = "oidc_" + "b" * 64
 ORIGIN = "https://paper.example"
 SID = "synthetic-session-owner"
 KEY = bytes(range(32))
+CHECKPOINT_KEY = bytes(reversed(range(32)))
 
 
 class OwnerPaperBoundaryTests(unittest.TestCase):
@@ -37,18 +38,19 @@ class OwnerPaperBoundaryTests(unittest.TestCase):
         # Unit-only checkpoint double; integration tests use the actual restricted PG role.
         self.checkpoints = Mock(spec=PostgresPaperCheckpoints)
         self.checkpoints.owner_id = OWNER
-        self.checkpoints.verification_key = KEY
+        self.checkpoints.verification_key = CHECKPOINT_KEY
         self.checkpoints.envelope = None
         self.checkpoints.load.side_effect = lambda: self.checkpoints.envelope
         self.checkpoints.ready.return_value = True
 
         def record(**values):
-            self.checkpoints.envelope = seal_checkpoint(sequence=values["sequence"], head=values["head"], secret=KEY)
+            self.checkpoints.envelope = seal_state_checkpoint(
+                owner=OWNER, sequence=values["sequence"], head=values["head"], secret=CHECKPOINT_KEY)
             return self.checkpoints.envelope
 
         self.checkpoints.record.side_effect = record
         self.paper = LivePaperSession(self.directory.name, OWNER, self.feed, clock=lambda: self.now,
-                                      checkpoint_store=self.checkpoints)
+                                      checkpoint_store=self.checkpoints, provision=True)
         self.addCleanup(self.paper.close)
         self.sessions = Mock()
         self.sessions.resolve_owner.side_effect = lambda sid: {SID: OWNER, "other-session": OTHER}[sid]
@@ -195,7 +197,31 @@ class OwnerPaperBoundaryTests(unittest.TestCase):
         self.checkpoints.record.side_effect = OSError("synthetic authority outage")
         self.assertEqual(self.request("orders", self.order())[0], 503)
         self.assertEqual(self.paper.runtime.ledger.sequence, 1)
-        self.assertEqual(self.request("control", {"action": "halt"})[0], 200)
+        self.assertEqual(self.request("control", {"action": "halt"})[0], 503)
         self.assertTrue(self.paper.runtime.ledger.halted)
         self.assertEqual(self.request("orders", self.order())[0], 503)
         self.assertEqual(self.paper.runtime.ledger.sequence, 1)
+
+    def test_a_second_bff_checks_the_session_that_armed_the_shared_runtime(self):
+        self.assertEqual(self.arm()[0], 200)
+        second = OwnerPaperBFF(self.research, self.paper, owner_id=OWNER, csrf_key=KEY)
+        self.sessions.resolve_owner.side_effect = PermissionError("revoked")
+        second.on_market_update()
+        self.assertTrue(self.paper.runtime.ledger.halted)
+
+    def test_owner_callback_redirects_to_dashboard_and_rejects_ambiguous_state(self):
+        state = "s" * 43
+        self.research.controller = Mock()
+        self.research.controller.complete.return_value = "__Host-alpha_session=test"
+        name = "__Host-alpha_oauth_state"
+        for query, cookie in (
+            ("code=ok&state=%C3%A9", f"{name}={state}"),
+            (f"code=ok&state={state}&state=other", f"{name}={state}"),
+            (f"code=ok&state={state}", f"{name}={state}; {name} =other"),
+            ("code=" + "x" * 4100 + "&state=" + state, f"{name}={state}"),
+        ):
+            self.assertEqual(self.request("/auth/callback", QUERY_STRING=query, HTTP_COOKIE=cookie)[0], 401)
+        self.research.controller.complete.assert_not_called()
+        code, headers, _ = self.request("/auth/callback", QUERY_STRING=f"code=ok&state={state}",
+                                        HTTP_COOKIE=f"{name}={state}")
+        self.assertEqual((code, headers["Location"]), (303, ORIGIN + "/owner-paper/"))

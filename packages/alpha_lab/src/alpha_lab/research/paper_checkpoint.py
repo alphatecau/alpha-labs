@@ -24,11 +24,32 @@ def _key(secret):
     return secret
 
 
-def seal_checkpoint(*, sequence, head, secret):
-    payload = _payload(sequence, head)
+def _envelope(payload, secret):
     body = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     signature = hmac.new(_key(secret), body, sha256).hexdigest()
     return json.dumps({**payload, "mac": signature}, sort_keys=True, separators=(",", ":"))
+
+
+def seal_checkpoint(*, sequence, head, secret):
+    return _envelope(_payload(sequence, head), secret)
+
+
+def seal_state_checkpoint(*, owner, sequence, head, secret):
+    """Version two commits the complete state and binds it to its owner."""
+    payload = _payload(sequence, head)
+    return _envelope({**payload, "version": 2, "owner": owner}, secret)
+
+
+def read_state_checkpoint(envelope, *, owner, secret):
+    try:
+        data = json.loads(envelope)
+        expected = seal_state_checkpoint(owner=owner, sequence=data["sequence"],
+                                         head=data["head"], secret=secret)
+        if not hmac.compare_digest(expected, envelope):
+            raise ValueError("checkpoint authentication or version mismatch: HALT")
+        return data["sequence"], data["head"]
+    except (TypeError, KeyError, json.JSONDecodeError) as exc:
+        raise ValueError("missing or malformed state checkpoint: HALT") from exc
 
 
 def verify_sealed_checkpoint(journal, envelope, *, secret):

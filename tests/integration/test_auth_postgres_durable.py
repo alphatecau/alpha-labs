@@ -9,7 +9,7 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 import psycopg
 from disposable_pg_guard import require_disposable_ci_database
-from deployment.postgres_pkce_state_store import PostgresPKCEStateStore
+from deployment.postgres_pkce_state_store import MAX_ACTIVE_STATES, PostgresPKCEStateStore
 from deployment.postgres_opaque_sessions import PostgresOpaqueSessions
 
 
@@ -80,6 +80,18 @@ class DurableAuthenticationTests(unittest.TestCase):
             results = list(pool.map(consume, range(8)))
         self.assertEqual(sum(r == record for r in results), 1)
         self.assertEqual(sum(r is None for r in results), 7)
+
+    def test_state_capacity_is_bounded_and_expired_slots_are_reclaimed(self):
+        self.admin.execute("INSERT INTO alpha_oauth_state SELECT lpad(i::text,64,'0'), '{}'::jsonb, "
+                           "to_timestamp(1001) FROM generate_series(1,%s) i", (MAX_ACTIVE_STATES,))
+        digest = hashlib.sha256(b"synthetic-capacity").hexdigest()
+        record = {"nonce": "synthetic", "verifier": "synthetic", "created_at": 1000}
+        with self.assertRaises(PermissionError):
+            PostgresPKCEStateStore(self.connect, clock=lambda: 1000).put(digest, record, 10)
+        later = PostgresPKCEStateStore(self.connect, clock=lambda: 1002)
+        later.put(digest, record, 10)
+        self.assertEqual(self.admin.execute("SELECT count(*) FROM alpha_oauth_state").fetchone()[0], 1)
+        self.assertEqual(later.consume(digest), record)
 
 
 if __name__ == "__main__":

@@ -8,8 +8,6 @@ import hashlib
 import hmac
 import json
 import re
-import secrets
-from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, urlsplit
 
 from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter, RateLimitExceeded
@@ -34,7 +32,7 @@ class StagingResearchBFF:
         self.origin = origin.rstrip("/")
         self.rate_limiter = rate_limiter
 
-    def __call__(self, env, start_response):
+    def __call__(self, env, start_response, *, login_redirect_path="/"):
         def reply(status, data=b"", headers=()):
             base = [("Content-Length", str(len(data))), ("Cache-Control", "no-store"),
                     ("X-Content-Type-Options", "nosniff"), ("Referrer-Policy", "no-referrer"),
@@ -47,26 +45,37 @@ class StagingResearchBFF:
             return reply("200 OK", b'{"status":"ok","trading":"disabled"}',
                          [("Content-Type", "application/json")])
         if path == "/auth/login" and method == "GET":
-            url = self.flow.begin()
-            params = parse_qs(urlsplit(url).query)
-            state = params["state"][0]
+            try:
+                url = self.flow.begin()
+                params = parse_qs(urlsplit(url).query)
+                state, = params["state"]
+            except Exception:
+                return reply("503 Service Unavailable")
             # Bind the single-use server-side state to the initiating browser.
             cookie = "__Host-alpha_oauth_state=" + state + "; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=300"
             return reply("302 Found", headers=[("Location", url), ("Set-Cookie", cookie)])
         if path == "/auth/callback" and method == "GET":
-            params = parse_qs(env.get("QUERY_STRING", ""), keep_blank_values=True)
+            query = env.get("QUERY_STRING", "")
+            if len(query) > 4096:
+                return reply("401 Unauthorized")
+            try:
+                params = parse_qs(query, keep_blank_values=True, strict_parsing=True,
+                                  errors="strict", max_num_fields=2)
+            except ValueError:
+                return reply("401 Unauthorized")
             if set(params) != {"code", "state"} or any(len(v) != 1 for v in params.values()):
                 return reply("401 Unauthorized")
             state_cookie = self._cookie(env, "__Host-alpha_oauth_state")
             state = params["state"][0]
-            if not state_cookie or not hmac.compare_digest(state_cookie, state):
+            if (not state_cookie or not re.fullmatch(r"[A-Za-z0-9_-]{20,256}", state)
+                    or not hmac.compare_digest(state_cookie, state)):
                 return reply("401 Unauthorized")
             try:
                 session_cookie = self.controller.complete(state, params["code"][0])
             except Exception:
                 return reply("401 Unauthorized", headers=[("Set-Cookie", self._clear_state())])
             return reply("303 See Other", headers=[
-                ("Location", self.origin + "/"),
+                ("Location", self.origin + login_redirect_path),
                 ("Set-Cookie", self._clear_state()),
                 ("Set-Cookie", session_cookie)])
         if path == "/auth/logout" and method == "POST":
@@ -119,13 +128,14 @@ class StagingResearchBFF:
 
     @staticmethod
     def _cookie(env, name):
-        try:
-            header = env.get("HTTP_COOKIE", "")
-            if len(header) > 4096 or header.count(name + "=") != 1:
-                return None
-            cookie = SimpleCookie()
-            cookie.load(header)
-            value = cookie[name].value if name in cookie else None
-            return value if value and len(value) <= 512 else None
-        except Exception:
+        header = env.get("HTTP_COOKIE", "")
+        if not isinstance(header, str) or len(header) > 4096:
             return None
+        values = []
+        for item in header.split(";"):
+            key, separator, value = item.lstrip().partition("=")
+            if key.rstrip() == name:
+                if key != name or not separator or not re.fullmatch(r"[A-Za-z0-9_-]{1,512}", value):
+                    return None
+                values.append(value)
+        return values[0] if len(values) == 1 else None

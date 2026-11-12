@@ -1,7 +1,6 @@
 """Local CLI safety regression tests; no network, broker or real-money orders."""
-import tempfile
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from alpha_lab.research.local_paper_terminal import command
 

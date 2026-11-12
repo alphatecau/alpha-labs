@@ -60,7 +60,7 @@ def quote_is_fresh(quote, *, now, max_age_seconds=10):
     return 0 <= age <= max_age_seconds
 
 
-def verified_book(quote, now, *, source, products, max_age):
+def verified_book(quote, now, *, source, products, max_age, max_future=timedelta(0)):
     if (not isinstance(quote, PaperQuote) or quote.symbol not in products or quote.source != source
             or quote.simulated_only is not True or type(quote.source_sequence) is not int
             or not 0 < quote.source_sequence < 2**63):
@@ -68,8 +68,9 @@ def verified_book(quote, now, *, source, products, max_age):
     stamps = (now, quote.exchange_at, quote.observed_at)
     if (not all(isinstance(t, datetime) and t.utcoffset() == timedelta(0) for t in stamps)
             or not isinstance(quote.source_timestamp, str) or len(quote.source_timestamp) > 40
-            or not timedelta(0) <= now - quote.exchange_at <= max_age
-            or not quote.exchange_at <= quote.observed_at <= now):
+            or not -max_future <= now - quote.exchange_at <= max_age
+            or not timedelta(0) <= now - quote.observed_at <= max_age
+            or quote.exchange_at > quote.observed_at + max_future):
         return False
     try:
         if datetime.fromisoformat(quote.source_timestamp) != quote.exchange_at:

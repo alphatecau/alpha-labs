@@ -9,6 +9,7 @@ import re
 import sqlite3
 from contextlib import contextmanager, nullcontext
 from hashlib import sha256
+from threading import get_ident
 
 _ORDER_ID = re.compile(r"[A-Za-z0-9_-]{1,80}\Z")
 
@@ -28,7 +29,7 @@ class PaperJournal:
             raise ValueError("persistent journal path required")
         self._lock_file = open(str(path) + ".writer.lock", "a+b")
         self.connection = None
-        self._transaction_open = False
+        self._transaction_thread = None
         try:
             # Keep main's exclusive ownership; acquire it before migration/replay.
             fcntl.flock(self._lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -121,7 +122,7 @@ class PaperJournal:
     def transaction(self):
         """Keep journal events and caller-owned control writes in one SQLite commit."""
         self.connection.execute("BEGIN IMMEDIATE")
-        self._transaction_open = True
+        self._transaction_thread = get_ident()
         try:
             yield
             self.connection.commit()
@@ -129,7 +130,7 @@ class PaperJournal:
             self.connection.rollback()
             raise
         finally:
-            self._transaction_open = False
+            self._transaction_thread = None
 
     def append(self, event, *, expected_seq=None, expected_head=None):
         if not isinstance(event, dict):
@@ -138,7 +139,7 @@ class PaperJournal:
         if order_id is not None and (not isinstance(order_id, str) or not _ORDER_ID.fullmatch(order_id)):
             raise ValueError("invalid journal order ID: HALT")
         try:
-            context = nullcontext() if self._transaction_open else self.transaction()
+            context = nullcontext() if self._transaction_thread == get_ident() else self.transaction()
             with context:
                 previous = self.verify()
                 if expected_seq is not None:

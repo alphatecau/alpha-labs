@@ -341,6 +341,12 @@ class LivePaperSession:
             if guard["enabled"]:
                 self._set_control(False, "MARKET_DATA_HALT")
             return None
+        # An accepted transport clock skew never authorises a noncausal mark or
+        # fill. Retain the book while the local clock catches up.
+        future = {symbol for symbol, quote in quotes.items() if quote.exchange_at > now}
+        if future:
+            healthy.update(dict.fromkeys(future, False))
+            return None
         marks = {symbol: quote.bid for symbol, quote in quotes.items()}
         account = self._account(marks)
         nav = account["nav"]
@@ -572,7 +578,8 @@ class LivePaperSession:
         now = self.clock()
         current, healthy, _ = self.feed.snapshot(now)
         if (set(current) != set(quotes) or set(healthy) != set(quotes)
-                or not all(healthy[symbol] is True and self.market.accepts(item, now)
+                or not all(healthy[symbol] is True and item.exchange_at <= now
+                           and self.market.accepts(item, now)
                            and self.market.accepts(current[symbol], now)
                            and self._same_book(current[symbol], item) for symbol, item in quotes.items())):
             raise PaperRejection("QUOTE_CHANGED", "The market snapshot changed. Retry with fresh quotes.")

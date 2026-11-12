@@ -10,6 +10,7 @@ PRODUCTS = ("BTC-USD", "ETH-USD", "SOL-USD")
 SOURCE = "Coinbase Exchange level 1"
 BASE_URL = "https://api.exchange.coinbase.com"
 MAX_AGE = timedelta(seconds=10)
+MAX_FUTURE_SKEW = timedelta(milliseconds=500)
 HTTP_TIMEOUT_SECONDS = 8
 _NUMBER = re.compile(r"[0-9]{1,10}(?:\.[0-9]{1,12})?")
 _TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z")
@@ -25,7 +26,7 @@ def parse_book(product, body, received):
     if type(sequence) is not int or not 0 < sequence < 2**63:
         raise ValueError("invalid exchange book sequence")
     event = datetime.fromisoformat(timestamp)
-    if received.utcoffset() != timedelta(0) or not timedelta(0) <= received - event <= MAX_AGE:
+    if received.utcoffset() != timedelta(0) or not -MAX_FUTURE_SKEW <= received - event <= MAX_AGE:
         raise ValueError("stale or future exchange book")
 
     def level(side):
@@ -61,4 +62,5 @@ def fetch_book(product, *, clock=lambda: datetime.now(timezone.utc), opener=None
 
 
 def executable(quote, now):
-    return verified_book(quote, now, source=SOURCE, products=PRODUCTS, max_age=MAX_AGE)
+    return verified_book(quote, now, source=SOURCE, products=PRODUCTS, max_age=MAX_AGE,
+                         max_future=MAX_FUTURE_SKEW)

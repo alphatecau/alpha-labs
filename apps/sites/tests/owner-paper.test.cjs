@@ -74,3 +74,11 @@ test('confirmation and transport failure preserve a single order ID through the 
   h.win.confirm=()=>false;await submit({preventDefault(){}});
   assert.equal(h.calls.filter(c=>c.url.endsWith('/orders')).length,2);
 });
+test('limit order intent retains price and identifier across an uncertain refresh',()=>{
+  const storage=memory(), limit={...terms,order_type:'LIMIT',limit_price:'99'};
+  const original=createIntentStore(storage,()=> 'limit_retry_order_1234').prepare(limit);
+  const recovered=createIntentStore(storage,()=>{throw Error('must reuse the existing ID')});
+  assert.deepEqual(recovered.prepare(limit),original);
+  assert.throws(()=>recovered.prepare({...limit,limit_price:'98'}),/pending order/);
+  assert.equal(validIntent({...limit,limit_price:'Infinity'}),false);
+});

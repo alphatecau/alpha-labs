@@ -5,10 +5,15 @@ import json
 from alpha_lab.research.strategies.momentum import ema_signal
 from alpha_lab.backtest.costs import CostModel
 from alpha_lab.backtest.engine import replay
+from alpha_lab.research.point_in_time_guards import validate_manifest
 
 def evaluate(dataset, *, fast=12, slow=48, starting_balance=Decimal('10000'),
              max_allocation=Decimal('0.20'), fee_bps=Decimal('10'),slippage_bps=Decimal('10')):
     bars=dataset.bars
+    if not isinstance(dataset.provenance, str) or not dataset.provenance.strip():
+        raise ValueError('dataset provenance required')
+    if not isinstance(dataset.sha256, str) or len(dataset.sha256) != 64:
+        raise ValueError('dataset source checksum required')
     if not 1<fast<slow or slow>=len(bars)//2: raise ValueError('Incompatible strategy horizons and dataset length')
     # Fixed chronological split; holdout cannot be used to tune parameter choices.
     split=int(len(bars)*Decimal('0.70'))

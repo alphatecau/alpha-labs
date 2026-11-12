@@ -3,6 +3,8 @@ from dataclasses import dataclass, asdict
 from decimal import Decimal
 from .costs import CostModel
 from alpha_lab.data.csv_import import Bar
+from alpha_lab.research.point_in_time_guards import finite_decimal, require_final_candle, utc_instant
+from alpha_lab.research.phase3_integrity import require_venue_bar_open, reconstruct_replay_economics
 
 @dataclass(frozen=True)
 class RunResult:
@@ -24,13 +26,40 @@ def _render(cash, qty, price, costs):
 
 def replay(bars: tuple[Bar,...], signals: list[bool], start: int, end: int, *,
            starting_balance=Decimal('10000'), max_allocation=Decimal('0.20'),
-           costs=CostModel(), passive=False) -> RunResult:
+           costs=CostModel(), passive=False, venue='crypto', sessions=None) -> RunResult:
+    if venue not in ('crypto', 'equity'):
+        raise ValueError('unsupported research venue')
+    if venue == 'equity' and not sessions:
+        raise ValueError('equity replay requires verified sessions')
+    starting_balance = finite_decimal(starting_balance, nonnegative=True)
+    max_allocation = finite_decimal(max_allocation, nonnegative=True)
+    if starting_balance == 0:
+        raise ValueError('starting balance must be positive')
+    # Validate all candles and signal timestamps before accepting any simulated order.
+    for j, bar in enumerate(bars):
+        utc_instant(bar.time)
+        for value in (bar.open, bar.high, bar.low, bar.close, bar.volume):
+            finite_decimal(value, nonnegative=True)
+        if j and bar.time <= bars[j-1].time:
+            raise ValueError('unordered or duplicate candle timestamps')
+    intervals = [(bars[j].time - bars[j-1].time).total_seconds() for j in range(1, len(bars))]
+    if not intervals or min(intervals) < 60 or min(intervals) % 60:
+        raise ValueError('cannot establish positive whole-minute candle interval')
+    inferred_interval_minutes = int(min(intervals) // 60)
     if not (1<=start<end<=len(bars)) or len(signals)!=len(bars): raise ValueError('invalid range or signals')
     if not (Decimal('0')<max_allocation<=Decimal('1')) or starting_balance<=0:
         raise ValueError('invalid capital controls')
     cash=Decimal(starting_balance);qty=Decimal(0);peak=Decimal(starting_balance);dd=Decimal(0)
     orders=[];total_fees=Decimal(0);completed=0;open_entry=None
     for i in range(start,end):
+        # A decision based on the previous close is eligible at the next open
+        # only if that previous interval has fully closed.
+        if i > 0:
+            # Infer the shortest observed bar interval; longer gaps may be holidays.
+            # Explicit exchange-calendar settlement remains a separate requirement.
+            require_final_candle(bars[i-1].time, inferred_interval_minutes, bars[i].time)
+        if venue == 'equity':
+            require_venue_bar_open(bars[i].time, sessions, venue=venue)
         price=bars[i].open
         # Close-bar signal is available only at the following candle open.
         should_hold = (i==start or qty>0) if passive else signals[i-1]
@@ -56,6 +85,7 @@ def replay(bars: tuple[Bar,...], signals: list[bool], start: int, end: int, *,
         dd=max(dd,(peak-nav)/peak)
     ending=_render(cash,qty,bars[end-1].close,costs)
     estimated_exit_fee=qty*costs.sell_price(bars[end-1].close)*costs.fee_bps/10000
+    reconstruct_replay_economics(bars, orders, starting_balance, costs, ending, last_close=bars[end-1].close)
     return RunResult(str(starting_balance),str(ending),str(ending-starting_balance),
                      float((ending/starting_balance-1)*100),float(dd*100),len(orders),
                      completed,qty>0,str(total_fees),str(estimated_exit_fee),orders)

@@ -8,6 +8,7 @@
   <title>Alpha Labs · Private paper desk</title>
   <link rel="stylesheet" href="/owner-paper/paper.css">
   <script src="/owner-paper/paper.js" defer></script>
+  <script src="/owner-paper/intelligence.js" defer></script>
 </head>
 <body>
   <main>
@@ -16,6 +17,16 @@
     <section class="intro"><h1>Private paper desk</h1><p>Coinbase Exchange quotes and virtual USD.</p></section>
     <section class="risk-strip" aria-label="Execution controls"><div><span class="label">PAPER EXECUTION</span><strong id="risk-status">Loading · HALTED</strong><span id="risk-reason">Waiting for authenticated evidence</span></div><button id="halt" class="danger">Emergency HALT</button></section>
     <p id="message" class="message" role="status" aria-live="polite">Connecting to the private API…</p>
+    <section aria-labelledby="intelligence-title" id="intelligence" class="intelligence"
+             data-enabled="{{intelligence_enabled}}">
+      <div class="section-head">
+        <h2 id="intelligence-title">Trade intelligence</h2>
+        <span id="intelligence-time">Research only</span>
+      </div>
+      <p id="intelligence-status" class="intelligence-status" role="status">Waiting for validated market evidence</p>
+      <p id="intelligence-risk" class="small"></p>
+      <div id="intelligence-markets" class="markets"></div>
+    </section>
     <section aria-labelledby="market-title"><div class="section-head"><h2 id="market-title">Market watch</h2><span>USD · source bid and ask</span></div>
       <div class="markets">
         <article class="market"><div class="asset"><h3>BTC <span>/ USD</span></h3><span id="BTC-health" class="badge">UNAVAILABLE</span></div><dl><div><dt>Bid</dt><dd id="BTC-bid">—</dd></div><div><dt>Ask</dt><dd id="BTC-ask">—</dd></div></dl><p id="BTC-source">Waiting for provider</p><time id="BTC-time">—</time></article>

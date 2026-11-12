@@ -15,15 +15,18 @@ from alpha_lab.research.live_paper_api import ROUTES, _json_object, _read_body
 from alpha_lab.research.live_paper_session import LivePaperSession, PaperRejection
 from alpha_lab.research.paper_market import COINBASE_MARKET
 from alpha_lab.research.postgres_paper_security import RateLimitExceeded
+from alpha_lab.research.trade_intelligence import Evidence, owner_recommendations
 from deployment.staging_authenticated_bff import StagingResearchBFF
 from deployment.postgres_paper_checkpoints import PostgresPaperCheckpoints
 from deployment.verified_proxy_ingress import VerifiedProxyIngress
 
 _ASSETS = {"/owner-paper/": ("index.html", "text/html; charset=utf-8"),
            "/owner-paper/paper.css": ("paper.css", "text/css; charset=utf-8"),
-           "/owner-paper/paper.js": ("paper.js", "text/javascript; charset=utf-8")}
+           "/owner-paper/paper.js": ("paper.js", "text/javascript; charset=utf-8"),
+           "/owner-paper/intelligence.js": ("intelligence.js", "text/javascript; charset=utf-8")}
 _ROOT = Path(__file__).resolve().parents[1] / "apps/sites/owner-paper"
-_OWNER_ROUTES = {**ROUTES, "/api/v1/paper/checkpoints": "GET"}
+_RECOMMENDATIONS = "/api/v1/paper/recommendations"
+_OWNER_ROUTES = {**ROUTES, "/api/v1/paper/checkpoints": "GET", _RECOMMENDATIONS: "GET"}
 _SIGNED_OUT = (b'<!doctype html><html lang="en"><meta charset="utf-8">'
                b'<meta name="viewport" content="width=device-width,initial-scale=1">'
                b'<title>Alpha Labs</title><main><h1>Signed out</h1>'
@@ -34,7 +37,7 @@ _STATUS = {200: "OK", 400: "Bad Request", 401: "Unauthorized", 403: "Forbidden",
 
 
 class OwnerPaperBFF:
-    def __init__(self, research, paper, *, owner_id, csrf_key):
+    def __init__(self, research, paper, *, owner_id, csrf_key, candle_feed=None, evidence=()):
         if (not isinstance(research, StagingResearchBFF)
                 or not isinstance(paper, LivePaperSession)
                 or not isinstance(owner_id, str) or not re.fullmatch(r"oidc_[a-f0-9]{64}", owner_id)
@@ -55,6 +58,10 @@ class OwnerPaperBFF:
         self.research, self.paper, self.owner_id = research, paper, owner_id
         self.csrf_key = csrf_key
         self.lock = paper.lock
+        self.candle_feed = candle_feed
+        self.evidence = tuple(evidence)
+        if not all(isinstance(item, Evidence) for item in self.evidence):
+            raise ValueError("versioned server-owned evidence required")
 
     def _csrf(self, sid):
         message = ("owner-paper-v1\0" + self.owner_id + "\0" + sid).encode()
@@ -141,6 +148,8 @@ class OwnerPaperBFF:
                     data = (_ROOT / name).read_bytes()
                     if name == "index.html":
                         data = data.replace(b"{{csrf}}", self._csrf(sid).encode())
+                        data = data.replace(b"{{intelligence_enabled}}",
+                                            b"true" if self.candle_feed is not None else b"false")
                     return self._reply(respond, 200, data, kind)
                 payload = None
                 if method == "POST":
@@ -166,6 +175,14 @@ class OwnerPaperBFF:
                         raise RuntimeError("shared quota unavailable")
                 except RateLimitExceeded:
                     return self._reply(respond, 429, {"error": "RATE_LIMITED"})
+                if path == _RECOMMENDATIONS:
+                    if self.candle_feed is None:
+                        return self._reply(respond, 503, {"error": "INTELLIGENCE_FEED_UNAVAILABLE"})
+                    try:
+                        data = owner_recommendations(self.paper, self.candle_feed, self.evidence)
+                        return self._reply(respond, 200, data)
+                    except (ValueError, ArithmeticError):
+                        return self._reply(respond, 503, {"error": "INTELLIGENCE_UNAVAILABLE"})
                 if not path.endswith("/cancel"):
                     self.on_market_update()
                 if path.endswith("/checkpoints"):
@@ -191,15 +208,26 @@ class OwnerPaperBFF:
                 return self._reply(respond, 503, {"error": "PAPER_HALTED"})
 
 
-def create_owner_paper_application(*, research, paper, owner_id, csrf_key, trusted_peer_cidrs):
+def create_owner_paper_application(*, research, paper, owner_id, csrf_key, trusted_peer_cidrs,
+                                   candle_feed=None, evidence=()):
     """Explicit operator composition only; no environment-based default app.
 
+    Pass a TradeCandleFeed to enable read-only recommendations. Its worker
+    starts only after the owner and ingress checks succeed.
     Start the read-only market feed and authority watchdog only when this factory
     is deliberately invoked. No broker execution adapter exists in this path.
     The returned WSGI wrapper must never be reachable except through its verified
     proxy peer ranges. Shutdown must stop the feed before closing the journal.
     """
-    app = OwnerPaperBFF(research, paper, owner_id=owner_id, csrf_key=csrf_key)
+    app = OwnerPaperBFF(research, paper, owner_id=owner_id, csrf_key=csrf_key,
+                        candle_feed=candle_feed, evidence=evidence)
     ingress = VerifiedProxyIngress(app, research.origin, trusted_peer_cidrs=trusted_peer_cidrs)
-    paper.feed.start(app.on_market_update)
+    if candle_feed is not None:
+        candle_feed.start()
+    try:
+        paper.feed.start(app.on_market_update)
+    except Exception:
+        if candle_feed is not None:
+            candle_feed.close()
+        raise
     return ingress

@@ -12,7 +12,7 @@ class RejectPublicRedirects(HTTPRedirectHandler):
         raise ValueError("public provider redirect refused")
 
 
-def decode_public_json(data):
+def decode_public_json(data, *, parse_float=float):
     def unique_object(pairs):
         result = dict(pairs)
         if len(result) != len(pairs):
@@ -22,7 +22,8 @@ def decode_public_json(data):
     def invalid_constant(_):
         raise ValueError("non-finite public JSON number")
 
-    return json.loads(data, object_pairs_hook=unique_object, parse_constant=invalid_constant)
+    return json.loads(data, object_pairs_hook=unique_object, parse_constant=invalid_constant,
+                      parse_float=parse_float)
 
 
 def read_public_https(url, *, origin, max_bytes, timeout, content_types=(), headers=None, opener=None):

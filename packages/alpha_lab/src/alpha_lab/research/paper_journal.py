@@ -7,7 +7,9 @@ import fcntl
 import json
 import re
 import sqlite3
+from contextlib import contextmanager, nullcontext
 from hashlib import sha256
+from threading import get_ident
 
 _ORDER_ID = re.compile(r"[A-Za-z0-9_-]{1,80}\Z")
 
@@ -22,11 +24,12 @@ def _unique_object(pairs):
 
 
 class PaperJournal:
-    def __init__(self, path, *, check_same_thread=True):
+    def __init__(self, path, *, check_same_thread=True, migrate=True):
         if path == ":memory:":
             raise ValueError("persistent journal path required")
         self._lock_file = open(str(path) + ".writer.lock", "a+b")
         self.connection = None
+        self._transaction_thread = None
         try:
             # Keep main's exclusive ownership; acquire it before migration/replay.
             fcntl.flock(self._lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -37,12 +40,15 @@ class PaperJournal:
             self.connection = sqlite3.connect(path, check_same_thread=check_same_thread)
             self.connection.execute("PRAGMA synchronous=FULL")
             self.connection.execute("BEGIN IMMEDIATE")
-            self.connection.execute(
-                "CREATE TABLE IF NOT EXISTS events (seq INTEGER PRIMARY KEY, "
-                "previous_hash TEXT NOT NULL, payload TEXT NOT NULL, digest TEXT NOT NULL)"
-            )
+            if migrate:
+                self.connection.execute(
+                    "CREATE TABLE IF NOT EXISTS events (seq INTEGER PRIMARY KEY, "
+                    "previous_hash TEXT NOT NULL, payload TEXT NOT NULL, digest TEXT NOT NULL)"
+                )
             columns = {row[1]: row for row in self.connection.execute("PRAGMA table_xinfo(events)")}
             if "order_id" not in columns:
+                if not migrate:
+                    raise ValueError("protected journal schema missing: HALT")
                 # Preserve original payload/hash bytes when migrating old journals.
                 self.connection.execute(
                     "ALTER TABLE events ADD COLUMN order_id TEXT GENERATED ALWAYS AS "
@@ -57,15 +63,16 @@ class PaperJournal:
             if expression not in normal_schema:
                 raise ValueError("unexpected generated order identity: HALT")
             self.verify()
-            self.connection.execute(
-                "CREATE UNIQUE INDEX IF NOT EXISTS events_order_id_unique "
-                "ON events(order_id) WHERE order_id IS NOT NULL"
-            )
+            if migrate:
+                self.connection.execute(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS events_order_id_unique "
+                    "ON events(order_id) WHERE order_id IS NOT NULL"
+                )
             indexes = {row[1]: row for row in self.connection.execute("PRAGMA index_list(events)")}
             index = indexes.get("events_order_id_unique")
             indexed = list(self.connection.execute("PRAGMA index_info(events_order_id_unique)"))
-            index_sql = self.connection.execute("SELECT sql FROM sqlite_master WHERE type='index' AND name='events_order_id_unique'").fetchone()[0]
-            normal_index = re.sub(r"\s+", "", index_sql).lower().replace("ifnotexists", "")
+            index_sql = self.connection.execute("SELECT sql FROM sqlite_master WHERE type='index' AND name='events_order_id_unique'").fetchone()
+            normal_index = re.sub(r"\s+", "", index_sql[0]).lower().replace("ifnotexists", "") if index_sql else ""
             if (index is None or index[2] != 1 or [row[2] for row in indexed] != ["order_id"]
                     or normal_index != "createuniqueindexevents_order_id_uniqueonevents(order_id)whereorder_idisnotnull"):
                 raise ValueError("journal order uniqueness missing: HALT")
@@ -111,33 +118,43 @@ class PaperJournal:
             raise ValueError("journal checkpoint mismatch: HALT")
         return actual_head
 
+    @contextmanager
+    def transaction(self, *, read_only=False):
+        """Keep journal operations in a consistent SQLite snapshot."""
+        self.connection.execute("BEGIN" if read_only else "BEGIN IMMEDIATE")
+        self._transaction_thread = get_ident()
+        try:
+            yield
+            self.connection.commit()
+        except BaseException:
+            self.connection.rollback()
+            raise
+        finally:
+            self._transaction_thread = None
+
     def append(self, event, *, expected_seq=None, expected_head=None):
         if not isinstance(event, dict):
             raise ValueError("invalid journal event: HALT")
         order_id = event.get("order_id")
         if order_id is not None and (not isinstance(order_id, str) or not _ORDER_ID.fullmatch(order_id)):
             raise ValueError("invalid journal order ID: HALT")
-        self.connection.execute("BEGIN IMMEDIATE")
         try:
-            previous = self.verify()
-            if expected_seq is not None:
-                current_seq = self.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0]
-                if current_seq != expected_seq or previous != expected_head:
-                    raise ValueError("stale journal state: HALT")
-            payload = json.dumps(event, sort_keys=True, separators=(",", ":"), allow_nan=False)
-            digest = sha256((previous + payload).encode()).hexdigest()
-            self.connection.execute(
-                "INSERT INTO events(previous_hash,payload,digest) VALUES(?,?,?)",
-                (previous, payload, digest)
-            )
-            self.connection.commit()
+            context = nullcontext() if self._transaction_thread == get_ident() else self.transaction()
+            with context:
+                previous = self.verify()
+                if expected_seq is not None:
+                    current_seq = self.connection.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+                    if current_seq != expected_seq or previous != expected_head:
+                        raise ValueError("stale journal state: HALT")
+                payload = json.dumps(event, sort_keys=True, separators=(",", ":"), allow_nan=False)
+                digest = sha256((previous + payload).encode()).hexdigest()
+                self.connection.execute(
+                    "INSERT INTO events(previous_hash,payload,digest) VALUES(?,?,?)",
+                    (previous, payload, digest)
+                )
             return digest
         except sqlite3.IntegrityError as exc:
-            self.connection.rollback()
             raise ValueError("duplicate simulated order ID or invalid journal: HALT") from exc
-        except Exception:
-            self.connection.rollback()
-            raise
 
     def close(self):
         if self.connection is not None:

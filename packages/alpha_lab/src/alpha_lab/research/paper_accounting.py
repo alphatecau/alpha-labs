@@ -48,6 +48,7 @@ def reconcile_paper_pnl(fills, marks, *, starting_cash):
     market_value = Decimal("0")
     open_basis = Decimal("0")
     quantities = {}
+    cost_basis = {}
     for symbol, queue in lots.items():
         qty = sum((lot[0] for lot in queue), Decimal("0"))
         quantities[symbol] = qty
@@ -58,11 +59,12 @@ def reconcile_paper_pnl(fills, marks, *, starting_cash):
             if mark <= 0:
                 raise ValueError("invalid closing mark: HALT")
             market_value += qty * mark
-            open_basis += sum((lot[0] * lot[1] for lot in queue), Decimal("0"))
+            cost_basis[symbol] = sum((lot[0] * lot[1] for lot in queue), Decimal("0"))
+            open_basis += cost_basis[symbol]
     nav = cash + market_value
     unrealised = market_value - open_basis
     if nav - number(starting_cash) != realised + unrealised:
         raise ValueError("paper P&L reconciliation failure: HALT")
     return {"cash": cash, "nav": nav, "realised": realised,
             "unrealised": unrealised, "fees": total_fees,
-            "positions": quantities}
+            "positions": quantities, "cost_basis": cost_basis}

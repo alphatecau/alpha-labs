@@ -1,26 +1,19 @@
 """Timestamped Coinbase Exchange level-one books for paper simulation."""
-import json
 import re
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
-from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-from alpha_lab.research.live_paper_quotes import PaperQuote
+from alpha_lab.data.public_https import decode_public_json, read_public_https
+from alpha_lab.research.live_paper_quotes import PaperQuote, verified_book
 
 PRODUCTS = ("BTC-USD", "ETH-USD", "SOL-USD")
 SOURCE = "Coinbase Exchange level 1"
 BASE_URL = "https://api.exchange.coinbase.com"
 MAX_AGE = timedelta(seconds=10)
-# Maximum accepted exchange-clock lead, based on observed Android clock skew.
 MAX_FUTURE_SKEW = timedelta(milliseconds=500)
 HTTP_TIMEOUT_SECONDS = 8
 _NUMBER = re.compile(r"[0-9]{1,10}(?:\.[0-9]{1,12})?")
 _TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z")
-
-
-class NoRedirect(HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
 
 
 def parse_book(product, body, received):
@@ -58,26 +51,16 @@ def parse_book(product, body, received):
                       bid_size=bid_size, ask_size=ask_size)
 
 
-def fetch_book(product, *, clock=lambda: datetime.now(timezone.utc), opener=None):
+def fetch_book(product, *, clock=lambda: datetime.now(timezone.utc), opener=None, timeout=HTTP_TIMEOUT_SECONDS):
     if product not in PRODUCTS:
         raise ValueError("unsupported product")
     url = f"{BASE_URL}/products/{product}/book?level=1"
-    request = Request(url, headers={
-        "Accept": "application/json", "Cache-Control": "no-cache, no-store, max-age=0",
-        "User-Agent": "AlphaLabsPaperResearch/1.0",
-    }, method="GET")
-    request_open = opener or build_opener(NoRedirect()).open
-    with request_open(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
-        if response.status != 200 or response.geturl() != url:
-            raise ValueError("unexpected provider response")
-        payload = response.read(8193)
-    if len(payload) > 8192:
-        raise ValueError("provider response exceeds limit")
-    return parse_book(product, json.loads(payload), clock())
+    payload = read_public_https(url, origin=BASE_URL, max_bytes=8192, timeout=timeout,
+                               content_types=("application/json",), opener=opener,
+                               headers={"Cache-Control": "no-cache, no-store, max-age=0"})
+    return parse_book(product, decode_public_json(payload), clock())
 
 
 def executable(quote, now):
-    return (quote.source == SOURCE and quote.simulated_only is True
-            and quote.exchange_at is not None
-            and -MAX_FUTURE_SKEW <= now - quote.exchange_at <= MAX_AGE
-            and timedelta(0) <= now - quote.observed_at <= MAX_AGE)
+    return verified_book(quote, now, source=SOURCE, products=PRODUCTS, max_age=MAX_AGE,
+                         max_future=MAX_FUTURE_SKEW)

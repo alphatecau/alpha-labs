@@ -1,3 +1,49 @@
+# Staging evidence matrix · updated 13 November 2026
+
+The current review is recorded in the [engineering acceptance report](master-engineering-completion-20261113.md) and the [machine-readable matrix](independent-staging-acceptance-20261112.json). Each current record includes evidence, environment, tested source and reproducibility. Historical results and source receipts follow the current matrix.
+
+| ID | Area | Status | Source | Environment |
+|---|---|---|---|---|
+| R01 | Exact heads and dependency ancestry | PASS | c5fd585 | GitHub read-only refs, local Git objects and branch ancestry |
+| CI103 | Existing draft CI | PASS | 0c0a99f | GitHub Actions PR-triggered exact-head workflow run |
+| U103 | Fresh pinned unit reproduction | PASS | 0c0a99f | Managed Linux, Python 3.12.14, pytest 9.2.0 |
+| CI104 | Existing draft CI | PASS | f41e8c7 | GitHub Actions PR-triggered exact-head workflow run |
+| U104 | Fresh pinned unit reproduction | PASS | f41e8c7 | Managed Linux, Python 3.12.14, pytest 9.2.0 |
+| CI105 | Existing draft CI | PASS | be2901e | GitHub Actions PR-triggered exact-head workflow run |
+| U105 | Fresh pinned unit reproduction | PASS | be2901e | Managed Linux, Python 3.12.14, pytest 9.2.0 |
+| PG104 | Original security stack PostgreSQL | PASS | f41e8c7 | Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2 |
+| PG105 | Original paper integration PostgreSQL | PASS | be2901e | Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2 |
+| DEP-OLD | Original dependency constraint | FAIL | 23b463c | Historical exact-source audit, preserved from 12 November 2026 |
+| DEP-NEW | Dependency upgrade verification | PASS | c5fd585 | Managed Linux, Python 3.12.14, pytest 9.2.0 |
+| AST103 | Ruff repair behavior preservation | PASS | 0c0a99f | Historical exact-source audit, preserved from 12 November 2026 |
+| B310-BEFORE | Historical public downloader redirects | FAIL | 58cdc4d | Historical exact-source audit, preserved from 12 November 2026 |
+| BANDIT-AFTER | Three medium findings disposition | PASS | c5fd585 | Managed Linux, Python 3.12.14, pytest 9.2.0 |
+| CHECKPOINT-BEFORE | Unanchored owner journal rollback | FAIL | 58cdc4d | Historical exact-source audit, preserved from 12 November 2026 |
+| CHECKPOINT-REPAIR | Protected checkpoint authority | PASS | c5fd585 | Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2 |
+| CHECKPOINT-COMMIT | Commit uncertainty and recovery | PASS | c5fd585 | Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2 |
+| DB-SHUTDOWN | Actual database outage | PASS | c5fd585 | Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2 |
+| HTTP-RELAY | Authenticated server-side boundary | PASS | c5fd585 | Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2 |
+| QUOTAS | Shared quotas and isolation | PASS | c5fd585 | Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2 |
+| AUTH0-REAL | Real Auth0 acceptance | BLOCKED | c5fd585 | Real hosted Auth0 unavailable |
+| PROXY-REAL | Actual HTTPS reverse proxy | BLOCKED | c5fd585 | Existing Render service is a health probe |
+| STORAGE-REAL | Protected storage/key/restore acceptance | BLOCKED | c5fd585 | Hosted storage and key custody unavailable |
+| CONTROL-STATE | Full mutable control-state rollback resistance | PASS | c5fd585 | Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2 |
+| COINBASE | Quote provenance and freshness | PASS | df81e55 | Managed Linux with actual read-only Coinbase public quotes |
+| WEB-LOGIC | Existing website and mobile controller regression | PASS | c5fd585 | Managed Linux, Node 24.22.1 |
+| ANDROID | Android/browser acceptance | BLOCKED | c5fd585 | Managed Linux, Chromium 156 and Playwright 1.62 |
+| SITE-ACCESS | Existing hosted Site owner-only gate | FAIL | 53f9773 | Sites deployment metadata and anonymous HTTPS probe from managed Linux |
+| SITE-VERSIONS | Saved/publication provenance | PASS | 53f9773 | Sites deployment metadata and anonymous HTTPS probe from managed Linux |
+| SITE-SOURCE | Hosted saved source inspection | BLOCKED | 53f9773 | Sites deployment metadata and anonymous HTTPS probe from managed Linux |
+| SITE-RELAY | Hosted paper relay acceptance | BLOCKED | c5fd585 | Sites deployment metadata and anonymous HTTPS probe from managed Linux |
+| PR99 | Superseded quote-test repair | PASS | 09f9c98 | Historical exact-source audit, preserved from 12 November 2026 |
+| PR92 | Original collector negative reproduction | FAIL | 6f5250b | Historical exact-source audit, preserved from 12 November 2026 |
+| LOCAL-REPAIR | Repair regression execution | PASS | df81e55 | Managed Linux, Python 3.12.14, pytest 9.2.0 |
+| MAKE | Documented unittest entry point | PASS | df81e55 | Managed Linux, Python 3.12.14, pytest 9.2.0 |
+| HISTORY | Exhaustive historical review | NOT_INSPECTED | c5fd585 | GitHub read-only refs, local Git objects and branch ancestry |
+| CI-REPAIR | Executed repair-head CI | PASS | e045f26 | Historical exact-source audit, preserved from 12 November 2026 |
+
+## Historical review · 12 November 2026
+
 # Independent review and staging acceptance — 2026-11-12
 
 **NO-GO for staging and production.** Priority defects repaired on an isolated research branch; external acceptance remains incomplete. Main and existing hosted Site are unchanged. No merge, deployment, access/credential change, real-money order or reserved 2027 holdout access occurred.

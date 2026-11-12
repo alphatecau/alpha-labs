@@ -8,7 +8,8 @@ from hashlib import sha256
 from alpha_lab.research.live_paper_session import PaperRejection
 
 PREFIX = "/api/v1/paper"
-ROUTES = {f"{PREFIX}/state": "GET", f"{PREFIX}/orders": "POST", f"{PREFIX}/control": "POST"}
+ROUTES = {f"{PREFIX}/state": "GET", f"{PREFIX}/orders": "POST", f"{PREFIX}/control": "POST",
+          f"{PREFIX}/cancel": "POST"}
 _MAX_BODY = 2048
 _MAX_RELAY_AGE = 30
 _SHA = re.compile(r"[a-f0-9]{40}")
@@ -105,6 +106,8 @@ class LivePaperAPI:
                     return reply(400, {"error": "INVALID_JSON", "message": "Invalid JSON object"})
                 if path.endswith("/orders"):
                     data = self.session.order(payload)
+                elif path.endswith("/cancel"):
+                    data = self.session.cancel(payload)
                 else:
                     if payload == {"action": "halt"}:
                         data = self.session.control("halt")

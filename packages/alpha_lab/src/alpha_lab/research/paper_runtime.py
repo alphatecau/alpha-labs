@@ -12,8 +12,8 @@ from alpha_lab.research.paper_risk import authorise_simulated_order
 
 class PaperRuntime:
     def __init__(self, path, *, starting_cash="10000", trusted_checkpoint=None,
-                 checkpoint_secret=None, check_same_thread=True):
-        self.journal = PaperJournal(path, check_same_thread=check_same_thread)
+                 checkpoint_secret=None, check_same_thread=True, migrate=True):
+        self.journal = PaperJournal(path, check_same_thread=check_same_thread, migrate=migrate)
         self.ledger = PaperLedger(starting_cash)
         self.recovery_verified = False
         self.order_ids = set()

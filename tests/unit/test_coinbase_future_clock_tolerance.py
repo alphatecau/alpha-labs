@@ -1,10 +1,12 @@
 """Regression for observed Android/Coinbase subsecond future exchange timestamps."""
 import unittest
 from datetime import datetime, timedelta, timezone
+from tempfile import TemporaryDirectory
 
 from alpha_lab.research.coinbase_paper_book import (
-    MAX_AGE, MAX_FUTURE_SKEW, executable, parse_book,
+    MAX_AGE, MAX_FUTURE_SKEW, PRODUCTS, executable, parse_book,
 )
+from alpha_lab.research.live_paper_session import LivePaperSession, PaperRejection
 
 
 class TestCoinbaseFutureClockTolerance(unittest.TestCase):
@@ -51,6 +53,30 @@ class TestCoinbaseFutureClockTolerance(unittest.TestCase):
     def test_limits_are_exact(self):
         self.assertEqual(MAX_FUTURE_SKEW, timedelta(milliseconds=500))
         self.assertEqual(MAX_AGE, timedelta(seconds=10))
+
+    def test_clock_lead_defers_risk_and_orders_until_the_quote_is_causal(self):
+        books = {symbol: parse_book(symbol, self.book(220), self.now) for symbol in PRODUCTS}
+        now = self.now
+
+        class Feed:
+            def snapshot(self, stamp):
+                return books, {symbol: executable(quote, stamp) for symbol, quote in books.items()}, {}
+
+        with TemporaryDirectory() as path:
+            paper = LivePaperSession(path, "clock_skew_test_account", Feed(), clock=lambda: now)
+            try:
+                state = paper.state()
+                self.assertFalse(state["risk"]["data_healthy"])
+                with self.assertRaisesRegex(PaperRejection, "Fresh books"):
+                    paper.control("arm", expected_revision=state["risk"]["revision"])
+                self.assertEqual(paper.runtime.ledger.sequence, 0)
+                now += timedelta(milliseconds=220)
+                paper.control("arm", expected_revision=paper.state()["risk"]["revision"])
+                fill = paper.order({"order_id": "clock_skew_book_order_01", "symbol": "SOL-USD",
+                                    "side": "BUY", "quantity": "1", "stop_price": "90"})
+                self.assertEqual(fill["status"], "SIMULATED_FILL")
+            finally:
+                paper.close()
 
 
 if __name__ == "__main__":

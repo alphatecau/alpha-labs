@@ -41,6 +41,18 @@ jobs:
           python-version: '3.12'
       - name: Install cryptographic verification dependency
         run: python -m pip install 'cryptography>=44,<47'
+      - name: Require complete unit suite without skips (cryptography installed)
+        env:
+          PYTHONPATH: packages/alpha_lab/src
+        run: |
+          python - <<'PY'
+          import unittest
+          suite = unittest.defaultTestLoader.discover('tests/unit', pattern='test_*.py')
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          assert result.testsRun >= 200, f'Unexpected test count: {result.testsRun}'
+          assert not result.skipped, f'Skipped tests: {result.skipped}'
+          assert result.wasSuccessful(), 'Unit suite failed'
+          PY
       - name: Require signed archive tests to execute
         env:
           PYTHONPATH: packages/alpha_lab/src

@@ -12,6 +12,16 @@ The recovery command takes read-only file snapshots and prints the canonical pat
 
 The opt-in live smoke uses three public Coinbase books and a disposable working journal. It prints source and receipt times and simulates a small buy and sell per pair when all books are fresh. The two historical files are outside its write paths. Retain detailed provider and journal output privately with the candidate Git SHA and device version. A quote failure reports simulated execution as NOT TESTED.
 
+## Save a new backup of the stopped journal
+
+Quit the paper terminal first. From the verified checkout, run the backup command with an unused filename in the existing Termux backup directory.
+
+~~~sh
+PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.research.local_paper_recovery backup --journal "$HOME/.alpha-labs-paper/alpha-paper.sqlite3" --destination "$HOME/alpha-labs-paper-backups/paper-backup-002.sqlite3" --minimum-events 2
+~~~
+
+PASS reports the saved path, verified event count and `EXACT_FILL_HISTORY`. The command preserves existing files and publishes the verified copy without relying on hard links. Abrupt termination during publication can leave an empty reservation. Treat it as a failed backup and use a new filename.
+
 ## Prepare a working copy
 
 A working copy requires the original and its independently checked backup. It writes only to a newly chosen directory. Schema changes occur on the temporary copy, followed by a verified halted startup before publication.

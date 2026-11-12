@@ -1,4 +1,4 @@
-"""Read-only journal verification and migration of an explicitly selected copy."""
+"""Read-only journal verification, backup and recovery into a new working copy."""
 import argparse
 import fcntl
 import json
@@ -7,7 +7,7 @@ import re
 import shutil
 import sqlite3
 import stat
-from contextlib import ExitStack, closing
+from contextlib import ExitStack, closing, suppress
 from decimal import Decimal, DecimalException
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -150,6 +150,47 @@ def verify_pair(journal, backup, *, minimum_events=0, expected_sequence=None, ex
     return result
 
 
+def backup_destination(source, destination):
+    target = Path(destination).expanduser()
+    target = target.parent.resolve() / target.name
+    if os.path.lexists(target) or target.is_relative_to(source.parent) or not target.parent.is_dir():
+        raise ValueError("backup must be a new file in an existing, separate directory")
+    return target
+
+
+def publish_verified_file(copy, target):
+    """Publish a verified file staged in the destination filesystem."""
+    copy.chmod(0o600)
+    with copy.open("rb") as handle:
+        os.fsync(handle.fileno())
+    # An interruption before rename can leave only the empty, exclusive reservation.
+    reservation = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        os.replace(copy, target)
+    except BaseException:
+        with suppress(FileNotFoundError):
+            current = target.lstat()
+            if current.st_size == 0 and os.path.samestat(current, os.fstat(reservation)):
+                target.unlink()
+        raise
+    finally:
+        os.close(reservation)
+
+
+def backup_stopped_journal(journal, destination, *, minimum_events=0):
+    source = Path(journal).expanduser().resolve(strict=True)
+    target = backup_destination(source, destination)
+    with TemporaryDirectory(prefix=".alpha-paper-backup-", dir=target.parent) as temporary:
+        copy = Path(temporary) / "backup.sqlite3"
+        snapshot_read_only(source, copy)
+        receipt = verify_pair(source, copy, minimum_events=minimum_events)
+        if receipt["backup_relationship"] != "EXACT_FILL_HISTORY":
+            raise ValueError("backup fill history differs from the journal: HALT")
+        publish_verified_file(copy, target)
+    return {"status": "PASS", "backup": str(target), "events": receipt["backup"]["events"],
+            "backup_relationship": receipt["backup_relationship"]}
+
+
 def _publish_copy(source_copy, original, target):
     if original["checkpoint"] == "AUTHORITY_REQUIRED":
         raise ValueError("protected journal needs its original checkpoint authority")
@@ -178,12 +219,9 @@ def _publish_copy(source_copy, original, target):
             raise ValueError("working copy replay changed the verified journal: HALT")
     if recovered["schema"] != "CURRENT" or recovered["stored_armed_flag"] != 0:
         raise ValueError("working copy did not recover into the current halted schema")
-    copy.chmod(0o600)
-    with copy.open("rb") as handle:
-        os.fsync(handle.fileno())
     target.mkdir(mode=0o700)
     try:
-        os.link(copy, target / JOURNAL_NAME)
+        publish_verified_file(copy, target / JOURNAL_NAME)
     except OSError:
         target.rmdir()
         raise
@@ -230,6 +268,10 @@ def main(argv=None):
     restore.add_argument("--destination", required=True)
     restore.add_argument("--expected-sequence", type=int, required=True)
     restore.add_argument("--expected-head", required=True)
+    backup = commands.add_parser("backup", help="verify a stopped journal and save a new backup")
+    backup.add_argument("--journal", required=True)
+    backup.add_argument("--destination", required=True)
+    backup.add_argument("--minimum-events", type=int, default=0)
     args = parser.parse_args(argv)
     try:
         if getattr(args, "minimum_events", 0) < 0:
@@ -240,6 +282,8 @@ def main(argv=None):
         elif args.command == "prepare-copy":
             result = prepare_working_copy(args.journal, args.backup, args.destination,
                                           minimum_events=args.minimum_events)
+        elif args.command == "backup":
+            result = backup_stopped_journal(args.journal, args.destination, minimum_events=args.minimum_events)
         else:
             result = restore_backup(args.backup, args.destination, expected_sequence=args.expected_sequence,
                                     expected_head=args.expected_head)

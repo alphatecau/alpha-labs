@@ -1,15 +1,25 @@
-"""Read-only Android journal checks and restored-copy tests on disposable files."""
+"""Android journal verification, backup and restore tests on disposable files."""
+import json
+import os
 import shutil
 import sqlite3
 import tempfile
 import unittest
-import os
-from contextlib import closing, redirect_stderr
+from contextlib import closing, redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 from alpha_lab.research.live_paper_session import LivePaperSession
-from alpha_lab.research.local_paper_recovery import JOURNAL_NAME, prepare_working_copy, restore_backup, verify_pair
+from alpha_lab.research.local_paper_recovery import (
+    JOURNAL_NAME,
+    backup_stopped_journal,
+    prepare_working_copy,
+    publish_verified_file,
+    restore_backup,
+    verify_pair,
+)
+from alpha_lab.research.local_paper_recovery import main as recovery
 from alpha_lab.research.local_paper_terminal import main as terminal
 from test_paper_commit_boundaries import ACCOUNT, FixedFeed, NOW, ORDER
 
@@ -72,6 +82,41 @@ class LocalRecoveryTests(unittest.TestCase):
         self.assertTrue(result["replay_halted"])
         self.assertEqual(self.backup.read_bytes(), backup)
 
+    def test_stopped_backup_cli_verifies_and_preserves_both_files(self):
+        original, backup = self.journal.read_bytes(), self.backup.read_bytes()
+        target = self.root / "next.sqlite3"
+        output = StringIO()
+        with redirect_stdout(output):
+            self.assertEqual(recovery(["backup", "--journal", str(self.journal), "--destination", str(target),
+                                       "--minimum-events", "1"]), 0)
+        self.assertEqual(json.loads(output.getvalue()), {"status": "PASS", "backup": str(target),
+                                                         "events": 1, "backup_relationship": "EXACT_FILL_HISTORY"})
+        self.assertEqual(target.read_bytes(), original)
+        self.assertEqual(target.stat().st_mode & 0o777, 0o600)
+        with self.assertRaisesRegex(ValueError, "new file"):
+            backup_stopped_journal(self.journal, self.backup)
+        self.assertEqual(self.journal.read_bytes(), original)
+        self.assertEqual(self.backup.read_bytes(), backup)
+
+    def test_backup_failure_removes_only_its_reservation(self):
+        original, backup = self.journal.read_bytes(), self.backup.read_bytes()
+        target = self.root / "next.sqlite3"
+        with patch.object(os, "replace", side_effect=OSError("interrupted publication")):
+            with self.assertRaisesRegex(OSError, "interrupted publication"):
+                backup_stopped_journal(self.journal, target, minimum_events=1)
+        self.assertFalse(target.exists())
+        self.assertEqual(self.journal.read_bytes(), original)
+        self.assertEqual(self.backup.read_bytes(), backup)
+
+    def test_publication_refuses_destination_created_after_validation(self):
+        staged = self.root / "staged.sqlite3"
+        shutil.copyfile(self.journal, staged)
+        previous = self.backup.read_bytes()
+        with self.assertRaises(FileExistsError):
+            publish_verified_file(staged, self.backup)
+        self.assertEqual(self.backup.read_bytes(), previous)
+        self.assertTrue(staged.is_file())
+
     def test_wrong_path_duplicate_and_rollback_fail_closed(self):
         missing = self.root / "wrong" / JOURNAL_NAME
         with self.assertRaises(FileNotFoundError):
@@ -116,6 +161,7 @@ class LocalRecoveryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "executable SQLite schema object"):
             verify_pair(self.journal, self.backup)
 
+    @unittest.skipUnless(hasattr(os, "link"), "platform lacks hard-link support")
     def test_terminal_refuses_an_alias_of_preserved_data(self):
         aliased = self.root / "alias"
         aliased.mkdir()

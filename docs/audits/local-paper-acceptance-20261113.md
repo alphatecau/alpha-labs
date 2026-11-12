@@ -1,6 +1,6 @@
 # Local paper acceptance · 13 November 2026
 
-**CONDITIONAL GO for limited local simulated research on a disposable or verified working journal.** Physical Android and the two original device files remain pending acceptance. Private staging and real-money operation are NO-GO.
+**CONDITIONAL GO for limited local simulated research on a disposable or verified working journal.** The operator verified the original Android journal and existing backup read-only. On-device publication of a new backup remains pending on the repaired candidate. Private staging and real-money operation are NO-GO.
 
 ## Reproducibility
 
@@ -34,9 +34,17 @@ Generate runtime-requirements.txt from pyproject.toml project.dependencies. The 
 | Quote integrity | PASS on fixtures | Out-of-order and same-sequence conflicting depth, restart watermark, bounded timestamp lead, 429 recovery, redirect, size/framing, non-finite and crossed books. |
 | Public Coinbase connectivity | PASS with transient failure recorded | A SOL timeout stopped the first final-source execution attempt before order submission. A new request passed all three books without changing the 10-second freshness limit. |
 | Live-quote simulated execution | PASS on disposable Linux | A BTC, ETH and SOL buy and sell each produced six simulated fills total. Independent replay reconciled closing cash and zero open positions. Restart recovered all six fills and startup HALT. |
-| Android original and backup | NOT TESTED | Neither file was accessible in the Linux executor. Historical device evidence is retained below. Execute the [read-only Termux runbook](../operations/android-paper-recovery.md). |
+| Android read-only journal and disposable smoke | PASS | Operator-provided Termux output on `0e5385484fc3527ee13eb69f5ff681c9c16f00e4`, CPython 3.13.13 and SQLite 3.53.2. The original journal had two events and backup 001 had one verified prefix event. The disposable live smoke recorded six simulated fills and startup HALT. |
+| Android new backup publication | FAIL on the original command. NOT TESTED on the repair. | The operator's run reached publication and failed because Python did not expose `os.link`. The [updated runbook](../operations/android-paper-recovery.md) saves a verified backup to a new path. |
+| Portable publication regression | PASS on disposable Linux | CPython 3.12.14 and 3.13.5 each passed 333 tests and 97 subtests with the backup repair. With `os.link` removed, the targeted backup, prepare and restore tests passed 18 tests and 3 subtests. The hard-link alias fixture was skipped. |
 | Hosted Auth0, TLS and custody | BLOCKED | Public issuer metadata and health-only probe were observable. Hosted app login, owner/tenant and independent trust custody remain open. |
 | Static and dependency security | PASS in scoped checks | Ruff, Bandit medium/high and strict runtime dependency audit. Draft PR carries the exact-head Actions receipts. |
+
+Reproduce the missing `os.link` condition on Linux using the project dependencies and pytest.
+
+~~~sh
+PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -c 'import os, pytest; del os.link; raise SystemExit(pytest.main(["tests/unit/test_local_paper_recovery.py", "tests/unit/test_local_paper_terminal.py", "-q"]))'
+~~~
 
 ### Live sample and timing
 

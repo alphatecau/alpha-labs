@@ -1,19 +1,18 @@
 """Single-user paper terminal with Coinbase spot or a synthetic US ETF rehearsal."""
 import argparse
 import json
-import os
 import shlex
 import sqlite3
 import uuid
 from contextlib import closing
 from decimal import Decimal, DecimalException
 from pathlib import Path
-from tempfile import NamedTemporaryFile
+from tempfile import TemporaryDirectory
 
 from alpha_lab.research.live_paper_session import LivePaperSession, PaperRejection
 from alpha_lab.research.local_etf_fixture import ETF_FIXTURE_MARKET, SyntheticEtfFeed
 from alpha_lab.research.local_multiasset_catalogue import catalogue
-from alpha_lab.research.local_paper_recovery import JOURNAL_NAME, inspect_journal
+from alpha_lab.research.local_paper_recovery import JOURNAL_NAME, backup_destination, inspect_journal, publish_verified_file
 from alpha_lab.research.paper_market import COINBASE_MARKET, PaperCosts
 from alpha_lab.research.paper_market_feed import PaperMarketFeed
 
@@ -21,18 +20,16 @@ DEFAULT_ACCOUNT = "localpaperowner0001"
 
 
 def backup_journal(session, destination):
-    target = Path(destination).expanduser().resolve()
     source = Path(session.db.execute("PRAGMA database_list").fetchone()[2]).resolve()
-    if target.exists() or target.is_relative_to(source.parent) or not target.parent.is_dir():
-        raise ValueError("backup must be a new file in an existing, separate directory")
-    with session.lock, NamedTemporaryFile(dir=target.parent, prefix=".alpha-backup-") as temporary:
-        with closing(sqlite3.connect(temporary.name)) as copy:
+    target = backup_destination(source, destination)
+    with session.lock, TemporaryDirectory(dir=target.parent, prefix=".alpha-backup-") as temporary:
+        path = Path(temporary) / "backup.sqlite3"
+        with closing(sqlite3.connect(path)) as copy:
             session.db.backup(copy)
             checked = inspect_journal(copy)
             if (checked["events"], checked["head"]) != (session.runtime.ledger.sequence, session.runtime.journal_head):
                 raise ValueError("backup differs from the active journal: HALT")
-        os.fsync(temporary.fileno())
-        os.link(temporary.name, target)
+        publish_verified_file(path, target)
     return {"backup": str(target), "integrity": "PASS", "replay": "PASS",
             "events": checked["events"], "head": checked["head"], "recovery": checked["checkpoint"]}
 

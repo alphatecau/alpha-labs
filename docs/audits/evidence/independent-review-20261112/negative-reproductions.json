@@ -1,0 +1,20 @@
+{
+  "alpha_lab.data.adapters.binance_archive": {
+    "redirect_followed": true,
+    "requests": [
+      "https://data.binance.vision/data/spot/monthly/klines/SOLUSDT/1h/synthetic.zip",
+      "http://127.0.0.1:9/synthetic-redirect-target"
+    ]
+  },
+  "alpha_lab.data.adapters.kraken_ohlc": {
+    "redirect_followed": true,
+    "requests": [
+      "https://api.kraken.com/0/public/OHLC?pair=SOLUSD&interval=60",
+      "http://127.0.0.1:9/synthetic-redirect-target"
+    ]
+  },
+  "unanchored_rollback": {
+    "lost_fill_accepted": true,
+    "rearmed": true
+  }
+}

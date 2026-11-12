@@ -38,6 +38,9 @@ jobs:
       PYTHONPATH: packages/alpha_lab/src
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

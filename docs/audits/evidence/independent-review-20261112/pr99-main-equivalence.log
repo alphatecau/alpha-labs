@@ -1,0 +1,9 @@
+test_no_live_execution_side_effect (pr99_actual.LivePaperQuotesTests.test_no_live_execution_side_effect) ... ok
+test_no_unapproved_symbols_or_naive_timestamps (pr99_actual.LivePaperQuotesTests.test_no_unapproved_symbols_or_naive_timestamps) ... ok
+test_reject_invalid_quotes (pr99_actual.LivePaperQuotesTests.test_reject_invalid_quotes) ... ok
+test_valid_quote_and_costs (pr99_actual.LivePaperQuotesTests.test_valid_quote_and_costs) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK

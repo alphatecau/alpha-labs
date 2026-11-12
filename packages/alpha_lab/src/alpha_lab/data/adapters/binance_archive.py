@@ -16,11 +16,11 @@ from calendar import monthrange
 from pathlib import Path
 import re
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
 from zipfile import BadZipFile, ZipFile
 
 from alpha_lab.data.csv_import import load_csv
 from alpha_lab.data.manifests import build_manifest, verify_manifest
+from alpha_lab.data.public_https import read_public_https
 
 BASE = "https://data.binance.vision/data/spot/monthly/klines"
 SYMBOLS = ("BTCUSDT", "ETHUSDT", "SOLUSDT")
@@ -64,15 +64,8 @@ def archive_name(symbol: str, year: int, month: int) -> str:
 
 
 def _read_url(url: str) -> bytes:
-    request = Request(
-        url, headers={"User-Agent": "AlphaLabsResearch/0.7 (read-only-public-archive)"}
-    )
-    with urlopen(request, timeout=35) as response:
-        # Limit network and disk cost, prevent oversized files.
-        result = response.read(MAX_ARCHIVE_BYTES + 1)
-    if len(result) > MAX_ARCHIVE_BYTES:
-        raise ValueError("Downloaded public archive exceeds file-size limit")
-    return result
+    return read_public_https(url, origin="https://data.binance.vision",
+                             max_bytes=MAX_ARCHIVE_BYTES, timeout=35)
 
 
 def verify_checksum(

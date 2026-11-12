@@ -13,10 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install 'ruff==0.15.22'
       - name: All selected rules without legacy exclusions
-        run: ruff check packages deployment tests
+        run: ruff check packages deployment tests scripts/engineering_status.py scripts/reconcile_repository.py

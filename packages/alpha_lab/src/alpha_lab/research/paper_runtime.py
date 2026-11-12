@@ -36,7 +36,7 @@ class PaperRuntime:
 
     def execute(self, *, symbol, side, quantity, reference_mid, executed_price, fee,
                 quote_timestamp, now, marks, proposed_loss, aggregate_open_risk,
-                gross_notional, peak_nav, day_start_nav, operator_approved=False):
+                gross_notional, peak_nav, day_start_nav, operator_approved=False, order_id=None):
         if not self.recovery_verified or self.ledger.halted or operator_approved is not True:
             raise PermissionError("HALT: operator approval and recovered ledger required")
         if not isinstance(now, datetime) or not isinstance(quote_timestamp, datetime):
@@ -63,6 +63,10 @@ class PaperRuntime:
         fill = candidate.fill(symbol=symbol,side=side,quantity=quantity,
             reference_mid=reference_mid,executed_price=executed_price,fee=fee)
         event = {"type":"FILL",**fill}
+        if order_id is not None:
+            if not isinstance(order_id, str) or not order_id or len(order_id) > 80:
+                raise ValueError("invalid paper order id")
+            event["order_id"] = order_id
         self.journal.append(event)
         self.ledger = candidate
         return fill

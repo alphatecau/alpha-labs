@@ -1,5 +1,6 @@
 """Research-only durable append-only journal; not a multi-user trading database."""
 import json
+import fcntl
 import os
 import sqlite3
 from hashlib import sha256
@@ -8,7 +9,18 @@ class PaperJournal:
     def __init__(self, path):
         if path == ":memory:":
             raise ValueError("persistent journal path required")
-        self.connection = sqlite3.connect(path)
+        # POSIX-only exclusive single-writer lock, acquired before journal replay.
+        self._lock_file = open(str(path) + ".writer.lock", "a+b")
+        try:
+            fcntl.flock(self._lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except (BlockingIOError, OSError) as exc:
+            self._lock_file.close()
+            raise PermissionError("HALT: paper journal already has a writer") from exc
+        try:
+            self.connection = sqlite3.connect(path)
+        except Exception:
+            self._lock_file.close()
+            raise
         self.connection.execute("PRAGMA synchronous=FULL")
         self.connection.execute("CREATE TABLE IF NOT EXISTS events (seq INTEGER PRIMARY KEY, previous_hash TEXT NOT NULL, payload TEXT NOT NULL, digest TEXT NOT NULL)")
         self.connection.commit()
@@ -39,3 +51,4 @@ class PaperJournal:
 
     def close(self):
         self.connection.close()
+        self._lock_file.close()

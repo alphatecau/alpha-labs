@@ -62,7 +62,11 @@ class PaperRuntime:
         candidate = copy.deepcopy(self.ledger)
         fill = candidate.fill(symbol=symbol,side=side,quantity=quantity,
             reference_mid=reference_mid,executed_price=executed_price,fee=fee)
-        event = {"type":"FILL",**fill}\n        if order_id is not None:\n            if not isinstance(order_id, str) or not order_id or len(order_id) > 80:\n                raise ValueError("invalid paper order id")\n            event["order_id"] = order_id
+        event = {"type":"FILL",**fill}
+        if order_id is not None:
+            if not isinstance(order_id, str) or not order_id or len(order_id) > 80:
+                raise ValueError("invalid paper order id")
+            event["order_id"] = order_id
         self.journal.append(event)
         self.ledger = candidate
         return fill

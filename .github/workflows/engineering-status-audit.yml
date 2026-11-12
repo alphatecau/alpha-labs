@@ -1,5 +1,10 @@
 name: Engineering status audit (read-only)
 on:
+  pull_request:
+    paths:
+      - 'scripts/engineering_status.py'
+      - 'tests/unit/test_engineering_status.py'
+      - '.github/workflows/engineering-status-audit.yml'
   workflow_dispatch:
   schedule:
     - cron: '15 21 * * 1'
@@ -21,7 +26,33 @@ jobs:
       - name: Verify status collector tests
         run: python -m unittest discover -s tests/unit -p test_engineering_status.py -v
       - name: Collect read-only PR and CI evidence
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python scripts/engineering_status.py --output engineering-status.json
+      - name: Record coverage and failed-head evidence
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("engineering-status.json")
+          if not path.exists():
+              raise SystemExit("Engineering status report was not produced")
+          report = json.loads(path.read_text())
+          print(json.dumps({
+              "collection": report["collection"],
+              "main_sha": report["main"]["head_sha"],
+              "open_pr_count": len(report["open_prs"]),
+              "heads_with_checks": sum(bool(p["recent_checks"]) for p in report["open_prs"]),
+              "incomplete_heads": [p["number"] for p in report["open_prs"]
+                                   if p["collection_state"] == "incomplete"],
+              "failed_heads": [{"number": p["number"], "head_sha": p["head_sha"],
+                                "failed_run_ids": [r["id"] for r in p["recent_checks"]
+                                                   if r["conclusion"] == "failure"]}
+                               for p in report["open_prs"]
+                               if any(r["conclusion"] == "failure" for r in p["recent_checks"])],
+          }))
+          PY
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4

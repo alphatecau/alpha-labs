@@ -25,6 +25,7 @@ class PaperLedger:
     halted: bool = True
     sequence: int = 0
     audit_hash: str = "0" * 64
+    _session_guard: object = field(default=None, init=False, repr=False)
 
     def __post_init__(self):
         self.starting_cash = number(self.starting_cash)
@@ -36,12 +37,16 @@ class PaperLedger:
         self.halted = True
 
     def enable_simulation(self, *, operator_approved=False):
+        if self._session_guard is not None:
+            raise PermissionError("Session-managed ledger requires authority-controlled approval")
         if operator_approved is not True:
             raise PermissionError("explicit simulated-only operator approval required")
         self.halted = False
 
     def fill(self, *, symbol, side, quantity, reference_mid, executed_price,
              fee, observed_quote=True, simulated_only=True):
+        if self._session_guard is not None:
+            raise PermissionError("Session-managed ledger requires authority-controlled fill")
         if self.halted:
             raise PermissionError("HALT: simulated execution denied")
         if simulated_only is not True or observed_quote is not True:
@@ -74,6 +79,21 @@ class PaperLedger:
         record["audit_hash"] = self.audit_hash
         self.fills.append(record)
         return dict(record)
+
+    def _session_enable(self, guard, *, operator_approved=False):
+        if guard is None or guard is not self._session_guard or operator_approved is not True:
+            raise PermissionError("Invalid session authority")
+        self.halted = False
+
+    def _session_fill(self, guard, **kwargs):
+        if guard is None or guard is not self._session_guard:
+            raise PermissionError("Invalid session authority")
+        original = self._session_guard
+        self._session_guard = None
+        try:
+            return self.fill(**kwargs)
+        finally:
+            self._session_guard = original
 
     def nav(self, marks):
         total = self.cash

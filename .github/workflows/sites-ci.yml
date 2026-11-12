@@ -1,6 +1,8 @@
 name: Sites v0.3 existing tests
 on:
   push:
+    branches:
+      - main
   pull_request:
 jobs:
   tests:

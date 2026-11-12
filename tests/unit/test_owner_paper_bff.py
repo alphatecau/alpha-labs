@@ -12,9 +12,11 @@ from alpha_lab.research.coinbase_paper_book import PRODUCTS, parse_book
 from alpha_lab.research.live_paper_api import create_app
 from alpha_lab.research.live_paper_session import LivePaperSession
 from alpha_lab.research.paper_market_feed import PaperMarketFeed
+from alpha_lab.research.paper_checkpoint import seal_checkpoint
 from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter, RateLimitExceeded
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.owner_paper_bff import OwnerPaperBFF, create_owner_paper_application
+from deployment.postgres_paper_checkpoints import PostgresPaperCheckpoints
 from deployment.staging_authenticated_bff import StagingResearchBFF
 
 OWNER = "oidc_" + "a" * 64
@@ -32,7 +34,21 @@ class OwnerPaperBoundaryTests(unittest.TestCase):
         self.feed = PaperMarketFeed(clock=lambda: self.now, fetch=self.fetch_book)
         with ThreadPoolExecutor(3) as pool:
             self.feed.poll(pool)
-        self.paper = LivePaperSession(self.directory.name, OWNER, self.feed, clock=lambda: self.now)
+        # Unit-only checkpoint double; integration tests use the actual restricted PG role.
+        self.checkpoints = Mock(spec=PostgresPaperCheckpoints)
+        self.checkpoints.owner_id = OWNER
+        self.checkpoints.verification_key = KEY
+        self.checkpoints.envelope = None
+        self.checkpoints.load.side_effect = lambda: self.checkpoints.envelope
+        self.checkpoints.ready.return_value = True
+
+        def record(**values):
+            self.checkpoints.envelope = seal_checkpoint(sequence=values["sequence"], head=values["head"], secret=KEY)
+            return self.checkpoints.envelope
+
+        self.checkpoints.record.side_effect = record
+        self.paper = LivePaperSession(self.directory.name, OWNER, self.feed, clock=lambda: self.now,
+                                      checkpoint_store=self.checkpoints)
         self.addCleanup(self.paper.close)
         self.sessions = Mock()
         self.sessions.resolve_owner.side_effect = lambda sid: {SID: OWNER, "other-session": OTHER}[sid]
@@ -164,3 +180,22 @@ class OwnerPaperBoundaryTests(unittest.TestCase):
         self.assertEqual(self.request(app=wrapped, REMOTE_ADDR="192.0.2.5")[0], 403)
         self.assertEqual(self.request(app=wrapped, HTTP_X_FORWARDED_FOR="127.0.0.1")[0], 403)
         self.assertEqual(self.request(app=wrapped)[0], 200)
+
+    def test_owner_api_refuses_unprotected_offline_session(self):
+        with tempfile.TemporaryDirectory() as directory:
+            offline = LivePaperSession(directory, OWNER, self.feed, clock=lambda: self.now)
+            try:
+                with self.assertRaisesRegex(ValueError, "protected checkpoint"):
+                    OwnerPaperBFF(self.research, offline, owner_id=OWNER, csrf_key=KEY)
+            finally:
+                offline.close()
+
+    def test_checkpoint_failure_after_local_commit_never_acknowledges_or_refills(self):
+        self.assertEqual(self.arm()[0], 200)
+        self.checkpoints.record.side_effect = OSError("synthetic authority outage")
+        self.assertEqual(self.request("orders", self.order())[0], 503)
+        self.assertEqual(self.paper.runtime.ledger.sequence, 1)
+        self.assertEqual(self.request("control", {"action": "halt"})[0], 200)
+        self.assertTrue(self.paper.runtime.ledger.halted)
+        self.assertEqual(self.request("orders", self.order())[0], 503)
+        self.assertEqual(self.paper.runtime.ledger.sequence, 1)

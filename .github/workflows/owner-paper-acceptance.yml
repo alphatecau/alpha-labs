@@ -4,13 +4,35 @@ on:
     paths:
       - 'deployment/**'
       - 'packages/alpha_lab/src/alpha_lab/research/**'
+      - 'packages/alpha_lab/src/alpha_lab/data/**'
       - 'tests/integration/**'
       - 'tests/unit/**paper**'
+      - 'tests/unit/test_public_https_security.py'
       - 'apps/sites/owner-paper/**'
       - '.github/workflows/owner-paper-acceptance.yml'
 permissions:
   contents: read
 jobs:
+  source-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'bandit==1.9.4'
+      - name: Reject medium and high source findings without suppressions
+        run: bandit -q -r packages deployment -ll -f json -o bandit-results.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: independent-source-security
+          path: bandit-results.json
+          if-no-files-found: error
   owner-paper:
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -45,6 +67,8 @@ jobs:
           tests/unit/test_paper_commit_boundaries.py
           tests/integration/test_owner_paper_postgres.py
           -v --junitxml=owner-paper.xml
+      - name: Check public transport security and local probe binding
+        run: python -m pytest tests/unit/test_public_https_security.py -v
       - name: Reject missing or skipped acceptance evidence
         run: |
           python - <<'PY'

@@ -16,6 +16,7 @@ from alpha_lab.research.live_paper_api import ROUTES, _json_object, _read_body
 from alpha_lab.research.live_paper_session import LivePaperSession, PaperRejection
 from alpha_lab.research.postgres_paper_security import RateLimitExceeded
 from deployment.staging_authenticated_bff import StagingResearchBFF
+from deployment.postgres_paper_checkpoints import PostgresPaperCheckpoints
 from deployment.verified_proxy_ingress import VerifiedProxyIngress
 
 _ASSETS = {"/owner-paper/": ("index.html", "text/html; charset=utf-8"),
@@ -40,6 +41,10 @@ class OwnerPaperBFF:
             raise ValueError("canonical HTTPS origin required")
         if paper._guard()["account"] != owner_id:
             raise ValueError("paper journal must be bound to the pinned internal owner")
+        if (not isinstance(paper.checkpoint_store, PostgresPaperCheckpoints)
+                or paper.checkpoint_store.owner_id != owner_id
+                or paper.checkpoint_store.ready() is not True):
+            raise ValueError("separate protected checkpoint authority required for owner API")
         self.research, self.paper, self.owner_id = research, paper, owner_id
         self.csrf_key = csrf_key
         self.lock = RLock()

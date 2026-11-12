@@ -1,0 +1,50 @@
+{
+  "base": "58cdc4df30004df424b2ad9da7f5905321fadf63",
+  "files": [
+    {
+      "path": ".github/workflows/owner-paper-acceptance.yml",
+      "sha256": "f756af4ce7aeab0417d0055d42f63a1326be6ae6a1ae65d422d70b71facc3d65"
+    },
+    {
+      "path": "deployment/owner_paper_bff.py",
+      "sha256": "9d9b0d70ab53793f6dba0512529ddbcee492a89204e972b2d52a574f5b13c4b6"
+    },
+    {
+      "path": "deployment/postgres_paper_checkpoints.py",
+      "sha256": "78180d808d68aeb8df2653159ce26930d4d59be981fecbea58368ffa1292e3f8"
+    },
+    {
+      "path": "deployment/staging_probe.py",
+      "sha256": "65ab1362e963ce17cb5a98cc8f94d0e0456cac8aeff8c6bfe094941b465b25f1"
+    },
+    {
+      "path": "packages/alpha_lab/src/alpha_lab/data/adapters/binance_archive.py",
+      "sha256": "9254f9f8f45ea2024d8de178c6c87119a1f087b6c7546ea842526684374abd16"
+    },
+    {
+      "path": "packages/alpha_lab/src/alpha_lab/data/adapters/kraken_ohlc.py",
+      "sha256": "f43ddc16c769fd15e134b32577ff2710c534fe3277953617429cda41410615d3"
+    },
+    {
+      "path": "packages/alpha_lab/src/alpha_lab/data/public_https.py",
+      "sha256": "49eb9e1e0ae98c177e15db728e6eb7b49ef95b4f675066386bde9b863e8c7c9e"
+    },
+    {
+      "path": "packages/alpha_lab/src/alpha_lab/research/live_paper_session.py",
+      "sha256": "a6764f7ecb2050cbdc118e2efe534237bbc2ad9f1c906cb595a19eab94bea776"
+    },
+    {
+      "path": "tests/integration/test_owner_paper_postgres.py",
+      "sha256": "31409afdff73865d7a21cf0d3777d8b0b0628a9ce91653e4714947bd26a1fdf7"
+    },
+    {
+      "path": "tests/unit/test_owner_paper_bff.py",
+      "sha256": "d8c79052458df4a4932440c3b9adb2fb990b898fc6b7db19776a0db64b614c80"
+    },
+    {
+      "path": "tests/unit/test_public_https_security.py",
+      "sha256": "e60047702dcd147f11519fd74ba7a22ce61b48e0eb0dbccb93c1a1e4d812c81e"
+    }
+  ],
+  "fingerprint": "949a957cb01f78dfd8088012c23fbad23c83aabccbb8b11baab018ad3d3b1c6f"
+}

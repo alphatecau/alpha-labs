@@ -13,6 +13,7 @@ from threading import RLock
 from alpha_lab.research.coinbase_paper_book import PRODUCTS, executable
 from alpha_lab.research.live_paper_quotes import simulated_fill_estimate
 from alpha_lab.research.paper_accounting import reconcile_paper_pnl
+from alpha_lab.research.paper_checkpoint import verify_sealed_checkpoint
 from alpha_lab.research.paper_risk import PaperRiskLimits, authorise_simulated_order
 from alpha_lab.research.paper_runtime import PaperRuntime
 
@@ -56,17 +57,29 @@ def parse_order(payload):
 
 
 class LivePaperSession:
-    def __init__(self, directory, account_id, feed, *, clock=lambda: datetime.now(timezone.utc)):
+    def __init__(self, directory, account_id, feed, *, clock=lambda: datetime.now(timezone.utc),
+                 checkpoint_store=None):
         if not isinstance(account_id, str) or not _ACCOUNT_ID.fullmatch(account_id):
             raise ValueError("explicit paper account binding required")
+        if checkpoint_store is not None and checkpoint_store.owner_id != account_id:
+            raise ValueError("checkpoint authority owner mismatch")
         self.feed, self.clock = feed, clock
+        self.checkpoint_store = checkpoint_store
         self.lock = RLock()
         self.fault = False
         self.file_lock = (Path(directory) / "alpha-paper.lock").open("a+b")
         self.runtime = None
         try:
             fcntl.flock(self.file_lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-            self.runtime = PaperRuntime(Path(directory) / "alpha-paper.sqlite3", check_same_thread=False)
+            envelope = checkpoint_store.load() if checkpoint_store is not None else None
+            self.runtime = PaperRuntime(Path(directory) / "alpha-paper.sqlite3", check_same_thread=False,
+                                        trusted_checkpoint=envelope,
+                                        checkpoint_secret=checkpoint_store.verification_key if envelope is not None else None)
+            if checkpoint_store is not None and envelope is None:
+                if self.runtime.ledger.sequence:
+                    raise ValueError("existing journal has no protected checkpoint: HALT")
+                checkpoint_store.record(sequence=0, head=self.runtime.journal_head,
+                                        expected_sequence=None, expected_head=None)
             self.db = self.runtime.journal.connection
             self._open_account(account_id)
         except Exception:
@@ -136,6 +149,19 @@ class LivePaperSession:
                 self._set_control(False, "LEDGER_HALT")
             except (sqlite3.Error, ValueError):
                 pass
+
+    def _verify_checkpoint(self):
+        if self.checkpoint_store is None:
+            return  # Offline library use only; the owner BFF rejects this mode.
+        try:
+            envelope = self.checkpoint_store.load()
+            head = verify_sealed_checkpoint(self.runtime.journal, envelope,
+                                            secret=self.checkpoint_store.verification_key)
+            if head != self.runtime.journal_head:
+                raise ValueError("checkpoint and active ledger disagree")
+        except Exception as exc:
+            self.fail_closed()
+            raise PaperRejection("CHECKPOINT_HALT", "Protected journal authority unavailable or inconsistent", 503) from exc
 
     def _account(self, marks):
         ledger = self.runtime.ledger
@@ -226,6 +252,7 @@ class LivePaperSession:
             if action == "halt":
                 self._set_control(False, "OPERATOR_HALT")
                 return {"armed": False, "reason": "OPERATOR_HALT"}
+            self._verify_checkpoint()
             now = self.clock()
             quotes, healthy, _ = self.feed.snapshot(now)
             account = self._refresh(now, quotes, healthy)
@@ -249,6 +276,7 @@ class LivePaperSession:
     def order(self, payload):
         order_id, symbol, side, quantity, stop, fingerprint = parse_order(payload)
         with self.lock:
+            self._verify_checkpoint()
             if order_id in self.runtime.order_ids:
                 fill = next(event for event in self.runtime.events if event["order_id"] == order_id)
                 if fill["details"]["fingerprint"] != fingerprint:
@@ -307,6 +335,7 @@ class LivePaperSession:
             "source_sequence": quote.source_sequence, "received_at": quote.observed_at.isoformat(),
             "filled_at": now.isoformat(),
         }
+        previous_sequence, previous_head = self.runtime.ledger.sequence, self.runtime.journal_head
         try:
             self.runtime.execute(symbol=quote.symbol, side=side, quantity=quantity, reference_mid=quote.mid,
                                  executed_price=price, fee=fee, quote_timestamp=quote.exchange_at, now=now,
@@ -316,12 +345,22 @@ class LivePaperSession:
         except PermissionError as exc:
             self._set_control(False, "RISK_HALT")
             raise PaperRejection("RISK_HALT", str(exc)) from exc
+        if self.checkpoint_store is not None:
+            try:
+                self.checkpoint_store.record(sequence=self.runtime.ledger.sequence, head=self.runtime.journal_head,
+                                             expected_sequence=previous_sequence, expected_head=previous_head)
+            except Exception as exc:
+                # The local fill may already be committed. Never acknowledge or
+                # auto-adopt it without the separate authority; recovery needs review.
+                self.fail_closed()
+                raise PaperRejection("CHECKPOINT_HALT", "Committed fill requires independent recovery", 503) from exc
         self._refresh(now, quotes, dict.fromkeys(PRODUCTS, True))
         return self.runtime.events[-1]
 
     def on_market_update(self):
         with self.lock:
             try:
+                self._verify_checkpoint()
                 now = self.clock()
                 quotes, healthy, _ = self.feed.snapshot(now)
                 account = self._refresh(now, quotes, healthy)
@@ -345,6 +384,7 @@ class LivePaperSession:
 
     def state(self):
         with self.lock:
+            self._verify_checkpoint()
             now = self.clock()
             quotes, healthy, history = self.feed.snapshot(now)
             account = self._refresh(now, quotes, healthy)

@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "actual_disposable_postgres_shutdown": true,
+  "response_code": "CHECKPOINT_HALT",
+  "http_status": 503,
+  "elapsed_seconds": 0.002,
+  "fills": 0,
+  "configured_connect_timeout_seconds": 1
+}

@@ -1,0 +1,8 @@
+Command: make research-test (venv selected in PATH)
+Exit code: 0
+----------------------------------------------------------------------
+Ran 512 tests in 14.699s
+
+OK
+Read-only research unavailable: FileNotFoundError
+Read-only research unavailable: ValueError

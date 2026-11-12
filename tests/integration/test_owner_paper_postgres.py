@@ -1,13 +1,17 @@
 """Actual durable identity/quota database plus SQLite paper ledger; fake quotes."""
 import io
 import json
+import http.client
 import os
+import sqlite3
 import tempfile
 import threading
+import re
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from unittest.mock import Mock
+from wsgiref.simple_server import make_server, WSGIRequestHandler
 
 import psycopg
 
@@ -19,7 +23,9 @@ from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter, 
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.owner_paper_bff import OwnerPaperBFF
 from deployment.postgres_opaque_sessions import PostgresOpaqueSessions, SCHEMA as SESSION_SCHEMA
+from deployment.postgres_paper_checkpoints import PostgresPaperCheckpoints, checkpoint_schema
 from deployment.staging_authenticated_bff import StagingResearchBFF
+from deployment.verified_proxy_ingress import VerifiedProxyIngress
 from disposable_pg_guard import require_disposable_ci_database
 
 
@@ -43,20 +49,31 @@ class OwnerPaperPostgresTests(unittest.TestCase):
         self.sid = self.sessions.create(self.alice.subject, self.alice.issuer)
         self.other = self.sessions.create(self.bob.subject, self.bob.issuer)
         self.owner = self.sessions.resolve_owner(self.sid)
+        self.admin.execute(checkpoint_schema(self.owner))
+        self.admin.execute("CREATE ROLE alpha_owner_checkpoint LOGIN NOINHERIT PASSWORD 'synthetic-checkpoint-only'")
+        self.admin.execute("GRANT SELECT,INSERT ON public.paper_journal_checkpoints TO alpha_owner_checkpoint")
+        self.checkpoints = PostgresPaperCheckpoints(self.checkpoint_connect, owner_id=self.owner,
+                                                   verification_key=bytes(range(32)))
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.now = datetime.now(timezone.utc)
         self.feed = PaperMarketFeed(fetch=self.fetch, clock=lambda: self.now)
         with ThreadPoolExecutor(3) as pool:
             self.feed.poll(pool)
-        self.paper = LivePaperSession(self.directory.name, self.owner, self.feed, clock=lambda: self.now)
+        self.paper = LivePaperSession(self.directory.name, self.owner, self.feed, clock=lambda: self.now,
+                                      checkpoint_store=self.checkpoints)
         self.addCleanup(self.paper.close)
         self.app = self.build()
 
     def connect(self):
         return psycopg.connect(self.dsn)
 
+    def checkpoint_connect(self):
+        return psycopg.connect(self.dsn, user="alpha_owner_checkpoint", password="synthetic-checkpoint-only")
+
     def drop_fixture(self):
+        self.admin.execute("DROP TABLE IF EXISTS public.paper_journal_checkpoints")
+        self.admin.execute("DROP ROLE IF EXISTS alpha_owner_checkpoint")
         self.admin.execute("DROP TABLE public.identity_rate_limit, public.paper_ownership, public.alpha_oidc_sessions")
         self.admin.execute("DROP ROLE alpha_owner_quota")
 
@@ -146,3 +163,134 @@ class OwnerPaperPostgresTests(unittest.TestCase):
             self.assertEqual(self.paper.runtime.ledger.sequence, 0)
         finally:
             self.admin.execute("ALTER TABLE unavailable_identity_rate_limit RENAME TO identity_rate_limit")
+
+    def test_checkpoint_role_cannot_delete_modify_rebind_or_bypass_capability_checks(self):
+        for sql in ("DELETE FROM public.paper_journal_checkpoints", "UPDATE public.paper_journal_checkpoints SET head=repeat('a',64)",
+                    "TRUNCATE public.paper_journal_checkpoints", "ALTER TABLE public.paper_journal_checkpoints DROP CONSTRAINT checkpoint_owner_binding"):
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege), self.checkpoint_connect() as conn:
+                conn.execute(sql)
+        for store in (PostgresPaperCheckpoints(self.connect, owner_id=self.owner, verification_key=bytes(range(32))),
+                      PostgresPaperCheckpoints(self.checkpoint_connect, owner_id="oidc_" + "b" * 64, verification_key=bytes(range(32))),
+                      PostgresPaperCheckpoints(self.checkpoint_connect, owner_id=self.owner, verification_key=b"x" * 32)):
+            with self.assertRaises(PermissionError):
+                store.load()
+        self.admin.execute("GRANT UPDATE ON public.paper_journal_checkpoints TO alpha_owner_checkpoint")
+        try:
+            with self.assertRaises(PermissionError):
+                self.checkpoints.ready()
+        finally:
+            self.admin.execute("REVOKE UPDATE ON public.paper_journal_checkpoints FROM alpha_owner_checkpoint")
+
+    def test_protected_checkpoint_rejects_deleted_committed_fill_on_restart(self):
+        self.arm()
+        self.assertEqual(self.request("orders", self.order())[0], 200)
+        self.paper.close()
+        with sqlite3.connect(self.directory.name + "/alpha-paper.sqlite3") as conn:
+            conn.execute("DELETE FROM events")
+        with self.assertRaisesRegex(ValueError, "checkpoint mismatch"):
+            LivePaperSession(self.directory.name, self.owner, self.feed, clock=lambda: self.now,
+                             checkpoint_store=self.checkpoints)
+
+    def test_checkpointed_restart_replays_once_without_rearming(self):
+        self.arm()
+        self.assertEqual(self.request("orders", self.order())[0], 200)
+        self.paper.close()
+        recovered = LivePaperSession(self.directory.name, self.owner, self.feed, clock=lambda: self.now,
+                                      checkpoint_store=self.checkpoints)
+        try:
+            self.assertTrue(recovered.runtime.ledger.halted)
+            self.assertEqual(recovered.runtime.ledger.sequence, 1)
+            self.assertEqual(recovered.order(self.order())["status"], "ALREADY_COMMITTED")
+            self.assertEqual(recovered.runtime.ledger.sequence, 1)
+        finally:
+            recovered.close()
+
+    def test_concurrent_checkpoint_cas_has_one_winner_and_owner_is_immutable(self):
+        barrier = threading.Barrier(2)
+
+        def advance(head):
+            barrier.wait(timeout=5)
+            try:
+                self.checkpoints.record(sequence=1, head=head, expected_sequence=0, expected_head="0" * 64)
+                return "recorded"
+            except PermissionError:
+                return "rejected"
+
+        with ThreadPoolExecutor(2) as pool:
+            outcomes = list(pool.map(advance, ("a" * 64, "b" * 64)))
+        self.assertCountEqual(outcomes, ["recorded", "rejected"])
+        self.assertEqual(self.admin.execute("SELECT count(*) FROM paper_journal_checkpoints").fetchone()[0], 2)
+        with self.assertRaises(psycopg.errors.CheckViolation), self.checkpoint_connect() as conn:
+            conn.execute("INSERT INTO public.paper_journal_checkpoints VALUES(2,%s,%s,'synthetic')",
+                         ("oidc_" + "b" * 64, "c" * 64))
+
+    def test_checkpoint_outage_after_fill_commit_blocks_ack_and_unanchored_restart(self):
+        self.arm()
+        append = self.paper.runtime.journal.append
+
+        def interrupt(*args, **kwargs):
+            head = append(*args, **kwargs)
+            self.admin.execute("ALTER TABLE paper_journal_checkpoints RENAME TO unavailable_checkpoints")
+            return head
+
+        self.paper.runtime.journal.append = interrupt
+        try:
+            code, result = self.request("orders", self.order())
+            self.assertEqual(code, 503)
+            self.assertEqual(result["error"], "CHECKPOINT_HALT")
+            self.assertEqual(self.paper.runtime.ledger.sequence, 1)
+            self.assertTrue(self.paper.runtime.ledger.halted)
+        finally:
+            self.admin.execute("ALTER TABLE unavailable_checkpoints RENAME TO paper_journal_checkpoints")
+        self.paper.close()
+        with self.assertRaisesRegex(ValueError, "checkpoint mismatch"):
+            LivePaperSession(self.directory.name, self.owner, self.feed, clock=lambda: self.now,
+                             checkpoint_store=self.checkpoints)
+
+    def test_loopback_http_boundary_uses_real_sessions_csrf_quota_and_checkpointed_orders(self):
+        class Quiet(WSGIRequestHandler):
+            def log_message(self, *args):
+                pass
+
+        wrapped = VerifiedProxyIngress(self.app, "https://owner.example", trusted_peer_cidrs=["127.0.0.1/32"])
+        server = make_server("127.0.0.1", 0, wrapped, handler_class=Quiet)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+
+        def request(path, payload=None, **extra):
+            conn = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+            try:
+                headers = {"Host": "owner.example", "X-Forwarded-Proto": "https",
+                           "Cookie": "__Host-alpha_session=" + self.sid,
+                           "Origin": "https://owner.example", "Content-Type": "application/json", **extra}
+                conn.request("POST" if payload is not None else "GET", path,
+                             json.dumps(payload) if payload is not None else None, headers)
+                response = conn.getresponse()
+                return response.status, response.read()
+            finally:
+                conn.close()
+
+        try:
+            code, html = request("/owner-paper/")
+            self.assertEqual(code, 200)
+            token = re.search(rb'name="alpha-csrf" content="([a-f0-9]{64})"', html).group(1).decode()
+            self.assertNotIn(self.sid.encode(), html)
+            self.assertEqual(request("/api/v1/paper/state", **{"X-Forwarded-For": "127.0.0.1"})[0], 403)
+            self.assertEqual(request("/api/v1/paper/state", Cookie="")[0], 401)
+            code, body = request("/api/v1/paper/state")
+            self.assertEqual(code, 200)
+            revision = json.loads(body)["risk"]["revision"]
+            control = {"action": "arm", "revision": revision}
+            self.assertEqual(request("/api/v1/paper/control", control)[0], 403)
+            csrf = {"X-Alpha-CSRF": token}
+            self.assertEqual(request("/api/v1/paper/control", control, **csrf)[0], 200)
+            self.assertEqual(request("/api/v1/paper/orders", self.order(), Cookie="__Host-alpha_session=" + self.other, **csrf)[0], 403)
+            self.assertEqual(request("/api/v1/paper/orders", self.order(), **csrf)[0], 200)
+            self.assertEqual(json.loads(request("/api/v1/paper/orders", self.order(), **csrf)[1])["status"], "ALREADY_COMMITTED")
+            self.sessions.revoke(self.sid)
+            self.assertEqual(request("/api/v1/paper/state")[0], 403)
+            self.assertTrue(self.paper.runtime.ledger.halted)
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=3)

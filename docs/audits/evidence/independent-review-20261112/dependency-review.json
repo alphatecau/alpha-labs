@@ -1,0 +1,23 @@
+[
+  {
+    "head": "0c0a99f62f8e25df6c66a74ea8447922f57ea16d",
+    "dependency": "b973e4330888970184cf9f90fb9487a1ff563b3b",
+    "dependency_ancestor": true,
+    "main_conflict_exit": 0,
+    "main_conflicts": []
+  },
+  {
+    "head": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+    "dependency": "0c0a99f62f8e25df6c66a74ea8447922f57ea16d",
+    "dependency_ancestor": true,
+    "main_conflict_exit": 0,
+    "main_conflicts": []
+  },
+  {
+    "head": "58cdc4df30004df424b2ad9da7f5905321fadf63",
+    "dependency": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+    "dependency_ancestor": true,
+    "main_conflict_exit": 0,
+    "main_conflicts": []
+  }
+]

@@ -1,0 +1,179 @@
+{
+  "observed_at": "2026-11-12T10:24:08.056Z",
+  "source_head": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+  "status": "PASS",
+  "runs": [
+    {
+      "id": 43199233793,
+      "name": "Ruff syntax and correctness",
+      "event": "pull_request",
+      "head_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43199233793"
+    },
+    {
+      "id": 43199233280,
+      "name": "Gitleaks secret scan",
+      "event": "pull_request",
+      "head_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43199233280"
+    },
+    {
+      "id": 43199233238,
+      "name": "Staging health-only probe (research only)",
+      "event": "pull_request",
+      "head_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43199233238"
+    },
+    {
+      "id": 43199233450,
+      "name": "Alpha Labs offline research tests",
+      "event": "pull_request",
+      "head_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43199233450"
+    },
+    {
+      "id": 43199233501,
+      "name": "Sites v0.3 existing tests",
+      "event": "pull_request",
+      "head_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43199233501"
+    },
+    {
+      "id": 43199233016,
+      "name": "CodeQL baseline",
+      "event": "pull_request",
+      "head_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43199233016"
+    },
+    {
+      "id": 43199233254,
+      "name": "Owner paper acceptance (disposable only)",
+      "event": "pull_request",
+      "head_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43199233254"
+    },
+    {
+      "id": 43199233257,
+      "name": "Backend CI baseline",
+      "event": "pull_request",
+      "head_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43199233257"
+    },
+    {
+      "id": 43199225784,
+      "name": "Alpha Labs offline research tests",
+      "event": "push",
+      "head_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+      "conclusion": "success",
+      "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43199225784"
+    }
+  ],
+  "decoded_jobs": [
+    {
+      "run": 43199233257,
+      "name": "Backend CI baseline",
+      "jobs": [
+        {
+          "id": 131117972706,
+          "name": "runtime-dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "pinned_head_in_log": true,
+          "evidence_lines": [
+            "2026-11-12T10:18:50.1475976Z   ref: e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:50.6347342Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:51.0993578Z [command]/usr/bin/git checkout --progress --force e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:51.1409951Z e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:52.6755596Z Collecting pip-api>=0.0.28 (from pip-audit<3,>=2)",
+            "2026-11-12T10:19:02.0368152Z No known vulnerabilities found"
+          ]
+        },
+        {
+          "id": 131117978077,
+          "name": "python",
+          "status": "completed",
+          "conclusion": "success",
+          "pinned_head_in_log": true,
+          "evidence_lines": [
+            "2026-11-12T10:18:51.3009676Z   ref: e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:51.7514110Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:52.0404682Z [command]/usr/bin/git checkout --progress --force e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:52.0755525Z ",
+            "2026-11-12T10:18:52.0823485Z e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:19:20.8457298Z 525 passed, 230 subtests passed in 21.09s",
+            "2026-11-12T10:19:20.9493958Z {'tests': 755, 'failures': 0, 'errors': 0, 'skipped': 0}",
+            "2026-11-12T10:19:21.3676782Z (node:2953) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities."
+          ]
+        }
+      ]
+    },
+    {
+      "run": 43199233254,
+      "name": "Owner paper acceptance (disposable only)",
+      "jobs": [
+        {
+          "id": 131117971793,
+          "name": "source-security",
+          "status": "completed",
+          "conclusion": "success",
+          "pinned_head_in_log": true,
+          "evidence_lines": [
+            "2026-11-12T10:18:49.9416543Z   ref: e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:50.3755366Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url",
+            "2026-11-12T10:18:50.4084150Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:50.9818294Z [command]/usr/bin/git checkout --progress --force e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:51.0230742Z e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:18:53.9688167Z ##[group]Run bandit -q -r packages deployment -ll -f json -o bandit-results.json",
+            "2026-11-12T10:18:53.9688918Z \u001b[36;1mbandit -q -r packages deployment -ll -f json -o bandit-results.json\u001b[0m",
+            "2026-11-12T10:18:55.7273289Z (node:2996) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities."
+          ]
+        },
+        {
+          "id": 131117972055,
+          "name": "owner-paper",
+          "status": "completed",
+          "conclusion": "success",
+          "pinned_head_in_log": true,
+          "evidence_lines": [
+            "2026-11-12T10:19:02.0131185Z   ref: e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:19:02.0131755Z   repository: alphatecau/alpha-labs",
+            "2026-11-12T10:19:02.4205755Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\\.gitdir:",
+            "2026-11-12T10:19:02.4589215Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:19:02.9417337Z [command]/usr/bin/git checkout --progress --force e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:19:02.9877899Z e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+            "2026-11-12T10:19:17.3442186Z ==================== 26 passed, 2 subtests passed in 4.80s =====================",
+            "2026-11-12T10:19:17.7755616Z tests/unit/test_public_https_security.py::PublicTransportTests::test_valid_payload_and_hash_are_preserved PASSED [100%]",
+            "2026-11-12T10:19:17.8077895Z ============================== 5 passed in 0.15s ===============================",
+            "2026-11-12T10:19:18.4822721Z (node:3894) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.",
+            "2026-11-12T10:19:19.7034755Z  waiting for server to shut down....2026-11-12 10:18:56.912 UTC [49] LOG:  aborting any active transactions"
+          ]
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 13933554419,
+      "name": "independent-source-security",
+      "expired": false,
+      "size": 2713,
+      "url": "https://api.github.com/repos/alphatecau/alpha-labs/actions/artifacts/13933554419/zip"
+    },
+    {
+      "id": 13933384478,
+      "name": "owner-paper-evidence",
+      "expired": false,
+      "size": 1277,
+      "url": "https://api.github.com/repos/alphatecau/alpha-labs/actions/artifacts/13933384478/zip"
+    }
+  ],
+  "note": "This is executed repair-source evidence. A concluding documentation-only commit may have a later head; its exact current CI is also recorded in draft #106. Application source fingerprint is unchanged."
+}

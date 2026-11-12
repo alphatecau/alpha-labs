@@ -111,3 +111,9 @@ Review order remains #103 → #104 → #105 → this separate hardening draft. A
 - Real money: NO-GO; prohibited and no broker execution path added.
 
 Owner-controlled acceptance requires a separately authorized isolated environment and approved identity/ingress/storage/key bindings. No approval to create those resources or change existing access is implied by these draft repairs.
+
+## Repair-head CI receipt
+
+Draft [#106](https://github.com/alphatecau/alpha-labs/pull/106) source head `e045f26994078a3193b113a6aa73af8e0f5e5d0a` passed all nine observed workflow runs. Decoded checkout logs confirm that exact SHA. [Backend 43199233257](https://github.com/alphatecau/alpha-labs/actions/runs/43199233257): 525 passed + 230 subtests, 755 JUnit cases, zero skips/errors/failures, and no known runtime dependency vulnerabilities. [Owner acceptance 43199233254](https://github.com/alphatecau/alpha-labs/actions/runs/43199233254): 26 tests + two subtests, five public-transport tests and the separate Bandit medium/high gate all passed. [CodeQL 43199233016](https://github.com/alphatecau/alpha-labs/actions/runs/43199233016) and the remaining triggered workflows succeeded.
+
+The matrix now contains 37 rows: 24 PASS, five FAIL baseline/unmet-gate records, six BLOCKED and two NOT_INSPECTED. These are scoped evidence records, not 37 deployment gates. No current unit/integration test failed. The concluding audit commit adds this receipt without changing application source; its current exact-head CI is recorded separately in the draft PR. The NO-GO decisions remain unchanged.

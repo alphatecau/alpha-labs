@@ -9,7 +9,13 @@
   },
   "repair_branch": "research/independent-staging-review-20261112",
   "repair_base": "58cdc4df30004df424b2ad9da7f5905321fadf63",
-  "repair_commit_and_ci": "Recorded in the draft PR after publication; no parent CI used as repair-head evidence",
+  "repair_commit_and_ci": {
+    "source_head": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+    "status": "PASS",
+    "successful_runs": 9,
+    "evidence": "evidence/independent-review-20261112/repair-ci-receipt.json",
+    "scope": "Executed source head; current concluding documentation-only head CI is recorded separately in draft #106"
+  },
   "status_definitions": {
     "PASS": "Executed/observed within stated scope",
     "FAIL": "Verified failing baseline or unmet acceptance gate; not erased by other passing results",
@@ -421,6 +427,18 @@
       "scope": "outside focused dependency review",
       "evidence": [],
       "details": "No new claim of exhaustive source review, branch-creation provenance or Git-history secret scanning. Prior branch inventory and evidence are retained. No branch deletion, PR closure or automatic merge."
+    },
+    {
+      "id": "CI-REPAIR",
+      "area": "Executed repair-head CI",
+      "status": "PASS",
+      "scope": {
+        "source_head": "e045f26994078a3193b113a6aa73af8e0f5e5d0a"
+      },
+      "evidence": [
+        "evidence/independent-review-20261112/repair-ci-receipt.json"
+      ],
+      "details": "All nine exact-head runs succeeded; decoded checkout logs match the source SHA. Backend: 525 + 230 subtests, 755 JUnit cases, zero skips/failures/errors. Owner acceptance: 26 tests + two subtests, public-transport five tests; separate Bandit medium/high gate and runtime dependency audit pass. Both owner/security artifacts retained."
     }
   ]
 }

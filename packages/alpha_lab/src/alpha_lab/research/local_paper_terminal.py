@@ -1,23 +1,64 @@
-"""Free single-user local paper terminal. No HTTP listener, broker keys or live orders.
-
-Run: python -m alpha_lab.research.local_paper_terminal --directory ~/.alpha-labs-paper
-Commands: help, state, markets, arm, halt, buy SYMBOL QTY STOP, sell SYMBOL QTY,
-          backup PATH, quit. Existing Coinbase spot session remains BTC/ETH/SOL only.
-"""
+"""Single-user paper terminal with Coinbase spot or a synthetic US ETF rehearsal."""
 import argparse
 import json
 import os
 import shlex
 import sqlite3
 import uuid
+from contextlib import closing
+from decimal import Decimal, DecimalException
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
-from alpha_lab.research.coinbase_paper_book import PRODUCTS
 from alpha_lab.research.live_paper_session import LivePaperSession, PaperRejection
-from alpha_lab.research.paper_market_feed import PaperMarketFeed
+from alpha_lab.research.local_etf_fixture import ETF_FIXTURE_MARKET, SyntheticEtfFeed
 from alpha_lab.research.local_multiasset_catalogue import catalogue
+from alpha_lab.research.paper_market import COINBASE_MARKET, PaperCosts
+from alpha_lab.research.paper_market_feed import PaperMarketFeed
 
 DEFAULT_ACCOUNT = "localpaperowner0001"
+
+
+def backup_journal(session, destination):
+    target = Path(destination).expanduser().resolve()
+    source = Path(session.db.execute("PRAGMA database_list").fetchone()[2]).resolve()
+    if target.exists() or target.is_relative_to(source.parent) or not target.parent.is_dir():
+        raise ValueError("backup must be a new file in an existing, separate directory")
+    with session.lock, NamedTemporaryFile(dir=target.parent, prefix=".alpha-backup-") as temporary:
+        with closing(sqlite3.connect(temporary.name)) as copy:
+            session.db.backup(copy)
+            if copy.execute("PRAGMA quick_check").fetchone() != ("ok",):
+                raise ValueError("backup integrity check failed")
+        os.fsync(temporary.fileno())
+        os.link(temporary.name, target)
+    return {"backup": str(target), "recovery": "LOCAL_UNANCHORED"}
+
+
+def _submit(session, parts):
+    order_id = uuid.uuid4().hex
+    if len(parts) >= 2 and parts[-2] == "--id":
+        order_id = parts[-1]
+        parts = parts[:-2]
+    is_limit = parts[0].lower() == "limit"
+    if is_limit:
+        parts = parts[1:]
+    if not parts or parts[0].lower() not in ("buy", "sell"):
+        raise ValueError("expected buy or sell")
+    side = parts[0].upper()
+    expected = 3 + int(side == "BUY") + int(is_limit)
+    if len(parts) != expected:
+        raise ValueError("expected market, quantity, limit price for a limit order and stop price for a buy")
+    if parts[1] not in session.market.symbols:
+        raise ValueError("unsupported paper market in this profile")
+    order = {"order_id": order_id, "symbol": parts[1], "side": side, "quantity": parts[2]}
+    if side == "BUY":
+        order["stop_price"] = parts[-1]
+    if is_limit:
+        order.update(order_type="LIMIT", limit_price=parts[3])
+    try:
+        return session.order(order)
+    except (PaperRejection, OSError, sqlite3.Error) as exc:
+        raise ValueError(f"{exc} (order ID {order_id})") from exc
 
 
 def command(session, line):
@@ -27,62 +68,64 @@ def command(session, line):
     verb = parts[0].lower()
     if verb == "help" and len(parts) == 1:
         return {"commands": ["help", "state", "markets", "arm", "halt",
-                             "buy BTC-USD 0.001 10000", "sell BTC-USD 0.001",
-                             "backup /safe/path/paper-backup.sqlite3", "quit"],
-                "notice": "Only BTC-USD, ETH-USD and SOL-USD may be simulated; other catalogue entries are disabled."}
+                             "buy SYMBOL QUANTITY STOP [--id ID]", "sell SYMBOL QUANTITY [--id ID]",
+                             "limit buy SYMBOL QUANTITY LIMIT STOP [--id ID]",
+                             "limit sell SYMBOL QUANTITY LIMIT [--id ID]", "cancel ID",
+                             "advance (ETF fixture only)", "backup PATH", "quit"],
+                "profile": session.market.name}
     if verb == "markets" and len(parts) == 1:
-        return {"catalogue": [dict(symbol=i.symbol, venue=i.venue,
-                                    asset_class=i.asset_class,
-                                    data_status=i.data_status,
-                                    order_status=i.order_status)
-                              for i in catalogue()],
-                "paper_products": list(PRODUCTS)}
+        return {"catalogue": [dict(symbol=i.symbol, venue=i.venue, asset_class=i.asset_class,
+                                    quote_currency=i.quote_currency, data_status=i.data_status,
+                                    order_status=i.order_status) for i in catalogue()],
+                "paper_products": list(session.market.symbols), "profile": session.market.name}
     if verb == "state" and len(parts) == 1:
         return session.state()
     if verb == "halt" and len(parts) == 1:
         return session.control("halt")
     if verb == "arm" and len(parts) == 1:
-        state = session.state()
-        return session.control("arm", expected_revision=state["risk"]["revision"])
-    if verb in ("buy", "sell") and len(parts) in (3, 4):
-        side = verb.upper()
-        if (side == "BUY" and len(parts) != 4) or (side == "SELL" and len(parts) != 3):
-            raise ValueError("buy requires a stop; sell does not")
-        if parts[1] not in PRODUCTS:
-            raise ValueError("unsupported paper market: catalogue listing does not enable orders")
-        order = {"order_id": uuid.uuid4().hex, "symbol": parts[1],
-                 "side": side, "quantity": parts[2]}
-        if side == "BUY":
-            order["stop_price"] = parts[3]
-        return session.order(order)
+        return session.control("arm", expected_revision=session.state()["risk"]["revision"])
+    if verb in ("buy", "sell", "limit"):
+        return _submit(session, parts)
+    if verb == "cancel" and len(parts) == 2:
+        return session.cancel({"order_id": parts[1]})
+    if verb == "advance" and len(parts) == 1 and isinstance(session.feed, SyntheticEtfFeed):
+        session.feed.advance()
+        session.on_market_update()
+        return session.state()
     if verb == "backup" and len(parts) == 2:
-        target = Path(parts[1]).expanduser().resolve()
-        source = Path(session.runtime.journal.connection.execute("PRAGMA database_list").fetchone()[2]).resolve()
-        if target == source or target.exists() or target.is_relative_to(source.parent):
-            raise ValueError("backup must be a new file in a separate directory")
-        if not target.parent.is_dir():
-            raise ValueError("backup destination directory does not exist")
-        with session.lock:
-            with sqlite3.connect(target) as destination:
-                session.db.backup(destination)
-            os.chmod(target, 0o600)
-        return {"backup": str(target), "note": "Copy offline; separately protect and verify checkpoint before trusting restoration"}
-    raise ValueError("unknown command or wrong arguments; type help")
+        return backup_journal(session, parts[1])
+    raise ValueError("unknown command or wrong arguments. Type help.")
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Alpha Labs local paper terminal (simulation only)")
-    parser.add_argument("--directory", default="~/.alpha-labs-paper")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--directory")
     parser.add_argument("--account", default=DEFAULT_ACCOUNT)
+    parser.add_argument("--synthetic-etfs", action="store_true")
+    parser.add_argument("--fee-bps", default="10")
+    parser.add_argument("--slippage-bps", default="5")
     args = parser.parse_args(argv)
-    directory = Path(args.directory).expanduser().resolve()
+    try:
+        costs = PaperCosts(Decimal(args.fee_bps) / 10000, Decimal(args.slippage_bps) / 10000)
+    except (DecimalException, ValueError) as exc:
+        parser.error(str(exc))
+    fallback = "~/.alpha-labs-etf-fixture" if args.synthetic_etfs else "~/.alpha-labs-paper"
+    directory = Path(args.directory or fallback).expanduser().resolve()
     directory.mkdir(mode=0o700, parents=True, exist_ok=True)
     os.chmod(directory, 0o700)
-    feed = PaperMarketFeed()
-    session = LivePaperSession(directory, args.account, feed)
+    if args.synthetic_etfs:
+        feed = SyntheticEtfFeed()
+        session = LivePaperSession(directory, args.account, feed, clock=feed.clock,
+                                   market=ETF_FIXTURE_MARKET, costs=costs)
+    else:
+        feed = PaperMarketFeed()
+        session = LivePaperSession(directory, args.account, feed, market=COINBASE_MARKET, costs=costs)
     try:
-        feed.start(session.on_market_update)
-        print("ALPHA LABS — LOCAL PAPER ONLY. No broker orders. Type help.")
+        if args.synthetic_etfs:
+            feed.resume_from(session.runtime.events)
+        else:
+            feed.start(session.on_market_update)
+        print(f"Alpha Labs · {session.market.name} · simulated USD. Type help.")
         while True:
             try:
                 line = input("paper> ").strip()
@@ -93,13 +136,13 @@ def main(argv=None):
             try:
                 result = command(session, line)
                 if result is not None:
-                    print(json.dumps(result, indent=2, default=str))
+                    print(json.dumps(result, indent=2))
             except (ValueError, PaperRejection, OSError, sqlite3.Error) as exc:
                 print(f"REJECTED: {exc}")
     finally:
-        # Stop feed before closing the journal; no asynchronous ledger writes after close.
         try:
-            feed.close()
+            if not args.synthetic_etfs:
+                feed.close()
         finally:
             session.close()
 

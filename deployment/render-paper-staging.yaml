@@ -15,5 +15,8 @@ services:
     startCommand: python deployment/staging_probe.py
     healthCheckPath: /healthz
     envVars:
+      # Explicit public bind only for health-only probe. Never for authenticated BFF.
+      - key: HOST
+        value: "0.0.0.0"
       - key: ALPHA_TRADING_ENABLED
         value: "false"

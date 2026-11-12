@@ -7,9 +7,9 @@ import io
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 from alpha_lab.data.csv_import import load_csv
+from alpha_lab.data.public_https import decode_public_json, read_public_https
 
 ALLOWED_PAIRS = {"XBTUSD", "ETHUSD", "SOLUSD"}
 ALLOWED_INTERVALS = {1, 5, 15, 30, 60, 240, 1440, 10080, 21600}
@@ -51,14 +51,11 @@ def parse_ohlc_payload(payload, *, pair, minutes):
 def fetch_public_ohlc(pair="SOLUSD", minutes=60, *, timeout=15):
     if pair not in ALLOWED_PAIRS or minutes not in ALLOWED_INTERVALS:
         raise ValueError("Unsupported pair or interval")
-    req = Request(
-        BASE_URL + "?" + urlencode({"pair": pair, "interval": minutes}),
-        headers={"User-Agent": "AlphaLabsResearch/0.5 (read-only)"},
-    )
-    with urlopen(req, timeout=timeout) as response:
-        raw = response.read(3_000_000)
+    raw = read_public_https(BASE_URL + "?" + urlencode({"pair": pair, "interval": minutes}),
+                           origin="https://api.kraken.com", max_bytes=3_000_000, timeout=timeout,
+                           content_types=("application/json",))
     try:
-        payload = json.loads(raw)
+        payload = decode_public_json(raw)
     except (UnicodeDecodeError, json.JSONDecodeError) as e:
         raise ValueError("Invalid JSON market response") from e
     return payload, hashlib.sha256(raw).hexdigest()

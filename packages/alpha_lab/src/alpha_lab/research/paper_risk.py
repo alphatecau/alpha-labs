@@ -14,7 +14,7 @@ class PaperRiskLimits:
 def authorise_simulated_order(*, nav, initial_nav, peak_nav, day_start_nav,
                              proposed_loss, aggregate_open_risk, gross_notional,
                              proposed_notional, data_fresh, ledger_reconciled,
-                             operator_enabled, limits=PaperRiskLimits()):
+                             operator_enabled, limits=PaperRiskLimits(), reducing_exposure=False):
     """Pure independent decision; does not submit, sign or execute any order."""
     reasons = []
     try:
@@ -26,13 +26,13 @@ def authorise_simulated_order(*, nav, initial_nav, peak_nav, day_start_nav,
         else:
             if loss > n * limits.max_position_risk_pct:
                 reasons.append("position risk exceeded")
-            if aggregate + loss > n * limits.max_aggregate_risk_pct:
+            if reducing_exposure is not True and aggregate + loss > n * limits.max_aggregate_risk_pct:
                 reasons.append("aggregate risk exceeded")
             if day - n >= day * limits.daily_loss_halt_pct:
                 reasons.append("daily loss HALT")
             if peak - n >= peak * limits.drawdown_halt_pct:
                 reasons.append("drawdown HALT")
-            if gross + proposed > n * limits.max_notional_multiple:
+            if reducing_exposure is not True and gross + proposed > n * limits.max_notional_multiple:
                 reasons.append("gross notional exceeded")
     except (ValueError, TypeError, KeyError):
         reasons.append("invalid risk inputs")

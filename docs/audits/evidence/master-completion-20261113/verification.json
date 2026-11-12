@@ -1,0 +1,646 @@
+{
+  "observed_at": "2026-11-12T15:00:26.686437+00:00",
+  "github": {
+    "main": "b973e4330888970184cf9f90fb9487a1ff563b3b",
+    "prs": {
+      "103": {
+        "head": "0c0a99f62f8e25df6c66a74ea8447922f57ea16d",
+        "runs": [
+          {
+            "id": 43171222942,
+            "workflow": "Gitleaks secret scan",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171222942"
+          },
+          {
+            "id": 43171222875,
+            "workflow": "Signed archival evidence verification",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171222875"
+          },
+          {
+            "id": 43171222917,
+            "workflow": "Paper simulator offline safety tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171222917"
+          },
+          {
+            "id": 43171223101,
+            "workflow": "Alpha Labs offline research tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171223101"
+          },
+          {
+            "id": 43171222965,
+            "workflow": "Sites v0.3 existing tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171222965"
+          },
+          {
+            "id": 43171222966,
+            "workflow": "Issue 16 main integration adversarial checks",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171222966"
+          },
+          {
+            "id": 43171222981,
+            "workflow": "Minimal authentication boundary verification",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171222981"
+          },
+          {
+            "id": 43171223062,
+            "workflow": "Ruff syntax and correctness",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171223062"
+          },
+          {
+            "id": 43171222961,
+            "workflow": "Backend CI baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171222961"
+          },
+          {
+            "id": 43171222985,
+            "workflow": "CodeQL baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43171222985"
+          }
+        ]
+      },
+      "104": {
+        "head": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+        "runs": [
+          {
+            "id": 43174500817,
+            "workflow": "Alpha Labs authenticated read-only API tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500817"
+          },
+          {
+            "id": 43174500808,
+            "workflow": "CodeQL baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500808"
+          },
+          {
+            "id": 43174500768,
+            "workflow": "Engineering status audit (read-only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500768"
+          },
+          {
+            "id": 43174500982,
+            "workflow": "Gitleaks secret scan",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500982"
+          },
+          {
+            "id": 43174500991,
+            "workflow": "OIDC browser staging security (research only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500991"
+          },
+          {
+            "id": 43174500761,
+            "workflow": "Paper simulator offline safety tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500761"
+          },
+          {
+            "id": 43174500921,
+            "workflow": "Authenticated staging entry research tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500921"
+          },
+          {
+            "id": 43174501099,
+            "workflow": "Sites v0.3 existing tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174501099"
+          },
+          {
+            "id": 43174500734,
+            "workflow": "Auth0 staging security (research only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500734"
+          },
+          {
+            "id": 43174500849,
+            "workflow": "PostgreSQL paper security integration (research only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500849"
+          },
+          {
+            "id": 43174500710,
+            "workflow": "Staging health-only probe (research only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500710"
+          },
+          {
+            "id": 43174500733,
+            "workflow": "Alpha Labs offline research tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500733"
+          },
+          {
+            "id": 43174500720,
+            "workflow": "Disposable PostgreSQL 16 security acceptance",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500720"
+          },
+          {
+            "id": 43174500897,
+            "workflow": "Ruff syntax and correctness",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500897"
+          },
+          {
+            "id": 43174500864,
+            "workflow": "Backend CI baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43174500864"
+          }
+        ]
+      },
+      "105": {
+        "head": "be2901e7582eee9636460236b2521b2fefe7a2c0",
+        "runs": [
+          {
+            "id": 43239398455,
+            "workflow": "Ruff syntax and correctness",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398455"
+          },
+          {
+            "id": 43239398068,
+            "workflow": "Gitleaks secret scan",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398068"
+          },
+          {
+            "id": 43239398391,
+            "workflow": "Staging health-only probe (research only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398391"
+          },
+          {
+            "id": 43239398211,
+            "workflow": "Signed archival evidence verification",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398211"
+          },
+          {
+            "id": 43239398294,
+            "workflow": "Disposable PostgreSQL 16 security acceptance",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398294"
+          },
+          {
+            "id": 43239398055,
+            "workflow": "Owner paper acceptance (disposable only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398055"
+          },
+          {
+            "id": 43239398183,
+            "workflow": "Alpha Labs authenticated read-only API tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398183"
+          },
+          {
+            "id": 43239398163,
+            "workflow": "Free local paper terminal acceptance",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398163"
+          },
+          {
+            "id": 43239398091,
+            "workflow": "Paper simulator offline safety tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398091"
+          },
+          {
+            "id": 43239398032,
+            "workflow": "Engineering status audit (read-only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398032"
+          },
+          {
+            "id": 43239398338,
+            "workflow": "Authenticated staging entry research tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398338"
+          },
+          {
+            "id": 43239398454,
+            "workflow": "Sites v0.3 existing tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398454"
+          },
+          {
+            "id": 43239398040,
+            "workflow": "Auth0 staging security (research only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398040"
+          },
+          {
+            "id": 43239398096,
+            "workflow": "OIDC browser staging security (research only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398096"
+          },
+          {
+            "id": 43239398289,
+            "workflow": "Minimal authentication boundary verification",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398289"
+          },
+          {
+            "id": 43239398137,
+            "workflow": "Issue 16 main integration adversarial checks",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398137"
+          },
+          {
+            "id": 43239398121,
+            "workflow": "PostgreSQL paper security integration (research only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398121"
+          },
+          {
+            "id": 43239398269,
+            "workflow": "Alpha Labs offline research tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398269"
+          },
+          {
+            "id": 43239398030,
+            "workflow": "Backend CI baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398030"
+          },
+          {
+            "id": 43239398025,
+            "workflow": "CodeQL baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43239398025"
+          }
+        ],
+        "recovered_attempt": {
+          "id": 43239398032,
+          "job_id": 131265610913,
+          "prior_conclusion": "failure",
+          "cause": "repository refs changed during collection; rerun required",
+          "rerun_conclusion": "success"
+        }
+      },
+      "106": {
+        "head": "eaafdcb0b126574e0af6be5e56034f371cf84794",
+        "runs": [
+          {
+            "id": 43241208982,
+            "workflow": "Alpha Labs offline research tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241208982"
+          },
+          {
+            "id": 43241208908,
+            "workflow": "Backend CI baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241208908"
+          },
+          {
+            "id": 43241208694,
+            "workflow": "Owner paper acceptance (disposable only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241208694"
+          },
+          {
+            "id": 43241208890,
+            "workflow": "Sites v0.3 existing tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241208890"
+          },
+          {
+            "id": 43241208770,
+            "workflow": "Ruff syntax and correctness",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241208770"
+          },
+          {
+            "id": 43241208690,
+            "workflow": "Gitleaks secret scan",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241208690"
+          },
+          {
+            "id": 43241208983,
+            "workflow": "CodeQL baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241208983"
+          },
+          {
+            "id": 43241208691,
+            "workflow": "Staging health-only probe (research only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241208691"
+          }
+        ]
+      },
+      "109": {
+        "head": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "runs": [
+          {
+            "id": 43241574449,
+            "workflow": "Free local paper terminal acceptance",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241574449"
+          },
+          {
+            "id": 43241574330,
+            "workflow": "Ruff syntax and correctness",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241574330"
+          },
+          {
+            "id": 43241574419,
+            "workflow": "Sites v0.3 existing tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241574419"
+          },
+          {
+            "id": 43241574478,
+            "workflow": "Gitleaks secret scan",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241574478"
+          },
+          {
+            "id": 43241574326,
+            "workflow": "Backend CI baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241574326"
+          },
+          {
+            "id": 43241574684,
+            "workflow": "Owner paper acceptance (disposable only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241574684"
+          },
+          {
+            "id": 43241574822,
+            "workflow": "Alpha Labs offline research tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241574822"
+          },
+          {
+            "id": 43241574562,
+            "workflow": "Alpha Labs authenticated read-only API tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241574562"
+          },
+          {
+            "id": 43241574369,
+            "workflow": "CodeQL baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241574369"
+          }
+        ]
+      },
+      "110": {
+        "head": "df81e558b3289007bc2ce816c06728dec1962df0",
+        "runs": [
+          {
+            "id": 43241881342,
+            "workflow": "CodeQL baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241881342"
+          },
+          {
+            "id": 43241881243,
+            "workflow": "Ruff syntax and correctness",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241881243"
+          },
+          {
+            "id": 43241881197,
+            "workflow": "Sites v0.3 existing tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241881197"
+          },
+          {
+            "id": 43241881151,
+            "workflow": "Gitleaks secret scan",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241881151"
+          },
+          {
+            "id": 43241881130,
+            "workflow": "Free local paper terminal acceptance",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241881130"
+          },
+          {
+            "id": 43241881137,
+            "workflow": "Owner paper acceptance (disposable only)",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241881137"
+          },
+          {
+            "id": 43241881168,
+            "workflow": "Alpha Labs offline research tests",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241881168"
+          },
+          {
+            "id": 43241881118,
+            "workflow": "Backend CI baseline",
+            "status": "success",
+            "url": "https://github.com/alphatecau/alpha-labs/actions/runs/43241881118"
+          }
+        ]
+      }
+    }
+  },
+  "unit": {
+    "103": {
+      "sha": "0c0a99f62f8e25df6c66a74ea8447922f57ea16d",
+      "passed": 247,
+      "subtests": 48,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+      "command": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q"
+    },
+    "104": {
+      "sha": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+      "passed": 460,
+      "subtests": 207,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+      "command": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q"
+    },
+    "105": {
+      "sha": "be2901e7582eee9636460236b2521b2fefe7a2c0",
+      "passed": 538,
+      "subtests": 240,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+      "command": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q"
+    },
+    "106": {
+      "sha": "eaafdcb0b126574e0af6be5e56034f371cf84794",
+      "passed": 545,
+      "subtests": 240,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+      "command": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q"
+    },
+    "109": {
+      "sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+      "passed": 560,
+      "subtests": 246,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+      "command": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q"
+    },
+    "110": {
+      "sha": "df81e558b3289007bc2ce816c06728dec1962df0",
+      "passed": 562,
+      "subtests": 246,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+      "command": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q"
+    }
+  },
+  "postgres": {
+    "104": {
+      "sha": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+      "passed": 35,
+      "subtests": 22,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+      "command": "ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q"
+    },
+    "105": {
+      "sha": "be2901e7582eee9636460236b2521b2fefe7a2c0",
+      "passed": 38,
+      "subtests": 22,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+      "command": "ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q"
+    },
+    "106": {
+      "sha": "eaafdcb0b126574e0af6be5e56034f371cf84794",
+      "passed": 44,
+      "subtests": 22,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+      "command": "ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q"
+    },
+    "109": {
+      "sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+      "passed": 47,
+      "subtests": 22,
+      "skipped": 0,
+      "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+      "command": "ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q"
+    }
+  },
+  "website": {
+    "sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+    "passed": 43,
+    "skipped": 0,
+    "environment": "Managed Linux, Node 24.22.1",
+    "command": "node --test apps/sites/tests/*.test.cjs"
+  },
+  "local_terminal": {
+    "sha": "df81e558b3289007bc2ce816c06728dec1962df0",
+    "passed": 40,
+    "subtests": 31,
+    "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+    "synthetic_products": [
+      "SPY",
+      "QQQ",
+      "IWM",
+      "XLF",
+      "XLE"
+    ],
+    "live_public_quotes": [
+      "BTC-USD",
+      "ETH-USD",
+      "SOL-USD"
+    ],
+    "source_timestamps_utc": [
+      "2026-11-12T14:46:03.413094163Z",
+      "2026-11-12T14:46:02.148075368Z",
+      "2026-11-12T14:46:01.850953001Z"
+    ],
+    "local_live_quote_smoke_fills": 2,
+    "fill_symbol": "SOL-USD",
+    "restart_halted": true
+  },
+  "recovery": {
+    "sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+    "command": "PYTHONPATH=packages/alpha_lab/src:.:tests/unit python tests/acceptance/protected_paper_recovery.py --postgres-bin /path/to/postgresql/bin",
+    "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+    "checkpoint_sequence": 4,
+    "matching_restore_halted": true,
+    "stale_restore_refused": true,
+    "postgres_stopped_during_write": true,
+    "interrupted_write": "CHECKPOINT_HALT/503",
+    "unmatched_restart_refused": true,
+    "recovered_fills": 1
+  },
+  "quality": {
+    "sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+    "ruff": "PASS 0.15.22",
+    "bandit_medium_high": "PASS 1.9.4",
+    "runtime_dependency_audit": "PASS no known vulnerabilities",
+    "unittest_on_local_head": 549,
+    "synthetic_smoke": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "browser": {
+    "sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+    "command": "PYTHONPATH=packages/alpha_lab/src:.:tests/unit python tests/acceptance/owner_paper_browser.py --postgres-bin /path/to/postgresql/bin --chromium /path/to/chromium",
+    "environment": "Managed Linux, Chromium 156 and Playwright 1.62",
+    "status": "BLOCKED",
+    "observed": "Chromium AF_UNIX socket denied. Headless Shell archive download was truncated. Physical Android unavailable."
+  },
+  "hosted": {
+    "render_health": "research_only, trading disabled",
+    "render_paper_state_http": 404,
+    "render_free_postgres_expiry": "2026-12-09",
+    "sites_live_version": 2,
+    "sites_latest_saved_version": 4,
+    "sites_deployed_commit": "53f97736f91f36f8c68a505628bb0085ad6c5bdb",
+    "sites_metadata": "successful",
+    "fresh_site_probe_http": 403
+  },
+  "legacy_failed_heads": [
+    {
+      "pr": 100,
+      "run_ids": [
+        43153779647
+      ],
+      "cause": "legacy Ruff findings; fixed in #103"
+    },
+    {
+      "pr": 76,
+      "run_ids": [
+        42641916245,
+        42639164939,
+        42639150695
+      ],
+      "cause": "legacy workflow missing cryptography; dependency-installed active stack passes"
+    },
+    {
+      "pr": 42,
+      "run_ids": [
+        42541378983,
+        42541373118
+      ],
+      "cause": "three legacy message assertions expect HALT while invalid numeric input is rejected first"
+    }
+  ]
+}

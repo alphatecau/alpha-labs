@@ -42,7 +42,18 @@
       "evidence": [
         "evidence/independent-review-20261112/dependency-review.json"
       ],
-      "details": "Fresh GitHub API heads match local immutable commits. main \u2192 #103 \u2192 #104 \u2192 #105 ancestry holds; object-only merge-tree reports zero conflicts for these three heads against current main. No merge performed."
+      "details": "Fresh GitHub API heads match local immutable commits. main \u2192 #103 \u2192 #104 \u2192 #105 ancestry holds; object-only merge-tree reports zero conflicts for these three heads against current main. No merge performed.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "GitHub read-only refs, local Git objects and branch ancestry",
+        "reproduce": "git ls-remote --heads origin; git merge-base --is-ancestor; git merge-tree --write-tree",
+        "details": "Current stack reconciled with independent #107 and #108 integrations. 116 branches inventoried. 35 dry conflicts against main.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "CI103",
@@ -56,7 +67,18 @@
         "evidence/independent-review-20261112/ci-snapshot.json",
         "evidence/independent-review-20261112/checkout-tree-proof.json"
       ],
-      "details": "12 exact-head-associated runs succeeded. Decoded backend logs independently match 247 tests + 48 subtests. #103/#104 checked out merge commits with trees exactly equal to their head trees; #105 checked out its head directly. Run success is not deployment approval."
+      "details": "12 exact-head-associated runs succeeded. Decoded backend logs independently match 247 tests + 48 subtests. #103/#104 checked out merge commits with trees exactly equal to their head trees; #105 checked out its head directly. Run success is not deployment approval.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "0c0a99f62f8e25df6c66a74ea8447922f57ea16d",
+        "environment": "GitHub Actions PR-triggered exact-head workflow run",
+        "reproduce": "List PR workflow runs by exact head and inspect job conclusions.",
+        "details": "10 observed workflows passed.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "U103",
@@ -69,7 +91,18 @@
       "evidence": [
         "evidence/independent-review-20261112/unit-103.log"
       ],
-      "details": "247 passed + 48 subtests; exit 0; zero failures/errors/skips. Fresh executions, not previous report counts."
+      "details": "247 passed + 48 subtests; exit 0; zero failures/errors/skips. Fresh executions, not previous report counts.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "0c0a99f62f8e25df6c66a74ea8447922f57ea16d",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+        "reproduce": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q",
+        "details": "247 passed and 48 subtests passed. Zero failures or skips.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "CI104",
@@ -83,7 +116,18 @@
         "evidence/independent-review-20261112/ci-snapshot.json",
         "evidence/independent-review-20261112/checkout-tree-proof.json"
       ],
-      "details": "16 exact-head-associated runs succeeded. Decoded backend logs independently match 460 tests + 207 subtests. #103/#104 checked out merge commits with trees exactly equal to their head trees; #105 checked out its head directly. Run success is not deployment approval."
+      "details": "16 exact-head-associated runs succeeded. Decoded backend logs independently match 460 tests + 207 subtests. #103/#104 checked out merge commits with trees exactly equal to their head trees; #105 checked out its head directly. Run success is not deployment approval.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+        "environment": "GitHub Actions PR-triggered exact-head workflow run",
+        "reproduce": "List PR workflow runs by exact head and inspect job conclusions.",
+        "details": "15 observed workflows passed.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "U104",
@@ -96,7 +140,18 @@
       "evidence": [
         "evidence/independent-review-20261112/unit-104.log"
       ],
-      "details": "460 passed + 207 subtests; exit 0; zero failures/errors/skips. Fresh executions, not previous report counts."
+      "details": "460 passed + 207 subtests; exit 0; zero failures/errors/skips. Fresh executions, not previous report counts.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+        "reproduce": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q",
+        "details": "460 passed and 207 subtests passed. Zero failures or skips.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "CI105",
@@ -110,7 +165,18 @@
         "evidence/independent-review-20261112/ci-snapshot.json",
         "evidence/independent-review-20261112/checkout-tree-proof.json"
       ],
-      "details": "20 exact-head-associated runs succeeded. Decoded backend logs independently match 518 tests + 230 subtests. #103/#104 checked out merge commits with trees exactly equal to their head trees; #105 checked out its head directly. Run success is not deployment approval."
+      "details": "20 exact-head-associated runs succeeded. Decoded backend logs independently match 518 tests + 230 subtests. #103/#104 checked out merge commits with trees exactly equal to their head trees; #105 checked out its head directly. Run success is not deployment approval.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "be2901e7582eee9636460236b2521b2fefe7a2c0",
+        "environment": "GitHub Actions PR-triggered exact-head workflow run",
+        "reproduce": "List PR workflow runs by exact head and inspect job conclusions.",
+        "details": "20 observed workflows passed. The ref-movement failure passed on rerun after refs stabilised.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "U105",
@@ -123,7 +189,18 @@
       "evidence": [
         "evidence/independent-review-20261112/unit-105.log"
       ],
-      "details": "518 passed + 230 subtests; exit 0; zero failures/errors/skips. Fresh executions, not previous report counts."
+      "details": "518 passed + 230 subtests; exit 0; zero failures/errors/skips. Fresh executions, not previous report counts.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "be2901e7582eee9636460236b2521b2fefe7a2c0",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+        "reproduce": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q",
+        "details": "538 passed and 240 subtests passed. Zero failures or skips.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "PG104",
@@ -135,7 +212,18 @@
       "evidence": [
         "evidence/independent-review-20261112/postgres-104.log"
       ],
-      "details": "35 original integration tests executed against disposable PostgreSQL 16, no skips. Actual RLS/tenant-role/GUC/pool/ownership/revocation/state/quota adversarial assertions, not production identity acceptance."
+      "details": "35 original integration tests executed against disposable PostgreSQL 16, no skips. Actual RLS/tenant-role/GUC/pool/ownership/revocation/state/quota adversarial assertions, not production identity acceptance.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+        "reproduce": "ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q",
+        "details": "35 passed and 22 subtests passed. Zero failures or skips.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "PG105",
@@ -147,7 +235,18 @@
       "evidence": [
         "evidence/independent-review-20261112/postgres-105.log"
       ],
-      "details": "38 original integration tests executed against disposable PostgreSQL, no skips; original owner boundary/quota tests reproduced before modifying their fixtures."
+      "details": "38 original integration tests executed against disposable PostgreSQL, no skips; original owner boundary/quota tests reproduced before modifying their fixtures.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "be2901e7582eee9636460236b2521b2fefe7a2c0",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+        "reproduce": "ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q",
+        "details": "38 passed and 22 subtests passed. Zero failures or skips.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "DEP-OLD",
@@ -159,7 +258,18 @@
       "evidence": [
         "evidence/independent-review-20261112/dependency-audit.json"
       ],
-      "details": "Fresh pip-audit exit 1: resolved cryptography 46.0.7 has seven advisory entries, four distinct IDs. Negative reproduction; not an assertion that #103 still uses this constraint."
+      "details": "Fresh pip-audit exit 1: resolved cryptography 46.0.7 has seven advisory entries, four distinct IDs. Negative reproduction; not an assertion that #103 still uses this constraint.",
+      "historical_status": "FAIL",
+      "current_verification": {
+        "status": "FAIL",
+        "commit_sha": "23b463c2326b461d0f4417cddff9459faf78b3db",
+        "environment": "Historical exact-source audit, preserved from 12 November 2026",
+        "reproduce": "Follow the exact commands and original source SHA in the historical evidence.",
+        "details": "Fresh pip-audit exit 1: resolved cryptography 46.0.7 has seven advisory entries, four distinct IDs. Negative reproduction; not an assertion that #103 still uses this constraint.",
+        "evidence": [
+          "evidence/independent-review-20261112/dependency-audit.json"
+        ]
+      }
     },
     {
       "id": "DEP-NEW",
@@ -172,7 +282,18 @@
       "evidence": [
         "evidence/independent-review-20261112/dependency-audit.json"
       ],
-      "details": "Resolved cryptography 50.0.2, cffi 2.1.1 and pycparser 3.12: zero known runtime advisories; exit 0. RSA/OIDC tests executed using patched cryptography. Test-tool dependencies and future advisories are outside this result."
+      "details": "Resolved cryptography 50.0.2, cffi 2.1.1 and pycparser 3.12: zero known runtime advisories; exit 0. RSA/OIDC tests executed using patched cryptography. Test-tool dependencies and future advisories are outside this result.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+        "reproduce": "pip-audit --strict -r runtime-requirements.txt --format json",
+        "details": "Resolved cryptography 50.0.2. Zero known runtime dependency vulnerabilities reported.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "AST103",
@@ -184,7 +305,18 @@
       "evidence": [
         "evidence/independent-review-20261112/ast-equivalence.json"
       ],
-      "details": "All 18 changed Python files are AST-equivalent with explicitly limited import splitting, two inspected OHLCV renames, and one test import moved across a function definition. No general semantic-proof claim."
+      "details": "All 18 changed Python files are AST-equivalent with explicitly limited import splitting, two inspected OHLCV renames, and one test import moved across a function definition. No general semantic-proof claim.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "0c0a99f62f8e25df6c66a74ea8447922f57ea16d",
+        "environment": "Historical exact-source audit, preserved from 12 November 2026",
+        "reproduce": "Follow the exact commands and original source SHA in the historical evidence.",
+        "details": "All 18 changed Python files are AST-equivalent with explicitly limited import splitting, two inspected OHLCV renames, and one test import moved across a function definition. No general semantic-proof claim.",
+        "evidence": [
+          "evidence/independent-review-20261112/ast-equivalence.json"
+        ]
+      }
     },
     {
       "id": "B310-BEFORE",
@@ -197,7 +329,19 @@
         "evidence/independent-review-20261112/negative-reproductions.json",
         "evidence/independent-review-20261112/bandit-disposition.json"
       ],
-      "details": "Actual urllib redirection processing, synthetic handlers and no external target request: both fixed HTTPS downloader origins followed a redirect to an HTTP loopback target. B310 findings are actionable transport weaknesses, not waived false positives."
+      "details": "Actual urllib redirection processing, synthetic handlers and no external target request: both fixed HTTPS downloader origins followed a redirect to an HTTP loopback target. B310 findings are actionable transport weaknesses, not waived false positives.",
+      "historical_status": "FAIL",
+      "current_verification": {
+        "status": "FAIL",
+        "commit_sha": "58cdc4df30004df424b2ad9da7f5905321fadf63",
+        "environment": "Historical exact-source audit, preserved from 12 November 2026",
+        "reproduce": "Follow the exact commands and original source SHA in the historical evidence.",
+        "details": "Actual urllib redirection processing, synthetic handlers and no external target request: both fixed HTTPS downloader origins followed a redirect to an HTTP loopback target. B310 findings are actionable transport weaknesses, not waived false positives.",
+        "evidence": [
+          "evidence/independent-review-20261112/negative-reproductions.json",
+          "evidence/independent-review-20261112/bandit-disposition.json"
+        ]
+      }
     },
     {
       "id": "BANDIT-AFTER",
@@ -208,7 +352,18 @@
         "evidence/independent-review-20261112/bandit-disposition.json",
         "evidence/independent-review-20261112/repair-source-fingerprint.json"
       ],
-      "details": "Both historical downloaders now use fixed-origin GET, reject redirects/status/origin changes and oversized responses. Kraken also rejects oversized valid-JSON prefixes. Probe diagnostic CLI now binds 127.0.0.1. Bandit 1.9.4 -ll exits 0 with zero medium/high findings; no nosec directives, skipped rules or blanket exclusions added. Dedicated CI job enforces this gate."
+      "details": "Both historical downloaders now use fixed-origin GET, reject redirects/status/origin changes and oversized responses. Kraken also rejects oversized valid-JSON prefixes. Probe diagnostic CLI now binds 127.0.0.1. Bandit 1.9.4 -ll exits 0 with zero medium/high findings; no nosec directives, skipped rules or blanket exclusions added. Dedicated CI job enforces this gate.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+        "reproduce": "bandit -q -r packages deployment -ll -f json -o bandit.json",
+        "details": "Zero medium/high findings. Exact-head owner CI also passed.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "CHECKPOINT-BEFORE",
@@ -220,7 +375,18 @@
       "evidence": [
         "evidence/independent-review-20261112/negative-reproductions.json"
       ],
-      "details": "Temporary database reproduction: committed fill removed from events; original LivePaperSession reopened with sequence zero and re-armed. Runtime checkpoint primitives existed but were absent from owner-session composition."
+      "details": "Temporary database reproduction: committed fill removed from events; original LivePaperSession reopened with sequence zero and re-armed. Runtime checkpoint primitives existed but were absent from owner-session composition.",
+      "historical_status": "FAIL",
+      "current_verification": {
+        "status": "FAIL",
+        "commit_sha": "58cdc4df30004df424b2ad9da7f5905321fadf63",
+        "environment": "Historical exact-source audit, preserved from 12 November 2026",
+        "reproduce": "Follow the exact commands and original source SHA in the historical evidence.",
+        "details": "Temporary database reproduction: committed fill removed from events; original LivePaperSession reopened with sequence zero and re-armed. Runtime checkpoint primitives existed but were absent from owner-session composition.",
+        "evidence": [
+          "evidence/independent-review-20261112/negative-reproductions.json"
+        ]
+      }
     },
     {
       "id": "CHECKPOINT-REPAIR",
@@ -232,7 +398,18 @@
         "evidence/independent-review-20261112/unit-repair.log",
         "evidence/independent-review-20261112/repair-source-fingerprint.json"
       ],
-      "details": "Owner BFF requires a separate PostgreSQL checkpoint adapter and an independently injected key. Dedicated LOGIN NOINHERIT role permits only SELECT/INSERT; mutable/privileged/owner/misbound identities rejected. Single-owner CHECK is validated; signed canonical checkpoints advance by atomic compare-and-swap. Rollback/mismatch/missing authority blocks startup/arm/state/order; idempotent retry cannot accept an unanchored extension."
+      "details": "Owner BFF requires a separate PostgreSQL checkpoint adapter and an independently injected key. Dedicated LOGIN NOINHERIT role permits only SELECT/INSERT; mutable/privileged/owner/misbound identities rejected. Single-owner CHECK is validated; signed canonical checkpoints advance by atomic compare-and-swap. Rollback/mismatch/missing authority blocks startup/arm/state/order; idempotent retry cannot accept an unanchored extension.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+        "reproduce": "ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q",
+        "details": "Owner-bound full state authentication, least privilege, replay and rollback rejection tested.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "CHECKPOINT-COMMIT",
@@ -243,7 +420,18 @@
         "evidence/independent-review-20261112/postgres-repair.log",
         "evidence/independent-review-20261112/unit-repair.log"
       ],
-      "details": "Checkpointed restart recovers exactly one fill, remains halted and returns ALREADY_COMMITTED. Concurrent checkpoint CAS has one winner. Actual checkpoint-table outage after local fill commit returns 503/HALT, cannot acknowledge/refill, and restart rejects the unanchored extension. The two databases do not form one atomic transaction; manual independent reconciliation is required for this failure window, with no automatic adoption."
+      "details": "Checkpointed restart recovers exactly one fill, remains halted and returns ALREADY_COMMITTED. Concurrent checkpoint CAS has one winner. Actual checkpoint-table outage after local fill commit returns 503/HALT, cannot acknowledge/refill, and restart rejects the unanchored extension. The two databases do not form one atomic transaction; manual independent reconciliation is required for this failure window, with no automatic adoption.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+        "reproduce": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q; PYTHONPATH=packages/alpha_lab/src:.:tests/unit python tests/acceptance/protected_paper_recovery.py --postgres-bin /path/to/postgresql/bin",
+        "details": "Lost confirmation recovers only an exact pair. Local-only commits fail closed.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "DB-SHUTDOWN",
@@ -253,7 +441,18 @@
       "evidence": [
         "evidence/independent-review-20261112/database-shutdown.json"
       ],
-      "details": "After deliberately stopping/removing the labelled local PostgreSQL container, protected state access returns CHECKPOINT_HALT/503 and ledger halts. Test connection timeout is one second; observed failure latency 0.002 seconds. Deployment network timeouts remain unaccepted."
+      "details": "After deliberately stopping/removing the labelled local PostgreSQL container, protected state access returns CHECKPOINT_HALT/503 and ledger halts. Test connection timeout is one second; observed failure latency 0.002 seconds. Deployment network timeouts remain unaccepted.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+        "reproduce": "PYTHONPATH=packages/alpha_lab/src:.:tests/unit python tests/acceptance/protected_paper_recovery.py --postgres-bin /path/to/postgresql/bin",
+        "details": "Actual shutdown during a write produced CHECKPOINT_HALT/503. Unmatched restart refused.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "HTTP-RELAY",
@@ -263,7 +462,18 @@
       "evidence": [
         "evidence/independent-review-20261112/postgres-repair.log"
       ],
-      "details": "Actual WSGI/HTTP round trip verifies cookie-derived owner, private HTML CSRF, forwarded-chain rejection, wrong-owner denial, order deduplication, protected commit and durable revocation/HALT. HTTPS assertion is simulated on a trusted loopback hop; this is not real TLS/proxy or Auth0 interoperability acceptance."
+      "details": "Actual WSGI/HTTP round trip verifies cookie-derived owner, private HTML CSRF, forwarded-chain rejection, wrong-owner denial, order deduplication, protected commit and durable revocation/HALT. HTTPS assertion is simulated on a trusted loopback hop; this is not real TLS/proxy or Auth0 interoperability acceptance.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+        "reproduce": "ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q",
+        "details": "Loopback WSGI owner routes and existing signed server relay pass adversarial tests.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "QUOTAS",
@@ -273,7 +483,18 @@
       "evidence": [
         "evidence/independent-review-20261112/postgres-repair.log"
       ],
-      "details": "All 44 integration tests pass. Two BFF instances sharing one paper session admit seven of 16 concurrent requests, one fill and nine 429 responses; research and paper routes share quota. Authenticated emergency HALT is quota-exempt and cannot return portfolio data or place orders. Tenant isolation, role impersonation, pooled identity and revocation tests use actual PostgreSQL."
+      "details": "All 44 integration tests pass. Two BFF instances sharing one paper session admit seven of 16 concurrent requests, one fill and nine 429 responses; research and paper routes share quota. Authenticated emergency HALT is quota-exempt and cannot return portfolio data or place orders. Tenant isolation, role impersonation, pooled identity and revocation tests use actual PostgreSQL.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+        "reproduce": "ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q",
+        "details": "Shared PostgreSQL quota, owner and tenant isolation and bounded PKCE challenges pass.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "AUTH0-REAL",
@@ -281,7 +502,18 @@
       "status": "BLOCKED",
       "scope": "external acceptance",
       "evidence": [],
-      "details": "Environment readiness reports no configured secrets/runtime bindings/outbound identities. Approved real issuer/client/callback configuration, a test identity and browser sign-in session are unavailable. No credential values requested, modified or created; synthetic JWT/PKCE tests cannot satisfy this gate."
+      "details": "Environment readiness reports no configured secrets/runtime bindings/outbound identities. Approved real issuer/client/callback configuration, a test identity and browser sign-in session are unavailable. No credential values requested, modified or created; synthetic JWT/PKCE tests cannot satisfy this gate.",
+      "historical_status": "BLOCKED",
+      "current_verification": {
+        "status": "BLOCKED",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Real hosted Auth0 unavailable",
+        "reproduce": "Use owner and second test identity; run hosted PKCE/JWKS/expiry/revocation checklist.",
+        "details": "Real issuer, client and hosted callback acceptance remain unavailable.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "PROXY-REAL",
@@ -289,7 +521,18 @@
       "status": "BLOCKED",
       "scope": "external acceptance",
       "evidence": [],
-      "details": "No reviewed deployed peer CIDRs, real TLS termination or trusted ingress topology supplied. Offline and loopback boundary tests pass, but actual forwarded-header stripping, cookies and cross-user behavior through the final gateway remain unaccepted. No deployment authorized."
+      "details": "No reviewed deployed peer CIDRs, real TLS termination or trusted ingress topology supplied. Offline and loopback boundary tests pass, but actual forwarded-header stripping, cookies and cross-user behavior through the final gateway remain unaccepted. No deployment authorized.",
+      "historical_status": "BLOCKED",
+      "current_verification": {
+        "status": "BLOCKED",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Existing Render service is a health probe",
+        "reproduce": "Observe trusted socket peers, TLS origin and spoofed-header rejection in isolated ingress.",
+        "details": "Render health-only probe reports research_only. No protected paper ingress configured.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "STORAGE-REAL",
@@ -297,15 +540,37 @@
       "status": "BLOCKED",
       "scope": "external acceptance",
       "evidence": [],
-      "details": "The SQL authority is tested using synthetic credentials/key only. Real separation from the paper disk, least-privilege deployment grants, key custody, restore floor and recovery procedure have not been provisioned or accepted. Coordinated rollback of both trusted database and journal needs independent backup/retention policy."
+      "details": "The SQL authority is tested using synthetic credentials/key only. Real separation from the paper disk, least-privilege deployment grants, key custody, restore floor and recovery procedure have not been provisioned or accepted. Coordinated rollback of both trusted database and journal needs independent backup/retention policy.",
+      "historical_status": "BLOCKED",
+      "current_verification": {
+        "status": "BLOCKED",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Hosted storage and key custody unavailable",
+        "reproduce": "PYTHONPATH=packages/alpha_lab/src:.:tests/unit python tests/acceptance/protected_paper_recovery.py --postgres-bin /path/to/postgresql/bin; repeat against authorised isolated hosted storage.",
+        "details": "Disposable backup restore passed. Durable mount, independent key and current protected recovery receipt require operational acceptance.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "CONTROL-STATE",
       "area": "Full mutable control-state rollback resistance",
-      "status": "NOT_INSPECTED",
+      "status": "PASS",
       "scope": "security scope limit",
       "evidence": [],
-      "details": "New checkpoints authenticate the fill-event journal, not every mutable paper_guard risk/control field. Exhaustive malicious control-metadata rollback, whole-host compromise and separate signing-key custody acceptance are not certified; private filesystem permissions and further independent acceptance remain required."
+      "details": "New checkpoints authenticate the fill-event journal, not every mutable paper_guard risk/control field. Exhaustive malicious control-metadata rollback, whole-host compromise and separate signing-key custody acceptance are not certified; private filesystem permissions and further independent acceptance remain required.",
+      "historical_status": "NOT_INSPECTED",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0, psycopg 3.3.9, disposable loopback PostgreSQL 16.2",
+        "reproduce": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q; ALPHA_DISPOSABLE_PG_CI=1 with guarded local fixture DSNs; python -m pytest tests/integration -q",
+        "details": "Full control-state commitments, limit lifecycle, guard-only rollback, tampering and recovery pass locally. Coordinated rollback requires independent receipt.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "COINBASE",
@@ -315,7 +580,18 @@
       "evidence": [
         "evidence/independent-review-20261112/coinbase-observation.json"
       ],
-      "details": "Fresh BTC-USD/ETH-USD/SOL-USD Coinbase Exchange level-one bid/ask, sequence and exchange-event UTC timestamps validated at 2026-11-12T09:59:42\u201343Z. Ages were 0.64\u20131.89 seconds. Historical observations only; no conversion, forecasts, live orders or future availability guarantee."
+      "details": "Fresh BTC-USD/ETH-USD/SOL-USD Coinbase Exchange level-one bid/ask, sequence and exchange-event UTC timestamps validated at 2026-11-12T09:59:42\u201343Z. Ages were 0.64\u20131.89 seconds. Historical observations only; no conversion, forecasts, live orders or future availability guarantee.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "df81e558b3289007bc2ce816c06728dec1962df0",
+        "environment": "Managed Linux with actual read-only Coinbase public quotes",
+        "reproduce": "PaperMarketFeed.poll with 3 workers; use the local terminal arm, buy, sell and restart against a disposable SQLite directory",
+        "details": "Three fresh books observed. Two SOL-USD simulated market fills recovered from a disposable journal.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "WEB-LOGIC",
@@ -325,7 +601,18 @@
       "evidence": [
         "evidence/independent-review-20261112/website.log"
       ],
-      "details": "42 tests pass, zero skips. Includes controller network/storage failures, confirmation cancellation, CSRF transport, same-ID retries and freshness locking. Existing research assets are unchanged. This is not browser rendering or physical Android acceptance."
+      "details": "42 tests pass, zero skips. Includes controller network/storage failures, confirmation cancellation, CSRF transport, same-ID retries and freshness locking. Existing research assets are unchanged. This is not browser rendering or physical Android acceptance.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Node 24.22.1",
+        "reproduce": "node --test apps/sites/tests/*.test.cjs",
+        "details": "43 passed. No skipped controller tests.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "ANDROID",
@@ -333,7 +620,18 @@
       "status": "BLOCKED",
       "scope": "managed browser",
       "evidence": [],
-      "details": "Managed desktop is enabled with state unknown; environment ccarenv_b64_Y2NhcmVudl8wNzA3Zjk2NTFiOTg4MTkxYTc0NWIwYWM5MDI4MGQxYQ. No cua_repl.js/desktop JavaScript control tool is exposed. Sites SKILL.md requires skipping managed browser QA in that case; no preview, browser workaround or device pass claimed."
+      "details": "Managed desktop is enabled with state unknown; environment ccarenv_b64_Y2NhcmVudl8wNzA3Zjk2NTFiOTg4MTkxYTc0NWIwYWM5MDI4MGQxYQ. No cua_repl.js/desktop JavaScript control tool is exposed. Sites SKILL.md requires skipping managed browser QA in that case; no preview, browser workaround or device pass claimed.",
+      "historical_status": "BLOCKED",
+      "current_verification": {
+        "status": "BLOCKED",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Managed Linux, Chromium 156 and Playwright 1.62",
+        "reproduce": "PYTHONPATH=packages/alpha_lab/src:.:tests/unit python tests/acceptance/owner_paper_browser.py --postgres-bin /path/to/postgresql/bin --chromium /path/to/chromium; manual Android steps in the protected staging runbook.",
+        "details": "AF_UNIX socket blocked. Headless Shell download failed. Physical Android not available.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "SITE-ACCESS",
@@ -343,7 +641,18 @@
       "evidence": [
         "evidence/independent-review-20261112/site-metadata.json"
       ],
-      "details": "Existing research Site reports access_mode=public, policy revision 2, one allowed user, zero external visitors; auth client configured does not establish owner-only access. Access/content unchanged. This is not evidence that private paper data is publicly exposed."
+      "details": "Existing research Site reports access_mode=public, policy revision 2, one allowed user, zero external visitors; auth client configured does not establish owner-only access. Access/content unchanged. This is not evidence that private paper data is publicly exposed.",
+      "historical_status": "FAIL",
+      "current_verification": {
+        "status": "FAIL",
+        "commit_sha": "53f97736f91f36f8c68a505628bb0085ad6c5bdb",
+        "environment": "Sites deployment metadata and anonymous HTTPS probe from managed Linux",
+        "reproduce": "Read published version 2 status and run an anonymous GET on the root and /api/v1/paper/state",
+        "details": "Research publication is public. It does not supply an owner-only access policy for paper trading.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "SITE-VERSIONS",
@@ -353,7 +662,18 @@
       "evidence": [
         "evidence/independent-review-20261112/site-metadata.json"
       ],
-      "details": "Latest saved version is 4; latest recorded successful publication is version 2, source 53f97736f91f36f8c68a505628bb0085ad6c5bdb. Version 4 has no recorded deployment. Do not label version 4 as the confirmed live version."
+      "details": "Latest saved version is 4; latest recorded successful publication is version 2, source 53f97736f91f36f8c68a505628bb0085ad6c5bdb. Version 4 has no recorded deployment. Do not label version 4 as the confirmed live version.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "53f97736f91f36f8c68a505628bb0085ad6c5bdb",
+        "environment": "Sites deployment metadata and anonymous HTTPS probe from managed Linux",
+        "reproduce": "Read published version 2 status and run an anonymous GET on the root and /api/v1/paper/state",
+        "details": "Sites reports version 2 published successfully, versions 3 and 4 saved.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "SITE-SOURCE",
@@ -363,7 +683,18 @@
       "evidence": [
         "evidence/independent-review-20261112/site-metadata.json"
       ],
-      "details": "Both selected saved archive downloads could not be authorized or resolved. No source-write credential, bypass token, environment-secret read or alternate access path was requested. Exact currently served source binding remains NOT_INSPECTED."
+      "details": "Both selected saved archive downloads could not be authorized or resolved. No source-write credential, bypass token, environment-secret read or alternate access path was requested. Exact currently served source binding remains NOT_INSPECTED.",
+      "historical_status": "BLOCKED",
+      "current_verification": {
+        "status": "BLOCKED",
+        "commit_sha": "53f97736f91f36f8c68a505628bb0085ad6c5bdb",
+        "environment": "Sites deployment metadata and anonymous HTTPS probe from managed Linux",
+        "reproduce": "Read published version 2 status and run an anonymous GET on the root and /api/v1/paper/state",
+        "details": "Publication metadata is available. Managed public GET returned 403 and saved source acceptance was not established.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "SITE-RELAY",
@@ -373,7 +704,18 @@
       "evidence": [
         "evidence/independent-review-20261112/site-metadata.json"
       ],
-      "details": "Unauthenticated GET / and /api/v1/paper/state both return HTTP 200 and identical research HTML (SHA256 98b467405ad9b67f7213a40fdf3312b673780af42e2f0a1c9b7e40bcbc56bf4c), not paper-state JSON. This does not establish an integrated authenticated hosted relay; other privileged routes were not probed."
+      "details": "Unauthenticated GET / and /api/v1/paper/state both return HTTP 200 and identical research HTML (SHA256 98b467405ad9b67f7213a40fdf3312b673780af42e2f0a1c9b7e40bcbc56bf4c), not paper-state JSON. This does not establish an integrated authenticated hosted relay; other privileged routes were not probed.",
+      "historical_status": "BLOCKED",
+      "current_verification": {
+        "status": "BLOCKED",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "Sites deployment metadata and anonymous HTTPS probe from managed Linux",
+        "reproduce": "Read published version 2 status and run an anonymous GET on the root and /api/v1/paper/state",
+        "details": "No secure hosted Site relay acceptance. External authenticated BFF retained.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "PR99",
@@ -385,7 +727,18 @@
       "evidence": [
         "evidence/independent-review-20261112/pr99-main-equivalence.log"
       ],
-      "details": "Four original #99 test methods executed against the exact main quote module and all pass. Assertions already represented in merged #98; semantic assertion equivalence, not byte identity. Recommend closure only after owner review; no closure performed."
+      "details": "Four original #99 test methods executed against the exact main quote module and all pass. Assertions already represented in merged #98; semantic assertion equivalence, not byte identity. Recommend closure only after owner review; no closure performed.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "09f9c9870d9b2bb9ed77b6cba6aaff6591b0300e",
+        "environment": "Historical exact-source audit, preserved from 12 November 2026",
+        "reproduce": "Follow the exact commands and original source SHA in the historical evidence.",
+        "details": "Four original #99 test methods executed against the exact main quote module and all pass. Assertions already represented in merged #98; semantic assertion equivalence, not byte identity. Recommend closure only after owner review; no closure performed.",
+        "evidence": [
+          "evidence/independent-review-20261112/pr99-main-equivalence.log"
+        ]
+      }
     },
     {
       "id": "PR92",
@@ -395,7 +748,16 @@
         "head": "6f5250b82a8242f58bfbe564c527dd233d965b8e"
       },
       "evidence": [],
-      "details": "Original 27 tests pass; six newer adversarial methods produce 11 assertion/subtest failures and two errors for count/conclusion/truncated-HTTP/current-ref cases. Existing #94 repair remains in #104/#105 and passes their fresh unit suites. Prefer successor, retain unchanged-head failures."
+      "details": "Original 27 tests pass; six newer adversarial methods produce 11 assertion/subtest failures and two errors for count/conclusion/truncated-HTTP/current-ref cases. Existing #94 repair remains in #104/#105 and passes their fresh unit suites. Prefer successor, retain unchanged-head failures.",
+      "historical_status": "FAIL",
+      "current_verification": {
+        "status": "FAIL",
+        "commit_sha": "6f5250b82a8242f58bfbe564c527dd233d965b8e",
+        "environment": "Historical exact-source audit, preserved from 12 November 2026",
+        "reproduce": "Follow the exact commands and original source SHA in the historical evidence.",
+        "details": "Original 27 tests pass; six newer adversarial methods produce 11 assertion/subtest failures and two errors for count/conclusion/truncated-HTTP/current-ref cases. Existing #94 repair remains in #104/#105 and passes their fresh unit suites. Prefer successor, retain unchanged-head failures.",
+        "evidence": []
+      }
     },
     {
       "id": "LOCAL-REPAIR",
@@ -408,7 +770,18 @@
         "evidence/independent-review-20261112/website.log",
         "evidence/independent-review-20261112/repair-source-fingerprint.json"
       ],
-      "details": "525 unit tests plus 230 subtests (755 JUnit cases), zero failures/errors/skips; 44 real PostgreSQL integration tests; 42 website tests. Three SQL fixtures, synthetic smoke, selected Ruff, actionlint, Gitleaks, runtime dependency audit and medium/high Bandit gate pass. Exact repair remote SHA/CI are recorded in the draft PR after publication, not inferred from parent CI."
+      "details": "525 unit tests plus 230 subtests (755 JUnit cases), zero failures/errors/skips; 44 real PostgreSQL integration tests; 42 website tests. Three SQL fixtures, synthetic smoke, selected Ruff, actionlint, Gitleaks, runtime dependency audit and medium/high Bandit gate pass. Exact repair remote SHA/CI are recorded in the draft PR after publication, not inferred from parent CI.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "df81e558b3289007bc2ce816c06728dec1962df0",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+        "reproduce": "PYTHONPATH=packages/alpha_lab/src:.:tests/integration python -m pytest tests/unit -q; node --test apps/sites/tests/*.test.cjs",
+        "details": "562 unit tests plus 246 subtests. Local terminal suite 40 plus 31 subtests. No skipped unit cases.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "MAKE",
@@ -418,7 +791,18 @@
       "evidence": [
         "evidence/independent-review-20261112/make-research-test-summary.log"
       ],
-      "details": "make research-test exits 0 with 512 unittest tests. Pytest discovers 525 methods/functions plus subtests, so the broader CI pytest gate matters. Expected read-only-unavailable diagnostics come from negative tests; no test failed."
+      "details": "make research-test exits 0 with 512 unittest tests. Pytest discovers 525 methods/functions plus subtests, so the broader CI pytest gate matters. Expected read-only-unavailable diagnostics come from negative tests; no test failed.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "df81e558b3289007bc2ce816c06728dec1962df0",
+        "environment": "Managed Linux, Python 3.12.14, pytest 9.2.0",
+        "reproduce": "make research-test",
+        "details": "549 unittest cases passed.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "HISTORY",
@@ -426,7 +810,18 @@
       "status": "NOT_INSPECTED",
       "scope": "outside focused dependency review",
       "evidence": [],
-      "details": "No new claim of exhaustive source review, branch-creation provenance or Git-history secret scanning. Prior branch inventory and evidence are retained. No branch deletion, PR closure or automatic merge."
+      "details": "No new claim of exhaustive source review, branch-creation provenance or Git-history secret scanning. Prior branch inventory and evidence are retained. No branch deletion, PR closure or automatic merge.",
+      "historical_status": "NOT_INSPECTED",
+      "current_verification": {
+        "status": "NOT_INSPECTED",
+        "commit_sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+        "environment": "GitHub read-only refs, local Git objects and branch ancestry",
+        "reproduce": "Inspect the ancestry and dry conflict inventory; review separate source branches individually.",
+        "details": "All observed branches inventoried. No complete source review of separate historical branches.",
+        "evidence": [
+          "evidence/master-completion-20261113/verification.json"
+        ]
+      }
     },
     {
       "id": "CI-REPAIR",
@@ -438,7 +833,39 @@
       "evidence": [
         "evidence/independent-review-20261112/repair-ci-receipt.json"
       ],
-      "details": "All nine exact-head runs succeeded; decoded checkout logs match the source SHA. Backend: 525 + 230 subtests, 755 JUnit cases, zero skips/failures/errors. Owner acceptance: 26 tests + two subtests, public-transport five tests; separate Bandit medium/high gate and runtime dependency audit pass. Both owner/security artifacts retained."
+      "details": "All nine exact-head runs succeeded; decoded checkout logs match the source SHA. Backend: 525 + 230 subtests, 755 JUnit cases, zero skips/failures/errors. Owner acceptance: 26 tests + two subtests, public-transport five tests; separate Bandit medium/high gate and runtime dependency audit pass. Both owner/security artifacts retained.",
+      "historical_status": "PASS",
+      "current_verification": {
+        "status": "PASS",
+        "commit_sha": "e045f26994078a3193b113a6aa73af8e0f5e5d0a",
+        "environment": "Historical exact-source audit, preserved from 12 November 2026",
+        "reproduce": "Follow the exact commands and original source SHA in the historical evidence.",
+        "details": "All nine exact-head runs succeeded; decoded checkout logs match the source SHA. Backend: 525 + 230 subtests, 755 JUnit cases, zero skips/failures/errors. Owner acceptance: 26 tests + two subtests, public-transport five tests; separate Bandit medium/high gate and runtime dependency audit pass. Both owner/security artifacts retained.",
+        "evidence": [
+          "evidence/independent-review-20261112/repair-ci-receipt.json"
+        ]
+      }
     }
-  ]
+  ],
+  "current_review": {
+    "observed_at": "2026-11-12T15:00:26.686437+00:00",
+    "verified_source_heads": {
+      "103": "0c0a99f62f8e25df6c66a74ea8447922f57ea16d",
+      "104": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+      "105": "be2901e7582eee9636460236b2521b2fefe7a2c0",
+      "106": "eaafdcb0b126574e0af6be5e56034f371cf84794",
+      "109": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+      "110": "df81e558b3289007bc2ce816c06728dec1962df0"
+    },
+    "evidence": "evidence/master-completion-20261113/verification.json",
+    "branch_inventory": "evidence/master-completion-20261113/branch-inventory.json",
+    "decisions": {
+      "offline_research": "GO",
+      "local_simulated_paper": "GO for Linux and synthetic fixture",
+      "private_staging": "NO-GO",
+      "public_research_dashboard": "NO-GO for fresh anonymous access sign-off; version 2 reported published",
+      "hosted_owner_paper": "NO-GO",
+      "real_money": "NO-GO"
+    }
+  }
 }

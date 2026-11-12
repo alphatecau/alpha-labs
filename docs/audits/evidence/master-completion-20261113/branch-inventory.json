@@ -1,0 +1,827 @@
+{
+  "observed_at": "2026-11-12T15:00:26.686437+00:00",
+  "main": "b973e4330888970184cf9f90fb9487a1ff563b3b",
+  "review_stack": "df81e558b3289007bc2ce816c06728dec1962df0",
+  "count": 116,
+  "relations": {
+    "main_ancestor": 4,
+    "separate": 75,
+    "review_stack_ancestor": 37
+  },
+  "dry_conflicts": 35,
+  "scope": "Read-only branch inventory and object-only dry merge against main. Separate branches have no exhaustive source review.",
+  "branches": [
+    {
+      "branch": "origin",
+      "sha": "b973e4330888970184cf9f90fb9487a1ff563b3b",
+      "relation": "main_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "audit/day1-ci-stabilisation-20261109",
+      "sha": "4022bcd2d1a8afe126468bebe549c654975a5d00",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "audit/day1-dedicated-security-ci-20261109",
+      "sha": "9c37ea55d69137953231ce467d4f8b5577611dea",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "audit/post-merge-enforcement-20261109",
+      "sha": "71577ed8dc7cf9e169022c0334acd4e3627d3a7e",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "development/global-foundation-v0.12",
+      "sha": "435f9032b99a0fa7686762b336cf27b9a33b7d48",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "docs/tradingagents-research-roadmap",
+      "sha": "2fa5b8b13b9c4519fcaddcffa73756a1431c89d6",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "feature/diagnostics-integration",
+      "sha": "9230779b557b2fddb6ef152480d48af7aecd60f0",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "feature/evidence-risk-foundation-20261105",
+      "sha": "1440ec07f015a167d49d93062a8a656f81e9adcd",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "feature/multiyear-evidence-20261105",
+      "sha": "20a4470607d670f910bad19a9e330ac3444f0afa",
+      "relation": "main_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "feature/three-market-research",
+      "sha": "d49b8acbf3b673509ae2d65f3cabb9126a758516",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "feature/walk-forward-validation",
+      "sha": "a8f05e24974addd2f02b5e4b8f06be8f2eabaca1",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "fix/binance-close-time-metadata-20261105",
+      "sha": "33691dbcabbe4c5a90a22b8be6fdb442787ba1d4",
+      "relation": "main_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "fix/day1-breakout-decimal-assertion-20261109",
+      "sha": "b877d92c3faabaaf9fb24888195c9dc9f8eddeff",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "fix/paper-quotes-unittest-ci-20261112",
+      "sha": "09f9c9870d9b2bb9ed77b6cba6aaff6591b0300e",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "fix/ruff-legacy-baseline-20261112",
+      "sha": "a903ca6b3c5772302286f175baef5c8bb446df30",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "integration/phase1-accounting-clean-20261108",
+      "sha": "8f79aa79dbc2b840bce8b4a644b5d85bbd964def",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "integration/phase1-data-gates-clean-20261108",
+      "sha": "32e4142b9fc21412664c685828b488d2c6a3a9b5",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "integration/phase1-pr15-review-20261108",
+      "sha": "faa52e80dfdf07c016ecd40cfe3b797a13c7432c",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "main",
+      "sha": "b973e4330888970184cf9f90fb9487a1ff563b3b",
+      "relation": "main_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "repair/restore-v06-source-20261103",
+      "sha": "15caf4fae962b9a51994602321510bbdb9fbd3d9",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/archival-pit-evidence-20261108",
+      "sha": "d0cdcc3448387494579a5cbbd0c9ac5801f08354",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/archive-byte-integrity-20261108",
+      "sha": "6739d937b40b5aaa63e8b03443eede5dec3353fd",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/archive-provenance-phase2-20261108",
+      "sha": "5b48366ae4ad6b4e2091c2e209c03308c1454a17",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/auth-ownership-revocation-20261111",
+      "sha": "cf367d371ab177e41c4d88cf442a99cafedb1b2e",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/auth0-discovery-pkce-main-20261110",
+      "sha": "faf51b983d831d3a03ca24855952923a41478c78",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/auth0-jwt-paper-staging-20261109",
+      "sha": "fbdb0e2776ef3a957127f5f991bac4b6cf147805",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/auth0-oidc-browser-staging-20261109",
+      "sha": "ea04a6170831797a3ad7d92db960a37d1f33c8c4",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/auth0-oidc-session-foundation-20261109",
+      "sha": "6d13cd25fadea94dc663cbe8fc27fe7e670f836b",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/auth0-staging-integration-audit-20261109",
+      "sha": "8933e740b449085b611bf340aee3c884d3ada837",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/authenticated-entry-audit-20261110",
+      "sha": "9a33d1513db44f214495e584aad14c54f1ff4192",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/authenticated-readonly-dashboard-api-20261110",
+      "sha": "529c21baf97acbad60dddb11e1c5d3f84c385662",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/authenticated-readonly-pg-staging-20261109",
+      "sha": "d72c20f8526b28bee85055e1b62bbb329dfb9aeb",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/authenticated-staging-composition-20261110",
+      "sha": "9849a4c71aed0828c2c759ee0d1a2d8a29a93fc1",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/authenticated-staging-entry-integration-20261110",
+      "sha": "4eafca676da18f015ae40c21c72e7849b90ad594",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/behaviour-simulation-prototype",
+      "sha": "5c23f9c386a97630cd5e66aed6a8b44fd69009af",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/chatgpt-engineering-team-20261112",
+      "sha": "9c078873206925d2d230d2d6b442756756f9d9ef",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/ci-evidence-coverage-20261111",
+      "sha": "6f5250b82a8242f58bfbe564c527dd233d965b8e",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/ci-legacy-repair-20261112",
+      "sha": "0c0a99f62f8e25df6c66a74ea8447922f57ea16d",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/ci-security-baseline-20261112",
+      "sha": "194a4a340b2ff0f4e5278125b0e30553a747ceb4",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/combined-evidence-regression-20261108",
+      "sha": "fd8fff9bbece0e58f03218f681de92178098af23",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/consolidated-assurance-review-20261109",
+      "sha": "757cd7c8c14b955a172a85f68e6f25b59607e24b",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/daily-session-import-20261109",
+      "sha": "8ee103055417fed34aa79be50d24b668cfc5c311",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/day2-independent-accounting-oracles-20261109",
+      "sha": "bcf314e4e51207ae05a60eed3031c216f12c4386",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/end-to-end-promotion-enforcement-audit-20261109",
+      "sha": "fc53492338ed16105dc246ab9ffba0e471ed2c68",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/eodhd-disabled-adapter-20261109",
+      "sha": "b83ba23ed2a09f64294ba338d7b75fcd76949865",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/external-bff-wsgi-20261110",
+      "sha": "ddafb88ca0645f2210609cf70a8991fdcea34103",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/free-local-multiasset-paper-20261112",
+      "sha": "ab21e1f8d56579070eb394238cd25756fa8bfca8",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/independent-staging-review-20261112",
+      "sha": "eaafdcb0b126574e0af6be5e56034f371cf84794",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/integrity-gates-20261107",
+      "sha": "63a73ff0afcf331dae130c41435ddc1cc878b61a",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/issue16-accounting-edgecases-20261109",
+      "sha": "2f00603f6c996eed9184e536c55691a85d6e8e06",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/issue16-fill-identity-fee-guard-20261109",
+      "sha": "677b53cdd697bdf7688c0ebec28776ace78a9ede",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/issue16-independent-accounting-oracle-20261109",
+      "sha": "7b393a5e2959ead53e7f1b36e629e5689126c205",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/issue16-main-integration-20261109",
+      "sha": "126b155f7e70d35f9975b5fad6552a4fc0bc7a7d",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/issue16-main-reconciled-ci-20261109",
+      "sha": "63fb0463c510e59ed432b03e82839cf2908d2a9a",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/issue16-phase1-adversarial-verification-20261109",
+      "sha": "311ed87963a439f78d6a6b682dc5ae24d9466d0c",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/issue16-reconciliation-review-20261109",
+      "sha": "1c100669b66fb862d7f9c0e97dfe21b8732ca25d",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/live-paper-console-20261112",
+      "sha": "f9eff55b995ac799877279752c3294eb4d69e202",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/live-paper-market-data-foundation-20261112",
+      "sha": "5b893b6e347e80cd1c79795dd6d1b7802dd18317",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/local-multiasset-rehearsal-20261113",
+      "sha": "df81e558b3289007bc2ce816c06728dec1962df0",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/master-integration-20261112",
+      "sha": "be2901e7582eee9636460236b2521b2fefe7a2c0",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/minimal-auth-boundaries-main-20261110",
+      "sha": "b4eac82018a1d55c27b886daaab27e310c7cb333",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/multi-asset-v0.11",
+      "sha": "f388d9c957a8fb66236f57bb30830289744110e3",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/oidc-account-provisioning-20261109",
+      "sha": "ccd1eef6943a598ff1d0737967b39c7c08d34020",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/oidc-ownership-api-gate-20261109",
+      "sha": "1e49e2dfe553a0066d49f90ca8f43bbdd0102b87",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/oidc-postgres-security-foundation-20261109",
+      "sha": "8aaebfd9bf1b0a904392c946f2b33852a3947a92",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/oidc-proxy-host-security-20261109",
+      "sha": "45abbabee5d5b05f897746d54852b030b3c47ff0",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/oidc-readonly-rate-limit-20261109",
+      "sha": "ebe8141f177024182a9beecc2706233ca2f996d1",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/oidc-session-paper-isolation-20261109",
+      "sha": "e4512e7a0b71a1f2e06dc5b10cd6f4f98b321f79",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/oidc-shared-session-postgres-20261109",
+      "sha": "7b63fda59ab64fa329e8649d18ec2860201c0083",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/oidc-transport-hardening-20261109",
+      "sha": "b2a9cef8e68fcb5fd0307e0087fe8311c0b7deb7",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/opaque-session-foundation-main-20261110",
+      "sha": "1edfae3e5a5a858d2f518ed2b9e927f65a8e72c3",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/paper-first-copy-trading-gates-20261109",
+      "sha": "251d8451d4a0160c67a7081749917ce2bc1d6047",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/paper-risk-failclosed-20261109",
+      "sha": "7130307c0d20df0309b8df1883182111a76bdb4a",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/paper-runtime-hardening-20261109",
+      "sha": "fa3c07018f1d66e72abbbbe0137048e2e54f2f7b",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/paper-runtime-integration-20261109",
+      "sha": "567fe3b2c7742e751a43a2e9b78ccb154efe02d4",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/paper-simulator-foundation-20261109",
+      "sha": "b718179861f4b74145a1ea19ffa6429266a200fa",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/per-account-db-role-isolation-20261110",
+      "sha": "3151ce621e176287fb353ff4d4b9a37fde291a12",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/personal-edition-paper-verification-20261111",
+      "sha": "af3efaafb0d6e0f7ce847d0ee87c334066ffb2b6",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/personal-edition-phase0-20261111",
+      "sha": "e5c215f89d0168c183c885bf56a400dd85ceb2a1",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/phase1-evidence-engine-20261108",
+      "sha": "c5d0aabf78db991a6ac20e0ae64d27d6ac842bfb",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/phase1-integrated-audit-20261108",
+      "sha": "30ce4530ca7c21c3c209e6dc4a57365d528f2b7c",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/phase2-combined-integration-20261109",
+      "sha": "4a1d3ae2bf181290eef32314ebea316f51f60bda",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/phase2-crypto-no-skips-ci-20261109",
+      "sha": "51b8863fed607db7e34037b43fa0f84926cbb304",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/phase2-independent-enforcement-verification-20261109",
+      "sha": "444cc2a050cfc2301e7744fe5d324ddb56cb7f12",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/phase2-three-gates-20261109",
+      "sha": "188f6ed6b4b1839540e0100195e49fbf5a2d4bd4",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/phase3-shared-limiter-20261112",
+      "sha": "6c5513711f42a28ee7f2552014dadecff2726a29",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/phase3-tenant-role-isolation-20261112",
+      "sha": "2f94e82368d7cc5c2665f41d1765ead35d6dfb02",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/postgres-adversarial-isolation-20261109",
+      "sha": "c35dfa00c7baf1392e5c71b5a5a72309fafaddac",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/postgres-real-integration-ci-20261109",
+      "sha": "22fd165e91fa9a5412d6676d7d6ffefe5e0e2511",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/postgres-rls-transaction-hardening-20261110",
+      "sha": "b161da032369fea33257bcf868877c30a3b58762",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/postgres-staging-release-gates-20261109",
+      "sha": "e90f68f836533f2ba81aec09b35d9a58f6b54574",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/pr76-ci-oidc-bff-hardening-20261110",
+      "sha": "f266f58694374691fc08d6a4b2b2188bb40221fb",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/pr92-independent-hardening-20261111",
+      "sha": "6839abe3bd4f1b5bb83709b3b0b890535635649c",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/private-staging-gates-20261112",
+      "sha": "5af42996560370b62a99eabe66729cf28c3e7fc1",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/promotion-bypass-audit-20261108",
+      "sha": "d8ad0885b8e0d7fb892babb0c684b12d52020d5d",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/protected-paper-state-20261113",
+      "sha": "c5fd585c87ba3776b5e2d9749b3a03e7d87c97c7",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/provenance-evidence-gate-20261108",
+      "sha": "8f6b350b3eefa1e7f9e19bc4600a26fb91b881b5",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/provider-neutral-foundation-20261109",
+      "sha": "41cda73050c8d589a4e134b0cef17097c05f00d4",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/proxy-peer-trust-verification-20261109",
+      "sha": "74225322e8aa56e3d35877b9ee7b64ab036c68a5",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/regime-robustness-review-20261111",
+      "sha": "207319429f39210759e3a1e4e93dc203ac380cc9",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/render-safe-staging-entry-20261109",
+      "sha": "0c129c6f09b9859b4464086bc97fd7f6215f9d49",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/security-main-reconciliation-20261112",
+      "sha": "f41e8c7ee43575d50771ddc4cfe96389c468243e",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/session-pit-validation-20261109",
+      "sha": "dc98bf7e07f724165562cb4323bc9f519e4f699b",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/staging-acceptance-audit-20261110",
+      "sha": "90489faaefb07f839220eada36edf7bcba1eeff7",
+      "relation": "review_stack_ancestor",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/step1-security-entrypoint-audit-20261109",
+      "sha": "61b208e8b7a8cb153ca9dceb4b6e9c25272ad63b",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/step2-archive-trust-boundary-20261109",
+      "sha": "ff2d05371cf5e8bb0cd6cca0bda27d24cc708371",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/step3-nav-cost-independent-verification-20261109",
+      "sha": "8b870ff0608326f2e69c8fd99e0e0c59a4b29ef5",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/strategy-evidence-gates-v1",
+      "sha": "979a305d848f8ec68ec3a460c36fec943421009e",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/strategy-v0.8",
+      "sha": "6f7b893ee4c319573bc23cc633f2fae6e90f7381",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/strategy-v0.9",
+      "sha": "40f0c34d4302cbaa7c6ba1ee88ea42d61bffc38c",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/tradingagents-071-causal-accounting-audit-20261110",
+      "sha": "de370d0bed95472b62571c74a1ac5627887c6031",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/tradingagents-075-cost-input-hardening-20261112",
+      "sha": "88643300247a05caa4943bcff8b9ff68a16db1c6",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "research/week3-preregistered-strategy-discovery",
+      "sha": "2dfd3a9dc026e75b96658a97d8c1f3c2acf3636b",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    },
+    {
+      "branch": "research/xtrend-screenshot-evidence-20261109",
+      "sha": "f5840aa58712a6a71bbd9282641eff99a7e42fd4",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "restore-v0.6-source",
+      "sha": "5421ce0422571c176e2dccdc53c47c6a1d8ab416",
+      "relation": "separate",
+      "main_dry_conflict": false,
+      "merge_tree_exit": 0
+    },
+    {
+      "branch": "restore-v06-20261103",
+      "sha": "8b41a40b8bc963243a033e8b5989fa4897eb1811",
+      "relation": "separate",
+      "main_dry_conflict": true,
+      "merge_tree_exit": 1
+    }
+  ]
+}

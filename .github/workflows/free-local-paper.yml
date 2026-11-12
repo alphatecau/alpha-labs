@@ -6,6 +6,7 @@ on:
       - 'packages/alpha_lab/src/alpha_lab/research/coinbase_paper_book.py'
       - 'tests/unit/test_local_*'
       - 'tests/unit/test_coinbase_future_clock_tolerance.py'
+      - 'tests/unit/test_local_paper_acceptance_20261113.py'
       - '.github/workflows/free-local-paper.yml'
   workflow_dispatch:
 permissions:
@@ -24,9 +25,9 @@ jobs:
       - name: Install existing project and test tools
         run: python -m pip install . 'pytest>=8,<10' 'ruff>=0.9,<1'
       - name: Lint local paper additions
-        run: python -m ruff check packages/alpha_lab/src/alpha_lab/research/local_multiasset_catalogue.py packages/alpha_lab/src/alpha_lab/research/local_paper_terminal.py tests/unit/test_local_multiasset_catalogue.py tests/unit/test_local_paper_terminal.py tests/unit/test_coinbase_future_clock_tolerance.py
+        run: python -m ruff check packages/alpha_lab/src/alpha_lab/research/local_multiasset_catalogue.py packages/alpha_lab/src/alpha_lab/research/local_paper_terminal.py tests/unit/test_local_multiasset_catalogue.py tests/unit/test_local_paper_terminal.py tests/unit/test_coinbase_future_clock_tolerance.py tests/unit/test_local_paper_acceptance_20261113.py
       - name: Local CLI and inherited runtime regression
-        run: python -m pytest tests/unit/test_local_multiasset_catalogue.py tests/unit/test_local_paper_terminal.py tests/unit/test_paper_runtime.py tests/unit/test_live_paper_service.py -q --junitxml=local-paper.xml
+        run: python -m pytest tests/unit/test_local_multiasset_catalogue.py tests/unit/test_local_paper_terminal.py tests/unit/test_paper_runtime.py tests/unit/test_live_paper_service.py tests/unit/test_local_paper_acceptance_20261113.py -q --junitxml=local-paper.xml
       - name: Enforce no skipped/failed acceptance
         run: |
           python - <<'PY'

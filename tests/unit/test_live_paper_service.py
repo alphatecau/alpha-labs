@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from alpha_lab.research.coinbase_paper_book import PRODUCTS, executable, parse_book
+from alpha_lab.research.coinbase_paper_book import PRODUCTS, executable, fetch_book, parse_book
 from alpha_lab.research.live_paper_api import LivePaperAPI, relay_message
 from alpha_lab.research.live_paper_session import LivePaperSession, PaperRejection
 from alpha_lab.research.paper_market_feed import PaperMarketFeed
@@ -56,6 +56,33 @@ class PaperMarketTests(unittest.TestCase):
         ):
             with self.subTest(mutations=mutations), self.assertRaises(ValueError):
                 parse_book("SOL-USD", {**book(self.now), **mutations}, self.now)
+
+    def test_fetch_is_public_bounded_and_rejects_changed_origin(self):
+        class Response(io.BytesIO):
+            status = 200
+
+            def geturl(self):
+                return self.url
+
+        def opener(request, timeout):
+            self.assertEqual(request.get_method(), "GET")
+            self.assertEqual(timeout, 8)
+            self.assertEqual(request.get_header("Cache-control"), "no-cache, no-store, max-age=0")
+            self.assertIsNone(request.get_header("Authorization"))
+            response = Response(json.dumps(book(self.now)).encode())
+            response.url = request.full_url
+            return response
+
+        quote = fetch_book("BTC-USD", opener=opener, clock=lambda: self.now)
+        self.assertEqual(quote.symbol, "BTC-USD")
+
+        def foreign_origin(request, timeout):
+            response = opener(request, timeout)
+            response.url = "https://unexpected.example/book"
+            return response
+
+        with self.assertRaisesRegex(ValueError, "unexpected provider response"):
+            fetch_book("BTC-USD", opener=foreign_origin, clock=lambda: self.now)
 
     def test_feed_invalidates_regressions_and_preserves_only_observed_history(self):
         payload = book(self.now)

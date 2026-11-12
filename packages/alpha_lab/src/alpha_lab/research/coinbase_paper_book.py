@@ -11,6 +11,7 @@ PRODUCTS = ("BTC-USD", "ETH-USD", "SOL-USD")
 SOURCE = "Coinbase Exchange level 1"
 BASE_URL = "https://api.exchange.coinbase.com"
 MAX_AGE = timedelta(seconds=10)
+HTTP_TIMEOUT_SECONDS = 8
 _NUMBER = re.compile(r"[0-9]{1,10}(?:\.[0-9]{1,12})?")
 _TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z")
 
@@ -60,11 +61,11 @@ def fetch_book(product, *, clock=lambda: datetime.now(timezone.utc), opener=None
         raise ValueError("unsupported product")
     url = f"{BASE_URL}/products/{product}/book?level=1"
     request = Request(url, headers={
-        "Accept": "application/json", "Cache-Control": "no-cache",
+        "Accept": "application/json", "Cache-Control": "no-cache, no-store, max-age=0",
         "User-Agent": "AlphaLabsPaperResearch/1.0",
     }, method="GET")
     request_open = opener or build_opener(NoRedirect()).open
-    with request_open(request, timeout=4) as response:
+    with request_open(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
         if response.status != 200 or response.geturl() != url:
             raise ValueError("unexpected provider response")
         payload = response.read(8193)

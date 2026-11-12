@@ -42,7 +42,7 @@ jobs:
           if counts["tests"] == 0 or any(counts[key] for key in ("failures", "errors", "skipped")):
               raise SystemExit("Unit/security evidence failed or contains skipped checks")
           PY
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: unit-results

@@ -7,18 +7,18 @@ BLUEPRINT = ROOT / "deployment/render-paper-staging.yaml"
 
 
 class StagingBlueprintSafetyTests(unittest.TestCase):
-    def test_probe_defaults_to_loopback_outside_explicit_hosting(self):
+    def test_diagnostic_cli_binds_only_loopback(self):
         probe = (ROOT / "deployment/staging_probe.py").read_text(encoding="utf-8")
-        self.assertIn('os.environ.get("HOST", "127.0.0.1")', probe)
+        self.assertIn('make_server("127.0.0.1"', probe)
+        self.assertNotIn('os.environ.get("HOST"', probe)
         self.assertNotIn('make_server("0.0.0.0"', probe)
 
     def test_staging_blueprint_does_not_enable_paper_orders(self):
         source = BLUEPRINT.read_text(encoding="utf-8")
-        self.assertIn("startCommand: python deployment/staging_probe.py", source)
+        self.assertIn('startCommand: gunicorn --bind "0.0.0.0:$PORT" --workers 1 deployment.staging_probe:application', source)
         self.assertIn("autoDeploy: false", source)
         self.assertIn("healthCheckPath: /healthz", source)
-        self.assertIn("key: HOST", source)
-        self.assertIn('value: "0.0.0.0"', source)
+        self.assertNotIn("key: HOST", source)
         self.assertIn('value: "false"', source)
         self.assertNotIn("paper_staging_wsgi:app", source)
         self.assertNotIn("ALPHA_PAPER_SIGNING_KEY_B64", source)

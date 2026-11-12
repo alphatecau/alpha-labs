@@ -1,0 +1,23 @@
+{
+  "before": [
+    {
+      "path": "deployment/staging_probe.py",
+      "test_id": "B104",
+      "severity": "MEDIUM",
+      "line": 30
+    },
+    {
+      "path": "packages/alpha_lab/src/alpha_lab/data/adapters/binance_archive.py",
+      "test_id": "B310",
+      "severity": "MEDIUM",
+      "line": 70
+    },
+    {
+      "path": "packages/alpha_lab/src/alpha_lab/data/adapters/kraken_ohlc.py",
+      "test_id": "B310",
+      "severity": "MEDIUM",
+      "line": 58
+    }
+  ],
+  "after": []
+}

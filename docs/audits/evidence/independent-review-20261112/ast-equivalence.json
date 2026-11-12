@@ -1,0 +1,92 @@
+[
+  {
+    "path": "deployment/oidc_verifier.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/backtest/engine.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/cli.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/data/adapters/binance_archive.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/data/adapters/kraken_ohlc.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/data/csv_import.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/research/metrics.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/research/phase1_accounting.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/research/phase1_daily_data.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/research/phase1_evidence.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "packages/alpha_lab/src/alpha_lab/research/strategies/momentum.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "tests/unit/test_binance_archive.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "tests/unit/test_kraken_ohlc_adapter.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "tests/unit/test_long_history.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "tests/unit/test_oidc_verifier.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "tests/unit/test_paper_simulator.py",
+    "status": "PASS",
+    "normalization": "PaperLedger import moved across an inspected function definition; normalization ignores only that movement"
+  },
+  {
+    "path": "tests/unit/test_phase1_daily_data.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  },
+  {
+    "path": "tests/unit/test_research_foundation.py",
+    "status": "PASS",
+    "normalization": "Import splitting and explicitly inspected OHLCV local renames only"
+  }
+]

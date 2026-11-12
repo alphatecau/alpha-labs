@@ -1,0 +1,44 @@
+{
+  "old": [
+    {
+      "package": "cryptography",
+      "version": "46.0.7",
+      "advisories": [
+        "PYSEC-2026-3554",
+        "PYSEC-2026-3552",
+        "PYSEC-2026-3553",
+        "PYSEC-2026-3552",
+        "PYSEC-2026-3553",
+        "PYSEC-2026-3554",
+        "GHSA-537c-gmf6-5ccf"
+      ]
+    },
+    {
+      "package": "cffi",
+      "version": "2.1.1",
+      "advisories": []
+    },
+    {
+      "package": "pycparser",
+      "version": "3.12",
+      "advisories": []
+    }
+  ],
+  "current": [
+    {
+      "package": "cryptography",
+      "version": "50.0.2",
+      "advisories": []
+    },
+    {
+      "package": "cffi",
+      "version": "2.1.1",
+      "advisories": []
+    },
+    {
+      "package": "pycparser",
+      "version": "3.12",
+      "advisories": []
+    }
+  ]
+}

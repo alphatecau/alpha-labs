@@ -11,12 +11,9 @@ services:
     plan: free
     branch: research/private-staging-gates-20261112
     autoDeploy: false
-    buildCommand: python -m pip install .
-    startCommand: python deployment/staging_probe.py
+    buildCommand: python -m pip install . "gunicorn>=23,<26"
+    startCommand: gunicorn --bind "0.0.0.0:$PORT" --workers 1 deployment.staging_probe:application
     healthCheckPath: /healthz
     envVars:
-      # Explicit public bind only for health-only probe. Never for authenticated BFF.
-      - key: HOST
-        value: "0.0.0.0"
       - key: ALPHA_TRADING_ENABLED
         value: "false"

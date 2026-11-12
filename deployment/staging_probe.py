@@ -24,8 +24,14 @@ def application(environ, start_response):
     return [body]
 
 
-if __name__ == "__main__":
+def main():
     from wsgiref.simple_server import make_server
     port = int(os.environ.get("PORT", "10000"))
-    with make_server(os.environ.get("HOST", "127.0.0.1"), port, application) as server:
+    # Local diagnostic entry only. Hosted ingress needs a separately reviewed
+    # WSGI/proxy configuration; this CLI never opts into external reachability.
+    with make_server("127.0.0.1", port, application) as server:
         server.serve_forever()
+
+
+if __name__ == "__main__":
+    main()

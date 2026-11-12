@@ -1,0 +1,7 @@
+# Transitional baseline for the existing research repository.
+# The Ruff CI workflow explicitly selects E4,E7,E9,F63,F7,F82.
+# 2026-11-12 CI run 43152307405 found 124 pre-existing violations:
+# E701 (72), E702 (46), E401 (3), E741 (2), E402 (1).
+# Retain the other enabled correctness rules; remove these ignores only
+# after a separately reviewed mechanical formatting/rename migration.
+lint.ignore = ["E701", "E702", "E401", "E741", "E402"]

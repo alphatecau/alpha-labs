@@ -1,0 +1,32 @@
+[
+  {
+    "symbol": "BTC-USD",
+    "status": "VERIFIED",
+    "source": "Coinbase Exchange level 1",
+    "source_time": "2026-11-12T07:35:33.014595477Z",
+    "received_at": "2026-11-12T07:35:33.521562+00:00",
+    "sequence": 139199626538,
+    "bid": "73508.7",
+    "ask": "73508.71"
+  },
+  {
+    "symbol": "ETH-USD",
+    "status": "VERIFIED",
+    "source": "Coinbase Exchange level 1",
+    "source_time": "2026-11-12T07:35:32.407653262Z",
+    "received_at": "2026-11-12T07:35:33.614318+00:00",
+    "sequence": 104951433331,
+    "bid": "2049.19",
+    "ask": "2049.2"
+  },
+  {
+    "symbol": "SOL-USD",
+    "status": "VERIFIED",
+    "source": "Coinbase Exchange level 1",
+    "source_time": "2026-11-12T07:35:33.467330859Z",
+    "received_at": "2026-11-12T07:35:33.879557+00:00",
+    "sequence": 33737233963,
+    "bid": "82.87",
+    "ask": "82.88"
+  }
+]

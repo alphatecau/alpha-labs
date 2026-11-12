@@ -22,6 +22,11 @@ class PaperQuote:
     observed_at: datetime
     source: str = "binance-public-bookTicker"
     simulated_only: bool = True
+    exchange_at: datetime | None = None
+    source_timestamp: str | None = None
+    source_sequence: int | None = None
+    bid_size: Decimal | None = None
+    ask_size: Decimal | None = None
 
     @property
     def mid(self):

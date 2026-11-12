@@ -69,3 +69,12 @@ branch run; they are not inferred from local tests.
 Rollback: revert this bounded CI/dependency/source-repair commit on its research
 branch. The integration branch depends on it. The original main and PRs remain
 unchanged until separately authorized review/merge.
+# Current published CI evidence
+
+Draft [#103](https://github.com/alphatecau/alpha-labs/pull/103) head `0c0a99f62f8e25df6c66a74ea8447922f57ea16d` has 12 successful exact-head push/PR workflow runs. Ruff [43171223062](https://github.com/alphatecau/alpha-labs/actions/runs/43171223062); backend [43171222961](https://github.com/alphatecau/alpha-labs/actions/runs/43171222961): decoded logs verify 247 passed plus 48 subtests, JUnit 295 cases with zero failures/errors/skips; the separate runtime dependency job reports no known vulnerabilities.
+
+Draft [#104](https://github.com/alphatecau/alpha-labs/pull/104) head `f41e8c7ee43575d50771ddc4cfe96389c468243e` has 16 successful exact-head runs. Backend [43174500864](https://github.com/alphatecau/alpha-labs/actions/runs/43174500864) logs verify 460 passed plus 207 subtests (667 JUnit cases, no skips). Disposable PostgreSQL [43174500720](https://github.com/alphatecau/alpha-labs/actions/runs/43174500720) and legacy PostgreSQL [43174500849](https://github.com/alphatecau/alpha-labs/actions/runs/43174500849) also succeeded.
+
+Priority reconciliation: #100's current head remains failed; this main-based replacement repairs its 124 source violations without its legacy ignores. #97's current checks pass but its narrowed Ruff selection missed those violations. #99 is semantically superseded by merged #98; its four original cases were executed against the retained implementation. #92 has independently reproduced defects repaired in existing #94, retained by #104. Old #42/#76 head failures remain explicitly recorded. No unchanged PR head is relabeled PASS using these new branch results.
+
+The paper integration adds a disposable owner-order acceptance workflow with no skipped evidence and extends Ruff to the two critical audit scripts. Its final exact head/run URLs are recorded in its draft PR. Bandit on the full imported stack returns three medium findings (including the existing health-probe wildcard bind), zero high; the earlier two-adapter report below covers the smaller CI branch scope.

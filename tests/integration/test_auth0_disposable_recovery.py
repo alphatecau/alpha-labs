@@ -19,7 +19,7 @@ class DisposableAuth0RecoveryTests(unittest.TestCase):
     def setUpClass(cls):
         import psycopg
         cls.dsn = os.environ["ALPHA_DISPOSABLE_PG_DSN"]
-        cls.connect = lambda: psycopg.connect(cls.dsn)
+        cls.connect = staticmethod(lambda: psycopg.connect(cls.dsn))
         with cls.connect() as conn:
             with conn.cursor() as cur:
                 cur.execute(OAUTH_SCHEMA)

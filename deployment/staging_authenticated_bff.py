@@ -43,9 +43,12 @@ class StagingResearchBFF:
             return reply("200 OK", b'{"status":"ok","trading":"disabled"}',
                          [("Content-Type", "application/json")])
         if path == "/auth/login" and method == "GET":
-            url = self.flow.begin()
-            params = parse_qs(urlsplit(url).query)
-            state = params["state"][0]
+            try:
+                url = self.flow.begin()
+                params = parse_qs(urlsplit(url).query)
+                state = params["state"][0]
+            except Exception:
+                return reply("503 Service Unavailable")
             # Bind the single-use server-side state to the initiating browser.
             cookie = "__Host-alpha_oauth_state=" + state + "; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=300"
             return reply("302 Found", headers=[("Location", url), ("Set-Cookie", cookie)])

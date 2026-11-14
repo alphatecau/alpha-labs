@@ -7,19 +7,27 @@ No implicit environment or database fallback.
 import hashlib
 import hmac
 import json
+import re
 import secrets
 from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, urlsplit
 
+from deployment.account_role_research_reader import AccountRoleResearchReader
+
 
 class StagingResearchBFF:
-    def __init__(self, flow, controller, sessions, reader, *, origin):
+    def __init__(self, flow, controller, sessions, reader, *, origin, authorize_owner):
         parsed = urlsplit(origin)
         if parsed.scheme != "https" or not parsed.hostname or parsed.path or parsed.query or parsed.fragment:
             raise ValueError("exact HTTPS origin required")
         if any(component is None for component in (flow, controller, sessions, reader)):
             raise ValueError("all authenticated dependencies required")
+        if not callable(authorize_owner):
+            raise ValueError("current ownership authorizer required")
+        if not isinstance(reader, AccountRoleResearchReader):
+            raise ValueError("tenant-role research reader required")
         self.flow, self.controller, self.sessions, self.reader = flow, controller, sessions, reader
+        self.authorize_owner = authorize_owner
         self.origin = origin.rstrip("/")
 
     def __call__(self, env, start_response):
@@ -74,8 +82,12 @@ class StagingResearchBFF:
                 return reply("401 Unauthorized")
             try:
                 owner = self.sessions.resolve_owner(sid)
-                if not isinstance(owner, str) or not owner.startswith("oidc_"):
+                if not isinstance(owner, str) or not re.fullmatch(r"oidc_[a-f0-9]{64}", owner):
                     raise PermissionError("unverified account")
+                # A valid session is not proof that account access is still active.
+                # No tenant credential lookup or data query may precede this check.
+                if self.authorize_owner(owner) is not True:
+                    raise PermissionError("account not authorised")
                 data = self.reader.list_runs(owner) if path.endswith("/runs") else self.reader.summary(owner)
                 body = json.dumps({"status": "verified_source", "data": data}, allow_nan=False).encode()
                 return reply("200 OK", body, [("Content-Type", "application/json")])

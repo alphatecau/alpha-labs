@@ -20,6 +20,8 @@ def build_authenticated_application(*, environ, ownership, principal_factory,
     config = staging_auth0_settings(environ)
     if ownership is None or not callable(getattr(ownership, "require", None)):
         raise ValueError("reviewed ownership registry required")
+    if not callable(getattr(ownership, "require_owner_id", None)):
+        raise ValueError("current owner-ID authorization required")
     if not callable(principal_factory):
         raise ValueError("reviewed principal factory required")
     if not all(callable(x) for x in (state_connect, session_connect, tenant_connect)):

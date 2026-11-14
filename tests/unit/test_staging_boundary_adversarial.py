@@ -3,6 +3,9 @@
 These tests use no real Auth0 tenant, credentials or database.
 """
 import unittest
+from unittest.mock import Mock
+
+from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.staging_authenticated_bff import StagingResearchBFF
 
 
@@ -15,8 +18,8 @@ class StagingBoundaryTests(unittest.TestCase):
     def setUp(self):
         self.app = StagingResearchBFF(
             ExplodingDependency(), ExplodingDependency(),
-            ExplodingDependency(), ExplodingDependency(),
-            origin="https://staging.example"
+            ExplodingDependency(), Mock(spec=AccountRoleResearchReader, wraps=ExplodingDependency()),
+            origin="https://staging.example", authorize_owner=lambda owner: True
         )
 
     def request(self, path, method="GET", **extra):

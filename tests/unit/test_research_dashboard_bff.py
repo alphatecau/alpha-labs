@@ -2,6 +2,9 @@
 import json
 import tempfile
 import unittest
+from unittest.mock import Mock
+
+from deployment.account_role_research_reader import AccountRoleResearchReader
 
 from alpha_lab.research.oidc_durable_store import DurableOIDCStore
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
@@ -28,7 +31,7 @@ class BFFBoundaryTests(unittest.TestCase):
         self.limiter = SQLiteIdentityLimiter(self.temp.name + "/limiter.sqlite", limit=20, window=60)
         verifier = SessionOwnershipVerifier(sessions=self.sessions, ownership=self.ownership, limiter=self.limiter)
         secret = "synthetic-only-" + "z" * 48
-        api = ResearchReadOnlyAPI(reader=Reader(), secret=secret)
+        api = ResearchReadOnlyAPI(reader=Mock(spec=AccountRoleResearchReader, wraps=Reader()), secret=secret)
         def backend(path, headers):
             response = {}
             body = b"".join(api({"PATH_INFO": path, "REQUEST_METHOD": "GET",

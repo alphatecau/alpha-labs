@@ -24,6 +24,8 @@ class BootstrapTests(unittest.TestCase):
 
     def test_missing_connection_denied_before_verifier_fetch(self):
         class Ownership:
+            def require_owner_id(self, owner, account):
+                return True
             def require(self, principal, scope):
                 return None
         with self.assertRaises(ValueError):
@@ -35,6 +37,8 @@ class BootstrapTests(unittest.TestCase):
 
     def test_verified_dependencies_construct_wsgi_without_network(self):
         class Ownership:
+            def require_owner_id(self, owner, account):
+                return True
             def require(self, principal, scope):
                 return None
         app = build_authenticated_application(
@@ -50,6 +54,8 @@ class BootstrapTests(unittest.TestCase):
 
     def test_missing_confidential_secret_fails_closed(self):
         class Ownership:
+            def require_owner_id(self, owner, account):
+                return True
             def require(self, principal, scope):
                 return None
         env = dict(self.env)
@@ -62,6 +68,8 @@ class BootstrapTests(unittest.TestCase):
 
     def test_untrusted_verifier_fails_closed(self):
         class Ownership:
+            def require_owner_id(self, owner, account):
+                return True
             def require(self, principal, scope):
                 return None
         with self.assertRaises(ValueError):
@@ -72,6 +80,8 @@ class BootstrapTests(unittest.TestCase):
 
     def test_invalid_principal_factory_fails_before_verifier(self):
         class Ownership:
+            def require_owner_id(self, owner, account):
+                return True
             def require(self, principal, scope):
                 return None
         with self.assertRaises(ValueError):
@@ -83,6 +93,8 @@ class BootstrapTests(unittest.TestCase):
 
     def test_authenticated_routes_not_public_without_session(self):
         class Ownership:
+            def require_owner_id(self, owner, account):
+                return True
             def require(self, principal, scope):
                 return None
         app = build_authenticated_application(

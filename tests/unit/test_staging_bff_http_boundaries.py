@@ -3,6 +3,9 @@
 No Auth0, PostgreSQL, network, or Render resources are accessed.
 """
 import unittest
+from unittest.mock import Mock
+
+from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.staging_authenticated_bff import StagingResearchBFF
 
 
@@ -15,8 +18,8 @@ class HttpBoundaryTests(unittest.TestCase):
     def setUp(self):
         sentinel = NeverCall()
         self.app = StagingResearchBFF(
-            sentinel, sentinel, sentinel, sentinel,
-            origin="https://staging.example")
+            sentinel, sentinel, sentinel, Mock(spec=AccountRoleResearchReader, wraps=sentinel),
+            origin="https://staging.example", authorize_owner=lambda owner: True)
 
     def request(self, path, method="GET", **kwargs):
         responses = []

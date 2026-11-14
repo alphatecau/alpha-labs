@@ -21,8 +21,10 @@ class Auth0PKCEFlow:
         redirect = urlsplit(redirect_uri)
         if (issuer_parts.scheme != "https" or not issuer_parts.hostname or
                 issuer_parts.path not in ("", "/") or issuer_parts.query or issuer_parts.fragment or
+                issuer_parts.username or issuer_parts.password or issuer_parts.port not in (None, 443) or
                 redirect.scheme != "https" or not redirect.hostname or
-                redirect.path != "/auth/callback" or redirect.query or redirect.fragment):
+                redirect.path != "/auth/callback" or redirect.query or redirect.fragment or
+                redirect.username or redirect.password or redirect.port not in (None, 443)):
             raise ValueError("exact HTTPS issuer and callback required")
         if not isinstance(client_id, str) or not client_id or state_store is None:
             raise ValueError("client ID and durable state store required")

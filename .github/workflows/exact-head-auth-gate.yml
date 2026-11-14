@@ -1,0 +1,25 @@
+name: Exact-head synthetic authentication gate
+on:
+  pull_request:
+    paths:
+      - 'scripts/security_unit_gate.py'
+      - 'tests/unit/test_oidc_verifier.py'
+      - 'tests/unit/test_verified_proxy_ingress.py'
+      - 'tests/unit/test_auth0_discovery_pkce_foundation.py'
+      - 'tests/unit/test_opaque_session_foundation.py'
+      - 'tests/unit/test_auth_session_fail_closed_regressions.py'
+      - '.github/workflows/exact-head-auth-gate.yml'
+permissions:
+  contents: read
+jobs:
+  synthetic-auth-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=50.0.0,<51'
+      - name: Fail closed on skipped, absent or failing security suites
+        run: PYTHONPATH=. python scripts/security_unit_gate.py

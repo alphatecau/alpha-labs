@@ -38,7 +38,8 @@ class BootstrapTests(unittest.TestCase):
             self.assertEqual(opener.open.call_args.kwargs["timeout"], 8)
 
     def test_composition_requires_restricted_separate_stores(self):
-        factory = lambda: None
+        def factory():
+            return None
         with self.assertRaises(ValueError):
             compose_auth0_staging(
                 issuer="https://alpha-labs-dev.au.auth0.com/",

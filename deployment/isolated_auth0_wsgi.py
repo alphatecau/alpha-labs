@@ -9,7 +9,6 @@ import threading
 from urllib.parse import urlsplit
 
 from deployment.account_role_research_reader import AccountRoleResearchReader
-from deployment.auth0_staging_composition import compose_auth0_staging
 from deployment.isolated_auth0_role_audit import audit_runtime_roles
 from deployment.tenant_credential_broker import TenantCredentialBroker
 
@@ -72,6 +71,7 @@ def build_isolated_app(env=None, *, pg_connect=None):
         return credentials[owner]
 
     reader = AccountRoleResearchReader(TenantCredentialBroker(secret_for, pg_connect))
+    from deployment.auth0_staging_composition import compose_auth0_staging
     return compose_auth0_staging(
         issuer=config["AUTH0_ISSUER"],
         client_id=config["AUTH0_CLIENT_ID"],

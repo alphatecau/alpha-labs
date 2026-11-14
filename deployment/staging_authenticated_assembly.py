@@ -15,7 +15,7 @@ from deployment.render_environment_tenant_secrets import RenderEnvironmentTenant
 
 
 def assemble(*, verify_token, ownership, principal_factory, state_store,
-             session_connect, tenant_connect, environ=None):
+             session_connect, tenant_connect, rate_limiter, environ=None):
     """Dependencies must be trusted; no browser-supplied credential selectors."""
     env = os.environ if environ is None else environ
     config = staging_auth0_settings(env)
@@ -37,6 +37,7 @@ def assemble(*, verify_token, ownership, principal_factory, state_store,
     broker = TenantCredentialBroker(provider, tenant_connect)
     reader = AccountRoleResearchReader(broker)
     return StagingResearchBFF(flow, controller, sessions, reader, origin=config["bff_origin"],
+                              rate_limiter=rate_limiter,
                               authorize_owner=lambda owner: ownership.require_owner_id(owner, "primary"))
 
 # Intentionally no module-level WSGI 'application': deployment must explicitly

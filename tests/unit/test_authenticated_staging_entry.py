@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from deployment.authenticated_staging_entry import create_application
 
 
@@ -9,14 +9,16 @@ class EntryTests(unittest.TestCase):
         self.args = dict(environ=self.env, ownership=object(),
                          principal_factory=lambda **k: k,
                          state_connect=lambda: None, session_connect=lambda: None,
-                         tenant_connect=lambda: None,
+                         tenant_connect=lambda: None, rate_limit_connect=lambda: None,
                          trusted_peer_cidrs=["10.1.2.0/24"],
                          readiness_check=lambda: True,
                          verifier_factory=lambda *a: lambda t: None)
 
-    def build(self):
+    def build(self, limiter_ready=True):
+        inner = Mock(return_value=[b"app"])
+        inner.rate_limiter.ready.return_value = limiter_ready
         with patch("deployment.authenticated_staging_entry.build_authenticated_application",
-                   return_value=lambda e, s: [b"app"]) as factory:
+                   return_value=inner) as factory:
             app = create_application(**self.args)
             factory.assert_called_once()
             return app
@@ -46,6 +48,12 @@ class EntryTests(unittest.TestCase):
             raise ConnectionError("database unavailable")
         self.args["readiness_check"] = failed
         self.assertEqual(self.call(self.build(), "/readyz")[0], "503 Service Unavailable")
+
+    def test_limiter_readiness_is_required(self):
+        app = self.build(limiter_ready=False)
+        self.assertEqual(self.call(app, "/livez")[0], "200 OK")
+        self.assertEqual(self.call(app, "/readyz"),
+                         ("503 Service Unavailable", b'{"status":"unavailable","authenticated_ready":false}'))
 
     def test_untrusted_peer_and_spoofed_headers_denied(self):
         app = self.build()

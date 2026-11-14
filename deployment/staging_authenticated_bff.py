@@ -12,14 +12,17 @@ import secrets
 from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, urlsplit
 
+from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter, RateLimitExceeded
 from deployment.account_role_research_reader import AccountRoleResearchReader
 
 
 class StagingResearchBFF:
-    def __init__(self, flow, controller, sessions, reader, *, origin, authorize_owner):
+    def __init__(self, flow, controller, sessions, reader, *, origin, authorize_owner, rate_limiter):
         parsed = urlsplit(origin)
         if parsed.scheme != "https" or not parsed.hostname or parsed.path or parsed.query or parsed.fragment:
             raise ValueError("exact HTTPS origin required")
+        if not isinstance(rate_limiter, PostgresIdentityLimiter):
+            raise ValueError("shared PostgreSQL rate limiter required")
         if any(component is None for component in (flow, controller, sessions, reader)):
             raise ValueError("all authenticated dependencies required")
         if not callable(authorize_owner):
@@ -29,6 +32,7 @@ class StagingResearchBFF:
         self.flow, self.controller, self.sessions, self.reader = flow, controller, sessions, reader
         self.authorize_owner = authorize_owner
         self.origin = origin.rstrip("/")
+        self.rate_limiter = rate_limiter
 
     def __call__(self, env, start_response):
         def reply(status, data=b"", headers=()):
@@ -88,6 +92,18 @@ class StagingResearchBFF:
                 # No tenant credential lookup or data query may precede this check.
                 if self.authorize_owner(owner) is not True:
                     raise PermissionError("account not authorised")
+            except PermissionError:
+                return reply("403 Forbidden")
+            except Exception:
+                return reply("503 Service Unavailable")
+            try:
+                if self.rate_limiter.allow_owner(owner) is not True:
+                    return reply("503 Service Unavailable")
+            except RateLimitExceeded:
+                return reply("429 Too Many Requests")
+            except Exception:
+                return reply("503 Service Unavailable")
+            try:
                 data = self.reader.list_runs(owner) if path.endswith("/runs") else self.reader.summary(owner)
                 body = json.dumps({"status": "verified_source", "data": data}, allow_nan=False).encode()
                 return reply("200 OK", body, [("Content-Type", "application/json")])

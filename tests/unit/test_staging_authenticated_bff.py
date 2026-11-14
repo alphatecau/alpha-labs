@@ -2,8 +2,8 @@
 import unittest
 from unittest.mock import Mock
 
+from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter
 from deployment.account_role_research_reader import AccountRoleResearchReader
-from urllib.parse import parse_qs, urlsplit
 from deployment.staging_authenticated_bff import StagingResearchBFF
 from deployment.transaction_scoped_research_reader import TransactionScopedResearchReader
 
@@ -29,8 +29,12 @@ class Reader:
 class BFFTests(unittest.TestCase):
     def setUp(self):
         self.sessions = Sessions()
-        self.app = StagingResearchBFF(Flow(), Controller(), self.sessions, Mock(spec=AccountRoleResearchReader, wraps=Reader()),
-                                      origin="https://staging.example", authorize_owner=lambda owner: True)
+        self.limiter = Mock(spec=PostgresIdentityLimiter)
+        self.limiter.allow_owner.return_value = True
+        reader = Mock(spec=AccountRoleResearchReader, wraps=Reader())
+        self.app = StagingResearchBFF(Flow(), Controller(), self.sessions, reader,
+                                      origin="https://staging.example", rate_limiter=self.limiter,
+                                      authorize_owner=lambda owner: True)
     def call(self, path, method="GET", **env):
         result = {}
         def start(status, headers): result.update(status=status, headers=headers)
@@ -61,6 +65,7 @@ class BFFTests(unittest.TestCase):
         legacy = TransactionScopedResearchReader(lambda: self.fail("legacy database connection opened"))
         with self.assertRaisesRegex(ValueError, "tenant-role research reader required"):
             StagingResearchBFF(Flow(), Controller(), self.sessions, legacy,
-                               origin="https://staging.example", authorize_owner=lambda owner: True)
+                               origin="https://staging.example", rate_limiter=self.limiter,
+                               authorize_owner=lambda owner: True)
 
 if __name__=="__main__": unittest.main()

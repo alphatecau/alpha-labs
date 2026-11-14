@@ -7,7 +7,7 @@ from unittest.mock import Mock
 import psycopg
 from disposable_pg_guard import require_disposable_ci_database
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
-from alpha_lab.research.postgres_paper_security import PostgresPaperOwnership
+from alpha_lab.research.postgres_paper_security import PostgresIdentityLimiter, PostgresPaperOwnership
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.postgres_opaque_sessions import PostgresOpaqueSessions
 from deployment.staging_authenticated_bff import StagingResearchBFF
@@ -52,8 +52,10 @@ class PostgreSQLOwnershipRevocationTests(unittest.TestCase):
     def application(self):
         # Construct a separate registry instance to exercise cross-instance visibility.
         registry = PostgresPaperOwnership(lambda: self.connection("alpha_rev_ownership"))
+        limiter = Mock(spec=PostgresIdentityLimiter)
+        limiter.allow_owner.return_value = True
         return StagingResearchBFF(object(), object(), self.sessions, self.reader,
-                                 origin="https://staging.example",
+                                 origin="https://staging.example", rate_limiter=limiter,
                                  authorize_owner=lambda owner: registry.require_owner_id(owner, "primary"))
 
     def request(self, app=None, token=None, path="/api/v1/research/runs", **extra):

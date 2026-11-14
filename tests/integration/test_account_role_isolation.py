@@ -9,7 +9,9 @@ import psycopg
 from psycopg import sql
 
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
-from alpha_lab.research.postgres_paper_security import PostgresPaperOwnership, SCHEMA as OWNERSHIP_SCHEMA
+from alpha_lab.research.postgres_paper_security import (
+    PostgresIdentityLimiter, PostgresPaperOwnership, SCHEMA as OWNERSHIP_SCHEMA,
+)
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.postgres_opaque_sessions import PostgresOpaqueSessions, SCHEMA as SESSION_SCHEMA
 from deployment.staging_authenticated_bff import StagingResearchBFF
@@ -139,6 +141,7 @@ class RoleIsolationTests(unittest.TestCase):
             tokens.append(sessions.create(subject, self.issuer))
         app = StagingResearchBFF(object(), object(), sessions, self.reader,
                                  origin="https://staging.example",
+                                 rate_limiter=PostgresIdentityLimiter(lambda: psycopg.connect(self.dsn)),
                                  authorize_owner=lambda owner: ownership.require_owner_id(owner, "primary"))
 
         def request(token, route="runs", **extra):

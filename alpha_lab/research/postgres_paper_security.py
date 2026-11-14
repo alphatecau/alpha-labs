@@ -21,10 +21,11 @@ CREATE TABLE IF NOT EXISTS public.identity_rate_limit (
 """
 
 class PostgresPaperOwnership:
-    def __init__(self, connect):
+    def __init__(self, connect, *, verify_provisioning_authority=None):
         if not callable(connect):
             raise ValueError("trusted connection factory required")
         self._connect = connect
+        self._verify_provisioning_authority = verify_provisioning_authority
 
     @staticmethod
     def _account(account_key):
@@ -35,6 +36,10 @@ class PostgresPaperOwnership:
     def provision(self, principal, account_key):
         if not isinstance(principal, VerifiedPrincipal):
             raise PermissionError("trusted verified principal required")
+        # The principal dataclass is NOT proof of authentication. Provisioning
+        # must be explicitly authorised by a trusted server-side verifier.
+        if self._verify_provisioning_authority is None or self._verify_provisioning_authority(principal) is not True:
+            raise PermissionError("verified provisioning authority required")
         owner = PostgresOpaqueSessions._owner(principal.subject, principal.issuer)
         account_key = self._account(account_key)
         with self._connect() as conn:

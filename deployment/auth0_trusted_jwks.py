@@ -19,7 +19,8 @@ def _https_json(url, *, max_bytes=131072):
         if response.status!=200 or response.headers.get_content_type()!="application/json":
             raise PermissionError("invalid identity-provider response")
         data=response.read(max_bytes+1)
-        if len(data)>max_bytes: raise PermissionError("identity-provider response too large")
+        if len(data)>max_bytes:
+            raise PermissionError("identity-provider response too large")
         return json.loads(data)
 
 def load_auth0_verifier(issuer,client_id,*,fetch=None):

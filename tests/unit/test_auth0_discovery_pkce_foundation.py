@@ -66,4 +66,5 @@ class Auth0FoundationTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             load_auth0_verifier(issuer, "client", fetch=lambda url: {
                 "issuer": issuer+"/", "jwks_uri": "https://evil.example/keys"})
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+    unittest.main()

@@ -6,6 +6,7 @@ import hashlib
 import os
 import unittest
 import psycopg
+from disposable_pg_guard import require_disposable_ci_database
 from deployment.postgres_pkce_state_store import PostgresPKCEStateStore
 from deployment.postgres_opaque_sessions import PostgresOpaqueSessions
 
@@ -13,8 +14,7 @@ from deployment.postgres_opaque_sessions import PostgresOpaqueSessions
 class DurableAuthenticationTests(unittest.TestCase):
     def setUp(self):
         self.dsn=os.environ["ALPHA_TEST_PG_DSN"]
-        if "alpha_rls_test" not in self.dsn:
-            raise RuntimeError("refusing non-disposable database")
+        require_disposable_ci_database(self.dsn)
         self.admin=psycopg.connect(self.dsn,autocommit=True)
         self.admin.execute("CREATE TABLE alpha_oauth_state(digest char(64) PRIMARY KEY,payload jsonb NOT NULL,expires_at timestamptz NOT NULL)")
         self.admin.execute("CREATE TABLE alpha_oidc_sessions(session_hash text PRIMARY KEY,owner_id text NOT NULL,expires_at timestamptz NOT NULL)")

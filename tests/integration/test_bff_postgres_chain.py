@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from contextlib import contextmanager
 import psycopg
+from disposable_pg_guard import require_disposable_ci_database
 from alpha_lab.research.oidc_durable_store import DurableOIDCStore
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
 from alpha_lab.research.paper_account_service import VerifiedPrincipal
@@ -24,8 +25,7 @@ from deployment.transaction_scoped_research_reader import TransactionScopedResea
 class FullChainPostgresTests(unittest.TestCase):
     def setUp(self):
         self.dsn = os.environ["ALPHA_TEST_PG_DSN"]
-        if "alpha_rls_test" not in self.dsn:
-            raise RuntimeError("refusing non-disposable PostgreSQL target")
+        require_disposable_ci_database(self.dsn)
         self.tmp = tempfile.TemporaryDirectory()
         self.sessions = DurableOIDCStore(self.tmp.name + "/sessions.sqlite")
         self.owners = PaperOwnershipRegistry(self.tmp.name + "/owners.sqlite")
@@ -75,7 +75,9 @@ class FullChainPostgresTests(unittest.TestCase):
     def tearDown(self):
         if hasattr(self, "admin"):
             self.admin.execute("DROP TABLE IF EXISTS public.research_run_registry")
-            # Disposable test database only: revoke every privilege held by the\n            # test role (including schema grants) before dropping the role.\n            self.admin.execute("DROP OWNED BY alpha_chain_reader")\n            self.admin.execute("DROP ROLE IF EXISTS alpha_chain_reader")
+            # Disposable test database only: remove grants before dropping role.
+            self.admin.execute("DROP OWNED BY alpha_chain_reader")
+            self.admin.execute("DROP ROLE IF EXISTS alpha_chain_reader")
             self.admin.close()
         self.sessions.close()
         self.owners.close()

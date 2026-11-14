@@ -3,6 +3,7 @@ import os
 import unittest
 from contextlib import contextmanager
 import psycopg
+from disposable_pg_guard import require_disposable_ci_database
 from deployment.account_role_research_reader import AccountRoleResearchReader
 
 
@@ -10,8 +11,7 @@ from deployment.account_role_research_reader import AccountRoleResearchReader
 class RoleIsolationTests(unittest.TestCase):
     def setUp(self):
         dsn = os.environ["ALPHA_TEST_PG_DSN"]
-        if "alpha_rls_test" not in dsn:
-            raise RuntimeError("refusing non-disposable database")
+        require_disposable_ci_database(dsn)
         self.dsn = dsn
         self.admin = psycopg.connect(dsn, autocommit=True)
         for role in ("alpha_tenant_a", "alpha_tenant_b"):

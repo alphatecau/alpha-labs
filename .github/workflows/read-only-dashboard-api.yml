@@ -46,6 +46,8 @@ on:
       - 'deployment/research_dashboard_bff.py'
       - 'deployment/transaction_scoped_research_reader.py'
       - 'tests/integration/test_bff_postgres_chain.py'
+      - 'tests/integration/disposable_pg_guard.py'
+      - 'tests/integration/test_auth_postgres_durable.py'
       - 'tests/unit/test_research_dashboard_bff.py'
       - 'deployment/oidc_verifier.py'
       - 'deployment/trusted_site_relay.py'
@@ -59,6 +61,8 @@ permissions:
 jobs:
   security-tests:
     runs-on: ubuntu-latest
+    env:
+      ALPHA_DISPOSABLE_PG_CI: '1'
     services:
       postgres:
         image: postgres:16
@@ -66,7 +70,7 @@ jobs:
           POSTGRES_PASSWORD: ci-only
           POSTGRES_DB: alpha_rls_test
         ports:
-          - 5432:5432
+          - 127.0.0.1:5432:5432
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s
@@ -113,19 +117,19 @@ jobs:
       - name: Run BFF-to-PostgreSQL two-account acceptance
         env:
           ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
-          PYTHONPATH: packages/alpha_lab/src:.
+          PYTHONPATH: packages/alpha_lab/src:.:tests/integration
         run: python -m unittest discover -s tests/integration -p 'test_bff_postgres_chain.py' -v
 
       - name: Verify durable PostgreSQL OAuth state and session revocation
         env:
           ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
-          PYTHONPATH: packages/alpha_lab/src:.
+          PYTHONPATH: packages/alpha_lab/src:.:tests/integration
         run: python -m unittest discover -s tests/integration -p 'test_auth_postgres_durable.py' -v
 
       - name: Verify tenant-role arbitrary SQL isolation
         env:
           ALPHA_TEST_PG_DSN: postgresql://postgres:ci-only@127.0.0.1:5432/alpha_rls_test
-          PYTHONPATH: packages/alpha_lab/src:.
+          PYTHONPATH: packages/alpha_lab/src:.:tests/integration
         run: |
           python -m unittest discover -s tests/integration -p 'test_account_role_isolation.py' -v
           python -m unittest discover -s tests/integration -p 'test_pg_credential_rotation.py' -v

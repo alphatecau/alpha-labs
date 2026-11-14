@@ -64,6 +64,7 @@ class RealTenantIsolationAcceptance(unittest.TestCase):
                 with self.subTest(owner=owner, command=str(command)):
                     with self.assertRaises(psycopg.errors.InsufficientPrivilege):
                         with self.fixture.connect(**creds) as conn:
+                            conn.read_only = False
                             conn.execute(command)
 
     def test_reader_fails_closed_after_policy_or_grant_drift(self):

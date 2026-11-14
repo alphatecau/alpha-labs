@@ -1,0 +1,22 @@
+name: Isolated Auth0 staging configuration gate
+on:
+  pull_request:
+    paths:
+      - 'deployment/isolated_auth0_*.py'
+      - 'tests/integration/test_isolated_auth0_*.py'
+      - '.github/workflows/isolated-auth0-staging.yml'
+  workflow_dispatch:
+jobs:
+  isolated-staging:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check staging Python syntax
+        run: python -m compileall -q deployment/isolated_auth0_role_audit.py deployment/isolated_auth0_wsgi.py
+      - name: Run fail-closed staging configuration tests
+        run: PYTHONPATH=. python -m unittest discover -s tests/integration -p 'test_isolated_auth0_*.py' -v

@@ -15,16 +15,16 @@ PATTERNS = (
 
 def main():
     suite = unittest.TestSuite()
-    loader = unittest.TestLoader()
     for pattern in PATTERNS:
-        found = loader.discover("tests/unit", pattern=pattern, top_level_dir=".")
+        # tests/unit is not a Python package; use it as the import root.
+        loader = unittest.TestLoader()
+        found = loader.discover("tests/unit", pattern=pattern, top_level_dir="tests/unit")
         count = found.countTestCases()
         if count == 0:
             print(f"FAIL: missing required suite {pattern}", file=sys.stderr)
             return 2
         suite.addTests(found)
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
     print(f"Security unit gate: run={result.testsRun}, skipped={len(result.skipped)}, failures={len(result.failures)}, errors={len(result.errors)}")
     if not result.wasSuccessful() or result.skipped or result.testsRun < 20:
         print("FAIL: security unit acceptance incomplete; release remains NO-GO", file=sys.stderr)

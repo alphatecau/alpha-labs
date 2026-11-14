@@ -52,6 +52,15 @@ def build_isolated_app(env=None, *, pg_connect=None):
         session_role=config["ALPHA_SESSION_ROLE"],
         ownership_role=config["ALPHA_OWNERSHIP_ROLE"])
 
+    for dsn_key, role_key in (("ALPHA_OAUTH_DSN", "ALPHA_OAUTH_ROLE"),
+                              ("ALPHA_SESSION_DSN", "ALPHA_SESSION_ROLE"),
+                              ("ALPHA_OWNERSHIP_DSN", "ALPHA_OWNERSHIP_ROLE")):
+        with connect_for(dsn_key)() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT session_user, current_user")
+                if cur.fetchone() != (config[role_key], config[role_key]):
+                    raise PermissionError("runtime DSN does not match audited restricted role")
+
     from alpha_lab.research.postgres_paper_security import PostgresPaperOwnership
 
     ownership = PostgresPaperOwnership(connect_for("ALPHA_OWNERSHIP_DSN"))

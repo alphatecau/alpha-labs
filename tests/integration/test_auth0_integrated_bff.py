@@ -188,6 +188,19 @@ class IntegratedAuth0BFFTests(unittest.TestCase):
         self.assertIn(b'"trading":"disabled"', self.request("/healthz")["body"])
 
 
+    def test_login_state_database_outage_fails_closed(self):
+        original = self.flow.begin
+        self.flow.begin = lambda: (_ for _ in ()).throw(
+            ConnectionError("simulated OAuth state-store outage"))
+        try:
+            response = self.request("/auth/login")
+            self.assertEqual(response["status"], 503)
+            self.assertEqual(response["body"], b"")
+            self.assertFalse(any(k in ("Location", "Set-Cookie") for k, _ in response["headers"]))
+        finally:
+            self.flow.begin = original
+        self.assertEqual(self.request("/auth/login")["status"], 302)
+
     def test_session_database_outage_fails_closed(self):
         _, _, sid = self.login()
         original = self.sessions.resolve_owner

@@ -1,0 +1,37 @@
+name: Two-account disposable PostgreSQL login isolation
+on:
+  pull_request:
+    paths:
+      - 'tests/integration/test_two_login_disposable_pg.py'
+      - '.github/workflows/two-account-postgres.yml'
+permissions:
+  contents: read
+jobs:
+  two-real-logins:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-disposable-only
+          POSTGRES_DB: alpha_disposable_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d alpha_disposable_ci"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'psycopg[binary]>=3.2,<4'
+      - name: Two independent database logins and cross-tenant adversarial checks
+        env:
+          ALPHA_DISPOSABLE_PG_CI: '1'
+          ALPHA_TEST_PG_DSN: 'host=127.0.0.1 port=5432 dbname=alpha_disposable_ci user=postgres password=ci-disposable-only'
+        run: PYTHONPATH=. python -m unittest discover -s tests/integration -p 'test_two_login_disposable_pg.py' -v

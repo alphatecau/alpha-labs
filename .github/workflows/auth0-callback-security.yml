@@ -1,0 +1,23 @@
+name: Auth0 callback security acceptance
+on:
+  pull_request:
+    paths:
+      - 'deployment/auth0_*.py'
+      - 'deployment/postgres_oauth_state.py'
+      - 'tests/integration/test_auth0_*.py'
+      - '.github/workflows/auth0-callback-security.yml'
+permissions:
+  contents: read
+jobs:
+  auth0-callback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install cryptography for verifier tests
+        run: python -m pip install 'cryptography>=50,<51'
+      - name: Run Auth0 callback adversarial tests
+        run: PYTHONPATH=. python -m unittest discover -s tests/integration -p 'test_auth0_*.py' -v

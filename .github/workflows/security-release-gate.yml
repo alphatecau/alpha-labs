@@ -1,0 +1,43 @@
+name: Security release evidence gate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/security-release-gate.yml'
+      - 'docs/security/security-release-evidence.md'
+      - 'deployment/**'
+      - 'alpha_lab/research/**'
+      - 'tests/integration/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  security-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify mandatory workflows and explicit human-review requirement
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          required = {
+            'CodeQL baseline': '.github/workflows/codeql.yml',
+            'Dependency updates': '.github/dependabot.yml',
+            'Disposable PostgreSQL isolation': '.github/workflows/disposable-pg-role-isolation.yml',
+            'Two-account PostgreSQL': '.github/workflows/two-account-postgres.yml',
+            'Authenticated BFF PostgreSQL': '.github/workflows/full-bff-tenant-postgres.yml',
+            'Dependency gate': '.github/workflows/authenticated-tenant-integration.yml',
+            'Restricted-role synthetic tests': '.github/workflows/restricted-role-pg-candidate.yml',
+          }
+          missing = [f'{label}: {path}' for label, path in required.items() if not Path(path).is_file()]
+          evidence = Path('docs/security/security-release-evidence.md').read_text()
+          for term in ('INDEPENDENT_REVIEW: PENDING', 'PRODUCTION_RELEASE: NO-GO', 'AUTH0_REAL_BROWSER: NOT VERIFIED'):
+              if term not in evidence:
+                  missing.append(f'missing explicit release restriction: {term}')
+          if missing:
+              raise SystemExit('FAIL CLOSED: ' + '; '.join(missing))
+          print('Security evidence contract PASS; this is NOT human security approval')
+          PY

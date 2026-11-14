@@ -1,0 +1,37 @@
+name: Authenticated tenant integration dependency gate
+on:
+  pull_request:
+    paths:
+      - 'deployment/staging_authenticated_bff.py'
+      - 'tests/integration/test_account_role_isolation.py'
+      - 'tests/integration/tenant_research_fixture.py'
+      - 'tests/integration/disposable_pg_guard.py'
+      - '.github/workflows/authenticated-tenant-integration.yml'
+permissions:
+  contents: read
+jobs:
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify complete BFF test dependencies exist
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          required = (
+              'deployment/staging_authenticated_bff.py',
+              'deployment/postgres_opaque_sessions.py',
+              'deployment/tenant_credential_broker.py',
+              'alpha_lab/research/paper_account_service.py',
+              'alpha_lab/research/postgres_paper_security.py',
+              'tests/integration/test_account_role_isolation.py',
+          )
+          missing = [p for p in required if not Path(p).is_file()]
+          if missing:
+              raise SystemExit('BLOCKED: missing integration dependencies: ' + ', '.join(missing))
+          print('Integration source dependencies present; real database tests still required')
+          PY

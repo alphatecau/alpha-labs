@@ -18,7 +18,7 @@ def decode_part(part):
 
 class OIDCVerifier:
     def __init__(self, *, issuer, audience, jwks, clock=None):
-        if not isinstance(issuer,str) or not issuer.startswith("https://") or issuer.endswith("/"):
+        if not isinstance(issuer,str) or not issuer.startswith("https://"):
             raise ValueError("HTTPS issuer required")
         if not isinstance(audience,str) or not audience:
             raise ValueError("audience required")
@@ -61,6 +61,6 @@ class OIDCVerifier:
             if not isinstance(sub,str) or not 1<=len(sub)<=255: raise ValueError()
             # Identity scoped to issuer. Deterministic, not browser-controlled.
             owner="oidc_"+hashlib.sha256((self.issuer+"\x00"+sub).encode()).hexdigest()
-            return {"verified":True,"owner_id":owner,"issuer":self.issuer}
+            return {"verified":True,"owner_id":owner,"issuer":self.issuer,"subject":sub,"nonce":claims.get("nonce")}
         except Exception as exc:
             raise PermissionError("invalid OIDC token") from exc

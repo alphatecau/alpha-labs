@@ -19,6 +19,7 @@ from deployment.trusted_site_relay import TrustedSiteRelay
 from deployment.research_dashboard_bff import ResearchDashboardBFF
 from deployment.research_readonly_api import ResearchReadOnlyAPI
 from deployment.transaction_scoped_research_reader import TransactionScopedResearchReader
+from tenant_research_fixture import TenantResearchFixture
 
 
 @unittest.skipUnless(os.environ.get("ALPHA_TEST_PG_DSN"), "isolated PostgreSQL required")
@@ -40,6 +41,7 @@ class FullChainPostgresTests(unittest.TestCase):
             self.cookies.append("__Host-alpha_session=" + self.sessions.create(p.subject, p.issuer))
             owner_ids.append(verifier(self.cookies[-1])["owner_id"])
         self.admin = psycopg.connect(self.dsn, autocommit=True)
+        self.addCleanup(self.admin.close)
         self.admin.execute("CREATE ROLE alpha_chain_reader LOGIN PASSWORD 'test-only-reader' NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION")
         self.admin.execute("CREATE TABLE public.research_run_registry (owner_id text NOT NULL, run_id text NOT NULL, evidence_sha256 text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(owner_id,run_id))")
         for index, owner in enumerate(owner_ids):
@@ -57,9 +59,12 @@ class FullChainPostgresTests(unittest.TestCase):
             with psycopg.connect(self.dsn, user="alpha_chain_reader", password="test-only-reader") as conn:
                 yield conn
 
-        reader = TransactionScopedResearchReader(restricted_connection)
+        self.legacy_reader = TransactionScopedResearchReader(restricted_connection)
+        tenant_fixture = TenantResearchFixture(self.admin, self.dsn, self.owner_ids)
+        self.addCleanup(tenant_fixture.cleanup)
+        tenant_fixture.install()
         secret = "test-only-" + "s" * 48
-        api = ResearchReadOnlyAPI(reader=reader, secret=secret)
+        api = ResearchReadOnlyAPI(reader=tenant_fixture.reader(), secret=secret)
 
         def backend(path, headers):
             response = {}
@@ -71,7 +76,6 @@ class FullChainPostgresTests(unittest.TestCase):
             return json.loads(raw)
 
         self.app = ResearchDashboardBFF(relay=TrustedSiteRelay(verifier, backend, secret))
-        self.reader = reader
 
     def tearDown(self):
         if hasattr(self, "admin"):
@@ -79,7 +83,6 @@ class FullChainPostgresTests(unittest.TestCase):
             # Disposable test database only: remove grants before dropping role.
             self.admin.execute("DROP OWNED BY alpha_chain_reader")
             self.admin.execute("DROP ROLE IF EXISTS alpha_chain_reader")
-            self.admin.close()
         self.sessions.close()
         self.owners.close()
         self.limiter.close()
@@ -109,7 +112,7 @@ class FullChainPostgresTests(unittest.TestCase):
         self.assertTrue(self.request(self.cookies[0])[0].startswith("401"))
 
     def test_reused_connection_resets_tenant_context_on_commit_and_rollback(self):
-        with self.reader.connection_factory() as conn:
+        with self.legacy_reader.connection_factory() as conn:
             conn.autocommit = True
             @contextmanager
             def pooled_connection():
@@ -126,11 +129,12 @@ class FullChainPostgresTests(unittest.TestCase):
             self.assertEqual(conn.execute("SELECT count(*) FROM public.research_run_registry").fetchone()[0], 0)
 
     def test_shared_reader_guc_is_not_independent_tenant_authority(self):
-        # Deliberately demonstrate the remaining security limitation, rather
-        # than claiming that fixed-query application checks contain arbitrary SQL.
-        with self.reader.connection_factory() as conn:
+        # Preserve the historical exploit and prove this adapter cannot back the signed API.
+        with self.legacy_reader.connection_factory() as conn:
             conn.execute("SELECT set_config('alpha_labs.owner_id',%s,true)", (self.owner_ids[1],))
             self.assertEqual(conn.execute("SELECT run_id FROM public.research_run_registry").fetchall(), [("test-1",)])
+        with self.assertRaisesRegex(ValueError, "tenant-role research reader required"):
+            ResearchReadOnlyAPI(reader=self.legacy_reader)
 
 
 if __name__ == "__main__":

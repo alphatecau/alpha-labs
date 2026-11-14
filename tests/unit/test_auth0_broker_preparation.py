@@ -1,6 +1,8 @@
 import unittest
+from contextlib import nullcontext
+from unittest.mock import MagicMock
 from deployment.auth0_login_flow import Auth0LoginFlow
-from deployment.tenant_credential_broker import TenantCredentialBroker
+from deployment.tenant_credential_broker import TenantCredentialBroker, tenant_login_role
 
 
 class Store:
@@ -42,27 +44,22 @@ class SecurityPreparationTests(unittest.TestCase):
         broker = TenantCredentialBroker(lambda owner: None,
                                         lambda **kwargs: self.fail("must not connect"))
         with self.assertRaises(PermissionError):
-            with broker("oidc_valid"): pass
+            with broker("oidc_" + "a" * 64): pass
 
-    def test_broker_rejects_superuser_and_missing_read_only(self):
-        class Cursor:
-            def __init__(self, readonly): self.n = 0; self.readonly = readonly
-            def __enter__(self): return self
-            def __exit__(self, *args): return False
-            def execute(self, sql): self.n += 1
-            def fetchone(self):
-                if self.n == 1: return ("alpha_tenant_a", True, False, False)
-                return ("on" if self.readonly else "off",)
-        class Connection:
-            def __enter__(self): return self
-            def __exit__(self, *args): return False
-            def cursor(self): return Cursor(True)
+    def test_broker_rejects_unsafe_login_read_only_setting_and_table(self):
+        owner = "oidc_" + "a" * 64
+        connection = MagicMock()
+        connection.transaction.return_value = nullcontext()
+        cursor = connection.cursor.return_value.__enter__.return_value
         broker = TenantCredentialBroker(
             lambda owner: {"host": "db.example", "port": 5432, "dbname": "research",
-                           "user": "alpha_tenant_a", "password": "synthetic"},
-            lambda **kwargs: Connection())
-        with self.assertRaises(PermissionError):
-            with broker("oidc_valid"): pass
+                           "user": tenant_login_role(owner), "password": "synthetic"},
+            lambda **kwargs: nullcontext(connection))
+        for rows in ([(False,)], [(True,), ("off",)], [(True,), ("on",), (False,)]):
+            with self.subTest(rows=rows), self.assertRaises(PermissionError):
+                cursor.fetchone.side_effect = rows
+                with broker(owner):
+                    self.fail("unsafe configuration yielded a connection")
 
 
 if __name__ == "__main__": unittest.main()

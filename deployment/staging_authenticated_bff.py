@@ -12,6 +12,8 @@ import secrets
 from http.cookies import SimpleCookie
 from urllib.parse import parse_qs, urlsplit
 
+from deployment.account_role_research_reader import AccountRoleResearchReader
+
 
 class StagingResearchBFF:
     def __init__(self, flow, controller, sessions, reader, *, origin, authorize_owner):
@@ -22,6 +24,8 @@ class StagingResearchBFF:
             raise ValueError("all authenticated dependencies required")
         if not callable(authorize_owner):
             raise ValueError("current ownership authorizer required")
+        if not isinstance(reader, AccountRoleResearchReader):
+            raise ValueError("tenant-role research reader required")
         self.flow, self.controller, self.sessions, self.reader = flow, controller, sessions, reader
         self.authorize_owner = authorize_owner
         self.origin = origin.rstrip("/")

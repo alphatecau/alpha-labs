@@ -1,6 +1,9 @@
 """Synthetic two-principal tests for the external BFF identity bridge."""
 import tempfile
 import unittest
+from unittest.mock import Mock
+
+from deployment.account_role_research_reader import AccountRoleResearchReader
 
 from alpha_lab.research.oidc_durable_store import DurableOIDCStore
 from alpha_lab.research.paper_ownership_registry import PaperOwnershipRegistry
@@ -27,7 +30,7 @@ class TwoUserBridgeTests(unittest.TestCase):
         self.verify = SessionOwnershipVerifier(sessions=self.sessions, ownership=self.owners, limiter=self.limiter)
         self.secret = "test-only-secret-" + "x" * 48
         self.reader = SyntheticReader()
-        self.api = ResearchReadOnlyAPI(reader=self.reader, secret=self.secret)
+        self.api = ResearchReadOnlyAPI(reader=Mock(spec=AccountRoleResearchReader, wraps=self.reader), secret=self.secret)
 
         def backend(path, headers):
             response = {}

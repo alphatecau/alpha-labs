@@ -1,18 +1,22 @@
 """Synthetic tenant-credential isolation fixtures; no database or credentials used."""
 import json
 import unittest
+from contextlib import nullcontext
 from deployment.render_environment_tenant_secrets import RenderEnvironmentTenantSecrets
-from deployment.tenant_credential_broker import TenantCredentialBroker
+from deployment.tenant_credential_broker import TenantCredentialBroker, tenant_login_role
 
 
 class Cursor:
     def __init__(self, role): self.role = role; self.query = ""
     def __enter__(self): return self
     def __exit__(self, *args): return False
-    def execute(self, sql): self.query = sql
+    def execute(self, sql, args=()): self.query, self.args = sql, args
     def fetchone(self):
-        if "pg_roles" in self.query: return (self.role, False, False, False)
-        return ("on",)
+        if "pg_auth_members" in self.query:
+            return (self.args == (self.role,),)
+        if self.query.startswith("SHOW"):
+            return ("on",)
+        return (True,)
 
 
 class Conn:
@@ -20,6 +24,7 @@ class Conn:
     def __enter__(self): return self
     def __exit__(self, *args): return False
     def cursor(self): return Cursor(self.role)
+    def transaction(self): return nullcontext()
 
 
 class TenantFixtureTests(unittest.TestCase):
@@ -31,8 +36,8 @@ class TenantFixtureTests(unittest.TestCase):
                         user=role, password="synthetic-only")
         self.env = {"ALPHA_TENANT_CREDENTIALS_JSON": json.dumps({
             "schema_version": 1,
-            "accounts": {self.alice: cred("alpha_tenant_alice"),
-                         self.bob: cred("alpha_tenant_bob")}})}
+            "accounts": {self.alice: cred(tenant_login_role(self.alice)),
+                         self.bob: cred(tenant_login_role(self.bob))}})}
         self.calls = []
         def connect(**kwargs):
             self.calls.append(kwargs)
@@ -43,7 +48,7 @@ class TenantFixtureTests(unittest.TestCase):
         with self.broker(self.alice): pass
         with self.broker(self.bob): pass
         self.assertEqual([c["user"] for c in self.calls],
-                         ["alpha_tenant_alice", "alpha_tenant_bob"])
+                         [tenant_login_role(self.alice), tenant_login_role(self.bob)])
         self.assertTrue(all(c["sslmode"] == "verify-full" for c in self.calls))
 
     def test_unprovisioned_or_spoofed_owner_denied(self):
@@ -55,7 +60,7 @@ class TenantFixtureTests(unittest.TestCase):
 
     def test_role_mismatch_denied(self):
         self.broker = TenantCredentialBroker(RenderEnvironmentTenantSecrets(self.env),
-                                             lambda **kw: Conn("alpha_tenant_bob"))
+                                             lambda **kw: Conn(tenant_login_role(self.bob)))
         with self.assertRaises(PermissionError):
             with self.broker(self.alice): pass
 

@@ -11,6 +11,7 @@ import os
 import re
 import time
 from urllib.parse import parse_qs
+from deployment.account_role_research_reader import AccountRoleResearchReader
 
 def _b64(data):
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
@@ -29,7 +30,8 @@ def sign_assertion(owner, secret, *, now=None, ttl=60):
     return payload + "." + signature
 
 def verify_assertion(value, secret, *, now=None):
-    if not isinstance(value, str) or len(value) > 1024 or value.count(".") != 1:
+    if (not isinstance(value, str) or len(value) > 1024
+            or not re.fullmatch(r"[A-Za-z0-9_-]+\.[A-Za-z0-9_-]{43}", value)):
         raise PermissionError("invalid assertion")
     if not isinstance(secret, str) or len(secret) < 32:
         raise PermissionError("relay not configured")
@@ -55,6 +57,8 @@ def verify_assertion(value, secret, *, now=None):
 
 class ResearchReadOnlyAPI:
     def __init__(self, reader=None, secret=None, clock=None):
+        if reader is not None and not isinstance(reader, AccountRoleResearchReader):
+            raise ValueError("tenant-role research reader required")
         self.reader = reader
         self.secret = secret
         self.clock = clock or time.time

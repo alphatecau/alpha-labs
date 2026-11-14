@@ -1,7 +1,11 @@
 """Fail-closed staging WSGI adversarial tests; synthetic identity and data only."""
 import unittest
+from unittest.mock import Mock
+
+from deployment.account_role_research_reader import AccountRoleResearchReader
 from urllib.parse import parse_qs, urlsplit
 from deployment.staging_authenticated_bff import StagingResearchBFF
+from deployment.transaction_scoped_research_reader import TransactionScopedResearchReader
 
 class Flow:
     def begin(self):
@@ -25,7 +29,7 @@ class Reader:
 class BFFTests(unittest.TestCase):
     def setUp(self):
         self.sessions = Sessions()
-        self.app = StagingResearchBFF(Flow(), Controller(), self.sessions, Reader(),
+        self.app = StagingResearchBFF(Flow(), Controller(), self.sessions, Mock(spec=AccountRoleResearchReader, wraps=Reader()),
                                       origin="https://staging.example", authorize_owner=lambda owner: True)
     def call(self, path, method="GET", **env):
         result = {}
@@ -53,5 +57,10 @@ class BFFTests(unittest.TestCase):
     def test_duplicate_cookie_rejected(self):
         cookie="__Host-alpha_session="+"s"*48
         self.assertEqual(self.call("/api/v1/research/runs",HTTP_COOKIE=cookie+"; "+cookie)["status"],"401 Unauthorized")
+    def test_legacy_shared_reader_rejected(self):
+        legacy = TransactionScopedResearchReader(lambda: self.fail("legacy database connection opened"))
+        with self.assertRaisesRegex(ValueError, "tenant-role research reader required"):
+            StagingResearchBFF(Flow(), Controller(), self.sessions, legacy,
+                               origin="https://staging.example", authorize_owner=lambda owner: True)
 
 if __name__=="__main__": unittest.main()

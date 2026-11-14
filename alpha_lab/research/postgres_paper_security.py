@@ -41,7 +41,7 @@ class PostgresPaperOwnership:
             with conn.cursor() as cur:
                 cur.execute(
                     "INSERT INTO public.paper_ownership(owner_id,account_key,active) VALUES (%s,%s,true) "
-                    "ON CONFLICT(owner_id,account_key) DO UPDATE SET active=true",
+                    "ON CONFLICT(owner_id,account_key) DO NOTHING",
                     (owner, account_key))
         return owner
 

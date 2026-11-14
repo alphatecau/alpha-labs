@@ -4,7 +4,7 @@ These tests do not substitute for real Auth0, PostgreSQL RLS or staging.
 """
 import hashlib
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from urllib.parse import parse_qs, urlsplit
 
 from deployment.auth0_login_flow import Auth0LoginFlow

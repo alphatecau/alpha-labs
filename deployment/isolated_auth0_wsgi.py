@@ -5,6 +5,7 @@ The existing health-only Render service must not point at this entrypoint.
 """
 import json
 import os
+import threading
 from urllib.parse import urlsplit
 
 from deployment.account_role_research_reader import AccountRoleResearchReader
@@ -72,8 +73,16 @@ def build_isolated_app(env=None, *, pg_connect=None):
         ownership=ownership, reader=reader)
 
 
-# A hosting operator may explicitly set WSGI target to
-# deployment.isolated_auth0_wsgi:application only after independent review.
-# There is intentionally no import-time application or environment side effect.
+# Hosting must explicitly select this WSGI target on a NEW isolated service.
+# No network, database or secret access occurs when this module is imported.
+_lock = threading.Lock()
+_app = None
+
+
 def application(environ, start_response):
-    raise RuntimeError("instantiate build_isolated_app in an approved server startup")
+    global _app
+    if _app is None:
+        with _lock:
+            if _app is None:
+                _app = build_isolated_app()
+    return _app(environ, start_response)

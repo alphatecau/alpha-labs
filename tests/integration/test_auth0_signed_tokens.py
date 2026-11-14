@@ -73,6 +73,24 @@ class SignedAuth0TokenTests(unittest.TestCase):
         with self.assertRaises(PermissionError):
             self.verifier.verify(self.token(dict(self.claims, exp=1799999999)), expected_nonce=self.nonce)
 
+    def test_future_not_before_rejected(self):
+        with self.assertRaises(PermissionError):
+            self.verifier.verify(self.token(dict(self.claims, nbf=1800000001)), expected_nonce=self.nonce)
+
+    def test_past_not_before_accepted(self):
+        principal = self.verifier.verify(self.token(dict(self.claims, nbf=1799999999)), expected_nonce=self.nonce)
+        self.assertEqual(principal.subject, "auth0|alice")
+
+    def test_boolean_or_invalid_timestamp_rejected(self):
+        for field, value in (("exp", True), ("iat", False), ("nbf", True), ("nbf", "0")):
+            with self.subTest(field=field, value=value), self.assertRaises(PermissionError):
+                self.verifier.verify(self.token(dict(self.claims, **{field: value})), expected_nonce=self.nonce)
+
+    def test_issuer_unexpected_port_rejected(self):
+        with self.assertRaises(ValueError):
+            Auth0IDTokenVerifier(issuer="https://auth.example:444/",
+                                 client_id=self.client_id, jwks=self.jwks)
+
     def test_wrong_issuer_rejected(self):
         with self.assertRaises(PermissionError):
             self.verifier.verify(self.token(dict(self.claims, iss="https://other.example/")), expected_nonce=self.nonce)

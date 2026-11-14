@@ -30,7 +30,8 @@ class Auth0IDTokenVerifier:
     def __init__(self, *, issuer, client_id, jwks, clock=time.time):
         parsed = urlsplit(issuer)
         if (parsed.scheme != "https" or not parsed.hostname or parsed.username or
-                parsed.password or parsed.query or parsed.fragment or parsed.path not in ("", "/")):
+                parsed.password or parsed.port not in (None, 443) or
+                parsed.query or parsed.fragment or parsed.path not in ("", "/")):
             raise ValueError("invalid Auth0 issuer")
         if not isinstance(client_id, str) or not client_id:
             raise ValueError("client ID required")
@@ -81,11 +82,14 @@ class Auth0IDTokenVerifier:
         )
         if (claims.get("iss") != self.issuer or not valid_audience or
                 claims.get("nonce") != expected_nonce or
-                not isinstance(claims.get("exp"), int) or claims["exp"] <= now or
-                not isinstance(claims.get("iat"), int) or claims["iat"] > now + 60 or
+                type(claims.get("exp")) is not int or claims["exp"] <= now or
+                type(claims.get("iat")) is not int or claims["iat"] > now + 60 or
                 claims["iat"] < now - 86400 or
                 not isinstance(claims.get("sub"), str) or not claims["sub"]):
             raise PermissionError("invalid ID-token claims")
+        nbf = claims.get("nbf")
+        if nbf is not None and (type(nbf) is not int or nbf > now):
+            raise PermissionError("ID token not yet valid")
         if isinstance(aud, list) and len(aud) > 1 and claims.get("azp") != self.client_id:
             raise PermissionError("invalid authorised party")
         return VerifiedPrincipal(subject=claims["sub"], issuer=self.issuer)

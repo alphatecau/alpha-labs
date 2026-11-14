@@ -188,5 +188,88 @@ class IntegratedAuth0BFFTests(unittest.TestCase):
         self.assertIn(b'"trading":"disabled"', self.request("/healthz")["body"])
 
 
+    def test_session_database_outage_fails_closed(self):
+        _, _, sid = self.login()
+        original = self.sessions.resolve_owner
+        self.sessions.resolve_owner = lambda token: (_ for _ in ()).throw(
+            ConnectionError("simulated session database outage"))
+        try:
+            response = self.request("/api/v1/research/runs", cookie=sid)
+            self.assertEqual(response["status"], 503)
+            self.assertNotIn(b"run-a", response["body"])
+        finally:
+            self.sessions.resolve_owner = original
+        self.assertEqual(self.request("/api/v1/research/runs", cookie=sid)["status"], 200)
+
+    def test_ownership_database_outage_fails_closed(self):
+        _, _, sid = self.login()
+        original = self.app.authorize_owner
+        self.app.authorize_owner = lambda owner: (_ for _ in ()).throw(
+            ConnectionError("simulated ownership database outage"))
+        try:
+            self.assertEqual(self.request("/api/v1/research/runs", cookie=sid)["status"], 503)
+            self.assertEqual(self.request("/api/v1/research/summary", cookie=sid)["status"], 503)
+        finally:
+            self.app.authorize_owner = original
+
+    def test_tenant_credential_failure_fails_closed(self):
+        _, _, sid = self.login()
+        original = self.app.reader.list_runs
+        self.app.reader.list_runs = lambda owner: (_ for _ in ()).throw(
+            PermissionError("tenant credential revoked"))
+        try:
+            self.assertEqual(self.request("/api/v1/research/runs", cookie=sid)["status"], 403)
+            self.assertNotIn(b"run-a", self.request("/api/v1/research/runs", cookie=sid)["body"])
+        finally:
+            self.app.reader.list_runs = original
+
+    def test_research_database_outage_fails_closed(self):
+        _, _, sid = self.login()
+        original = self.app.reader.list_runs
+        self.app.reader.list_runs = lambda owner: (_ for _ in ()).throw(
+            ConnectionError("tenant database unavailable"))
+        try:
+            self.assertEqual(self.request("/api/v1/research/runs", cookie=sid)["status"], 503)
+            self.assertEqual(self.request("/api/v1/research/summary", cookie=sid)["status"], 503)
+        finally:
+            self.app.reader.list_runs = original
+
+    def test_callback_token_exchange_failure_no_session(self):
+        first = self.request("/auth/login")
+        url = next(v for k, v in first["headers"] if k == "Location")
+        state = parse_qs(urlsplit(url).query)["state"][0]
+        cookie = self.cookie(first, "__Host-alpha_oauth_state")
+        self.controller.exchange_code = lambda **kwargs: (_ for _ in ()).throw(
+            ConnectionError("Auth0 token endpoint unavailable"))
+        failed = self.request("/auth/callback", query="code=code&state=" + state, cookie=cookie)
+        self.assertEqual(failed["status"], 401)
+        self.assertFalse(any(k == "Set-Cookie" and v.startswith("__Host-alpha_session=")
+                             for k, v in failed["headers"]))
+        self.assertEqual(self.request("/api/v1/research/runs")["status"], 401)
+
+    def test_malformed_callback_never_exchanges_code(self):
+        first = self.request("/auth/login")
+        url = next(v for k, v in first["headers"] if k == "Location")
+        state = parse_qs(urlsplit(url).query)["state"][0]
+        cookie = self.cookie(first, "__Host-alpha_oauth_state")
+        for query in ("code=x&code=y&state=" + state,
+                      "code=&state=" + state,
+                      "code=x&state=" + state + "&unexpected=1",
+                      "state=" + state,
+                      "code=x&state="):
+            with self.subTest(query=query):
+                self.assertEqual(self.request("/auth/callback", query=query, cookie=cookie)["status"], 401)
+        self.assertEqual(self.exchange_calls, [])
+
+    def test_revocation_blocks_research_immediately(self):
+        _, _, sid = self.login()
+        self.assertEqual(self.request("/api/v1/research/runs", cookie=sid)["status"], 200)
+        self.active.remove(self.owner)
+        self.assertEqual(self.request("/api/v1/research/runs", cookie=sid)["status"], 403)
+        self.assertEqual(self.request("/api/v1/research/summary", cookie=sid)["status"], 403)
+        self.active.add(self.owner)
+        self.assertEqual(self.request("/api/v1/research/runs", cookie=sid)["status"], 200)
+
+
 if __name__ == "__main__":
     unittest.main()

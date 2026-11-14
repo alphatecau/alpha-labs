@@ -4,7 +4,7 @@ on:
     paths:
       - 'alpha_lab/research/postgres_paper_security.py'
       - 'alpha_lab/research/paper_account_service.py'
-      - 'tests/unit/test_ownership_provisioning_authority.py'
+      - 'tests/integration/test_ownership_provisioning_authority.py'
       - '.github/workflows/ownership-provisioning-gate.yml'
 permissions:
   contents: read
@@ -18,4 +18,4 @@ jobs:
         with:
           python-version: '3.12'
       - name: Reject unauthorised account provisioning
-        run: PYTHONPATH=. python -m unittest discover -s tests/unit -p 'test_ownership_provisioning_authority.py' -v
+        run: PYTHONPATH=. python -m unittest discover -s tests/integration -p 'test_ownership_provisioning_authority.py' -v

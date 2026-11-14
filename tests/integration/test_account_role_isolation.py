@@ -132,7 +132,7 @@ class RoleIsolationTests(unittest.TestCase):
                         "DROP TABLE public.alpha_oidc_sessions, public.paper_ownership, public.identity_rate_limit")
         now = datetime(2026, 11, 12, tzinfo=timezone.utc)
         sessions = PostgresOpaqueSessions(lambda: psycopg.connect(self.dsn), clock=lambda: now)
-        ownership = PostgresPaperOwnership(lambda: psycopg.connect(self.dsn))
+        ownership = PostgresPaperOwnership(\n            lambda: psycopg.connect(self.dsn),\n            verify_provisioning_authority=lambda principal: (\n                principal.issuer == self.issuer and principal.subject in ("alice", "bob", "unprovisioned")\n            ),\n        )
         tokens = []
         for subject in ("alice", "bob", "unprovisioned"):
             ownership.provision(VerifiedPrincipal(subject=subject, issuer=self.issuer), "primary")

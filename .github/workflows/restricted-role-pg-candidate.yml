@@ -1,0 +1,24 @@
+name: Restricted-role PostgreSQL candidate — synthetic gate
+on:
+  pull_request:
+    paths:
+      - 'deployment/account_role_research_reader.py'
+      - 'deployment/tenant_credential_broker.py'
+      - 'deployment/research_role_isolation_fixture.sql'
+      - 'tests/unit/test_tenant_role_contract.py'
+      - '.github/workflows/restricted-role-pg-candidate.yml'
+permissions:
+  contents: read
+jobs:
+  synthetic-role-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile candidate modules
+        run: python -m py_compile deployment/account_role_research_reader.py deployment/tenant_credential_broker.py tests/unit/test_tenant_role_contract.py
+      - name: Execute synthetic role contract
+        run: PYTHONPATH=. python -m unittest discover -s tests/unit -p 'test_tenant_role_contract.py' -v

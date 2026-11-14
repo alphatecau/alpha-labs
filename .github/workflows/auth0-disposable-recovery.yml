@@ -1,0 +1,36 @@
+name: Auth0 disposable PostgreSQL recovery and isolation
+on:
+  pull_request:
+    paths:
+      - 'deployment/postgres_oauth_state.py'
+      - 'deployment/postgres_opaque_sessions.py'
+      - 'tests/integration/test_auth0_disposable_recovery.py'
+      - '.github/workflows/auth0-disposable-recovery.yml'
+  workflow_dispatch:
+jobs:
+  auth0-disposable-recovery:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: disposable-only
+          POSTGRES_DB: alpha_disposable
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d alpha_disposable"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      ALPHA_DISPOSABLE_PG_DSN: 'postgresql://postgres:disposable-only@127.0.0.1:5432/alpha_disposable'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'psycopg[binary]>=3.2,<4'
+      - name: Auth0 session and state recovery acceptance
+        run: PYTHONPATH=. python -m unittest discover -s tests/integration -p 'test_auth0_disposable_recovery.py' -v

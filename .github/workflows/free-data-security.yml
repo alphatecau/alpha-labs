@@ -5,6 +5,8 @@ on:
     paths:
       - 'packages/alpha_lab/src/alpha_lab/data/dual_source_check.py'
       - 'scripts/osv_audit.py'
+      - 'packages/alpha_lab/src/alpha_lab/research/dual_source_paper_gate.py'
+      - 'tests/unit/test_dual_source_paper_gate.py'
       - 'tests/unit/test_dual_source_check.py'
       - 'tests/unit/test_osv_audit.py'
       - '.github/workflows/free-data-security.yml'
@@ -27,7 +29,7 @@ jobs:
       - name: Offline provider and OSV tests
         env:
           PYTHONPATH: packages/alpha_lab/src
-        run: python -m unittest discover -s tests/unit -p 'test_dual_source_check.py' -v && python -m unittest discover -s tests/unit -p 'test_osv_audit.py' -v
+        run: python -m unittest discover -s tests/unit -p 'test_dual_source_check.py' -v && python -m unittest discover -s tests/unit -p 'test_osv_audit.py' -v && python -m unittest discover -s tests/unit -p 'test_dual_source_paper_gate.py' -v
 
   dependency-audit:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

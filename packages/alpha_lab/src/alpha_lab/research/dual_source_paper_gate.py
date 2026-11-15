@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from threading import Lock
 
-from alpha_lab.data.dual_source_check import ASSETS, MarketDataHalt, crosscheck
+from alpha_lab.data.dual_source_check import MarketDataHalt, crosscheck
 
 PRODUCT_ASSETS = {"BTC-USD": "BTC", "ETH-USD": "ETH", "SOL-USD": "SOL"}
 
@@ -29,6 +29,7 @@ class DualSourcePaperGate:
         self.max_age_seconds = max_age_seconds
         self.lock = Lock()
         self.validated = {}
+        self._refresh_generation = 0
 
     def refresh(self, *, now=None):
         now = datetime.now(timezone.utc) if now is None else now
@@ -36,6 +37,8 @@ class DualSourcePaperGate:
             raise ValueError("UTC time required")
         stamp = int(now.timestamp())
         with self.lock:
+            self._refresh_generation += 1
+            generation = self._refresh_generation
             self.validated.clear()  # fail closed throughout refresh
         passed = {}
         for product, asset in PRODUCT_ASSETS.items():
@@ -50,6 +53,8 @@ class DualSourcePaperGate:
             except Exception:
                 continue
         with self.lock:
+            if generation != self._refresh_generation:
+                return {}  # an older, slower refresh cannot overwrite newer evidence
             self.validated = passed
         return dict(passed)
 

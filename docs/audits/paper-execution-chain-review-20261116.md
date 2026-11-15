@@ -26,3 +26,19 @@ This is **not** a full repository-wide or live-device acceptance certificate.
 6. Keep real-capital execution disabled. Do not conflate CI success, paper simulation acceptance and live trading authorisation.
 
 The tests on PR #135 passed for its head SHA `3f5bf6cbdae1397ab24651e03364ae7b305f4114`.
+
+## Implementation update (same audit branch)
+
+The CLI now supports `--dual-source-check` for Coinbase crypto paper mode only.
+The opt-in wrapper polls the research providers on a separate bounded background
+thread, propagates health updates to the session and expires evidence. Startup
+remains HALT. Synthetic ETF fixtures reject this option.
+
+Example (existing working journal only):
+
+```sh
+PYTHONPATH=packages/alpha_lab/src python -m alpha_lab.research.local_paper_terminal --dual-source-check
+```
+
+This does not activate live-capital trading, guarantee provider availability or
+prove physical Android acceptance. Keep the feature opt-in pending device tests.

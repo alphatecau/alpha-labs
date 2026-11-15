@@ -1,5 +1,4 @@
 """Deterministic offline tests: no network, keys or order placement."""
-import json
 import unittest
 from decimal import Decimal
 from unittest.mock import patch

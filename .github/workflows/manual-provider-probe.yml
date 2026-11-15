@@ -1,0 +1,26 @@
+name: Manual public market provider probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  provider-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check public provider connectivity (research only)
+        env:
+          PYTHONPATH: packages/alpha_lab/src
+        run: |
+          python -m alpha_lab.data.dual_source_check --asset BTC
+          python -m alpha_lab.data.dual_source_check --asset ETH
+          python -m alpha_lab.data.dual_source_check --asset SOL

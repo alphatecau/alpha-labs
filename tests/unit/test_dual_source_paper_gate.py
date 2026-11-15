@@ -12,6 +12,8 @@ class Feed:
         return {}, {"BTC-USD": True, "ETH-USD": True, "SOL-USD": True}, {}
     def poll(self, pool):
         return None
+    def start(self, on_poll, **kwargs):
+        self.on_poll = on_poll
     def close(self):
         return None
 
@@ -60,6 +62,18 @@ class GateTests(unittest.TestCase):
         worker.join(timeout=5)
         self.assertFalse(worker.is_alive())
         self.assertFalse(any(gate.snapshot(NOW)[1].values()))
+
+    def test_background_refresh_notifies_and_closes(self):
+        updated = Event()
+        gate = DualSourcePaperGate(Feed(), validator=lambda asset, now: {
+            "status": "VERIFIED_RESEARCH_DATA", "asset": asset, "observed_at_utc": now})
+        gate.start(updated.set)
+        try:
+            self.assertTrue(updated.wait(timeout=5))
+        finally:
+            gate.close()
+        self.assertIsNotNone(gate._worker)
+        self.assertFalse(gate._worker.is_alive())
 
     def test_invalid_evidence_fails_closed(self):
         gate = DualSourcePaperGate(Feed(), validator=lambda asset, now: {"status": "PASS"})

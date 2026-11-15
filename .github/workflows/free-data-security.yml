@@ -31,6 +31,22 @@ jobs:
           PYTHONPATH: packages/alpha_lab/src
         run: python -m unittest discover -s tests/unit -p 'test_dual_source_check.py' -v && python -m unittest discover -s tests/unit -p 'test_osv_audit.py' -v && python -m unittest discover -s tests/unit -p 'test_dual_source_paper_gate.py' -v
 
+  public-provider-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe BTC ETH SOL via both public providers
+        env:
+          PYTHONPATH: packages/alpha_lab/src
+        run: |
+          python -m alpha_lab.data.dual_source_check --asset BTC
+          python -m alpha_lab.data.dual_source_check --asset ETH
+          python -m alpha_lab.data.dual_source_check --asset SOL
+
   dependency-audit:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest

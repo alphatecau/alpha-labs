@@ -2,7 +2,6 @@
 import io
 import json
 import unittest
-from unittest.mock import Mock
 
 from scripts.osv_audit import audit
 

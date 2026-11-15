@@ -37,3 +37,25 @@ A missing API response or unavailable OSV service fails the security audit rathe
 5. No production trading or order submission permitted.
 
 Academic research APIs are intentionally deferred.
+
+## Paper runtime integration boundary
+
+`DualSourcePaperGate` is an opt-in wrapper for the existing `PaperMarketFeed`.
+It exposes the same `poll`, `snapshot`, `start`, and `close` methods.
+A caller can explicitly construct `DualSourcePaperGate(existing_feed)` and
+call `refresh()` on a bounded background worker, not from an order-request path.
+The wrapped `snapshot` reports BTC-USD/ETH-USD/SOL-USD unhealthy until all
+required evidence for each product is validated. Evidence expires after 60 seconds.
+An upstream feed HALT always remains a HALT. Provider errors never trigger orders.
+
+**Not enabled by default:** The current paper market is Coinbase USD; the Binance
+USDT/CoinGecko USD comparison is an independent research sanity check, not a
+substitute for the existing Coinbase book, exchange timestamps or depth.
+Activating the wrapper in the production paper service requires a deliberate
+operator configuration, polling-budget design, device testing and acceptance
+of cross-venue basis risk. Never enable it implicitly.
+
+The `Manual public market provider probe` workflow can be started from GitHub
+Actions by an authorised operator. It exercises the real public APIs, without
+credentials or orders, for all three assets. CI does not automatically run this
+network-dependent probe.

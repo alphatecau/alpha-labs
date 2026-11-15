@@ -30,7 +30,7 @@ def audit(packages, *, opener=urlopen):
     request = Request(OSV_URL, data=body, headers={
         "Content-Type": "application/json", "User-Agent": "alpha-labs-security-audit/1"
     }, method="POST")
-    with opener(request, timeout=20) as response:
+    with opener(request, timeout=20) as response:  # nosec B310 - fixed HTTPS OSV host
         if response.status != 200:
             raise RuntimeError("OSV service error")
         data = response.read(2_000_001)

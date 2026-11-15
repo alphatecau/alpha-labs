@@ -2,6 +2,9 @@ name: Manual public market provider probe
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/manual-provider-probe.yml'
 
 permissions:
   contents: read

@@ -28,7 +28,7 @@ class MarketDataHalt(Exception):
 def _json_get(url: str, headers: dict[str, str] | None = None) -> object:
     request = Request(url, headers={"Accept": "application/json", "User-Agent": "alpha-labs-research/1", **(headers or {})})
     try:
-        with urlopen(request, timeout=10) as response:
+        with urlopen(request, timeout=10) as response:  # nosec B310 - fixed HTTPS API host
             if response.status != 200:
                 raise MarketDataHalt("market data HTTP failure")
             payload = response.read(65537)

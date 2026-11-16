@@ -46,8 +46,23 @@ class Tests(unittest.TestCase):
             with self.assertRaises(RuntimeError):w.process(x,self.keys,DEVICE,self.db,True,NOW)
         with patch("worker_v5.publish") as publish:
             w.reconcile(self.db,[x])
-            publish.assert_called_once()
+            publish.assert_not_called()
         execute.assert_called_once()
+    def test_ambiguous_receipt_never_republished(self):
+        x=self.issue()
+        with patch("worker_v5.worker_v2.execute",return_value="success"), patch("worker_v5.publish",side_effect=RuntimeError("network failed after comment")) as publish:
+            with self.assertRaises(RuntimeError):
+                w.process(x,self.keys,DEVICE,self.db,True,NOW)
+            w.reconcile(self.db,[x])
+            publish.assert_called_once()
+        self.assertEqual(self.db.execute("SELECT status FROM tasks WHERE issue=123").fetchone()[0],"publishing_success")
+    def test_successful_receipt_marked_published(self):
+        x=self.issue()
+        with patch("worker_v5.worker_v2.execute",return_value="success"), patch("worker_v5.publish") as publish:
+            w.process(x,self.keys,DEVICE,self.db,True,NOW)
+            w.reconcile(self.db,[x])
+            publish.assert_called_once()
+        self.assertEqual(self.db.execute("SELECT status FROM tasks WHERE issue=123").fetchone()[0],"published_success")
     def test_reserved_no_retry(self):
         x=self.issue()
         task=w.validate(x,self.keys,DEVICE,NOW)

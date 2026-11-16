@@ -10,6 +10,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from alpha_lab.research.live_paper_session import LivePaperSession, PaperRejection
+from alpha_lab.research.dual_source_paper_gate import DualSourcePaperGate, PRODUCT_ASSETS
 from alpha_lab.research.local_etf_fixture import ETF_FIXTURE_MARKET, SyntheticEtfFeed
 from alpha_lab.research.local_multiasset_catalogue import catalogue
 from alpha_lab.research.local_paper_recovery import JOURNAL_NAME, backup_destination, inspect_journal, publish_verified_file
@@ -76,7 +77,8 @@ def command(session, line, *, operator=None):
                              "buy SYMBOL QUANTITY STOP --id ID", "sell SYMBOL QUANTITY --id ID",
                              "limit buy SYMBOL QUANTITY LIMIT STOP --id ID",
                              "limit sell SYMBOL QUANTITY LIMIT --id ID", "cancel ID",
-                             "advance (ETF fixture only)", "backup PATH", "quit"],
+                             "advance (ETF fixture only)", "refresh-data (gated mode only)",
+                             "backup PATH", "quit"],
                 "profile": session.market.name}
     if verb == "markets" and len(parts) == 1:
         return {"catalogue": [dict(symbol=i.symbol, venue=i.venue, asset_class=i.asset_class,
@@ -88,6 +90,15 @@ def command(session, line, *, operator=None):
         if operator is not None:
             result["recovery"].update(operator)
         return result
+    if verb == "refresh-data" and len(parts) == 1 and isinstance(session.feed, DualSourcePaperGate):
+        passed = session.feed.refresh()
+        # The existing session still owns arming and risk decisions.
+        # Never auto-arm after a successful external check.
+        if set(passed) != set(PRODUCT_ASSETS):
+            session.control("halt")
+        return {"validation": "PASS" if set(passed) == set(PRODUCT_ASSETS) else "HALT",
+                "validated_products": sorted(passed), "required_products": sorted(PRODUCT_ASSETS),
+                "armed": False if set(passed) != set(PRODUCT_ASSETS) else session.state()["risk"]["armed"]}
     if verb == "new-id" and len(parts) == 1:
         return {"order_id": uuid.uuid4().hex}
     if verb == "halt" and len(parts) == 1:
@@ -116,9 +127,12 @@ def main(argv=None):
     parser.add_argument("--init", action="store_true", help="explicitly initialise a new working directory")
     parser.add_argument("--account", default=DEFAULT_ACCOUNT)
     parser.add_argument("--synthetic-etfs", action="store_true")
+    parser.add_argument("--dual-source-gate", action="store_true", help="opt-in Binance/CoinGecko sanity gate for Coinbase paper quotes")
     parser.add_argument("--fee-bps", default="10")
     parser.add_argument("--slippage-bps", default="5")
     args = parser.parse_args(argv)
+    if args.synthetic_etfs and args.dual_source_gate:
+        parser.error("dual-source gate is only supported for Coinbase paper markets")
     try:
         costs = PaperCosts(Decimal(args.fee_bps) / 10000, Decimal(args.slippage_bps) / 10000)
     except (DecimalException, ValueError) as exc:
@@ -141,6 +155,8 @@ def main(argv=None):
                                        market=ETF_FIXTURE_MARKET, costs=costs, migrate=args.init)
         else:
             feed = PaperMarketFeed()
+            if args.dual_source_gate:
+                feed = DualSourcePaperGate(feed)
             session = LivePaperSession(directory, args.account, feed, market=COINBASE_MARKET,
                                        costs=costs, migrate=args.init)
     except (ValueError, KeyError, OSError, sqlite3.Error) as exc:
@@ -153,6 +169,8 @@ def main(argv=None):
         operator = {"journal": str(journal), "last_verified_backup": "NOT TESTED"}
         print(f"Alpha Labs · {session.market.name} · simulated USD. Type help.")
         print(f"Journal {operator['journal']} · {session.runtime.ledger.sequence} verified fills · STARTUP HALT")
+        if args.dual_source_gate:
+            print("Dual-source gate ACTIVE · validation initially missing · use refresh-data then arm")
         while True:
             try:
                 line = input("paper> ").strip()

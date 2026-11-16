@@ -3,6 +3,17 @@
 Candidate: PR #122, restricted-role PostgreSQL and authenticated BFF.
 Evidence baseline commit: `45079e442c45a005ee3bc47054c80f17b61e16e2`.
 
+## Exact-main automated verification — 16 November 2026
+
+Verified repository main SHA: `f4e7e01dd3a7d7295b5168515f4e45b7f2ae4c8b`.
+Manually dispatched GitHub Actions completed successfully at this exact SHA:
+- Auth0 callback adversarial CI: [run 43811035929](https://github.com/alphatecau/alpha-labs/actions/runs/43811035929)
+- Authenticated BFF + disposable PostgreSQL integration: [run 43811040000](https://github.com/alphatecau/alpha-labs/actions/runs/43811040000)
+- Real tenant RLS with disposable PostgreSQL 16: [run 43811043922](https://github.com/alphatecau/alpha-labs/actions/runs/43811043922)
+- Security release evidence gate: [run 43811047994](https://github.com/alphatecau/alpha-labs/actions/runs/43811047994)
+
+Each run was reported completed/success with successful job steps. These are synthetic/adversarial and disposable-database CI checks; they do not prove real Auth0 browser flows, Render ingress trust, production role security or independent reviewer approval. The security release evidence gate checks required workflow-file presence and explicit restriction markers; it does not independently certify release readiness. The historical PR #122 baseline below is retained for audit continuity. See [acceptance issue #154](https://github.com/alphatecau/alpha-labs/issues/154).
+
 ## Automated baseline (historical exact commit)
 GitHub Actions runs on the baseline commit completed successfully:
 - CodeQL baseline: 43641386530

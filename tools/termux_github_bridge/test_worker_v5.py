@@ -46,7 +46,7 @@ class Tests(unittest.TestCase):
             with self.assertRaises(RuntimeError):w.process(x,self.keys,DEVICE,self.db,True,NOW)
         with patch("worker_v5.publish") as publish:
             w.reconcile(self.db,[x])
-            publish.assert_called_once()
+            publish.assert_not_called()
         execute.assert_called_once()
     def test_ambiguous_receipt_never_republished(self):
         x=self.issue()

@@ -39,17 +39,39 @@ class CoinbaseResearchImportTests(unittest.TestCase):
         cases = []
         for field, value in (("product_id", "DOGE-USD"), ("provider", "unknown"),
                              ("product_type", "GLOBAL_PERP"), ("quote_currency", "USDT")):
-            x = fixture(); x[field] = value; cases.append(x)
-        x = fixture(); x["account_uuid"] = "secret"; cases.append(x)
-        x = fixture(); x["candles"][1] = copy.deepcopy(x["candles"][0]); cases.append(x)
-        x = fixture(); x["candles"][0]["complete"] = False; cases.append(x)
-        x = fixture(); x["candles"][0]["high"] = "80"; cases.append(x)
-        x = fixture(); x["candles"][0]["close"] = "NaN"; cases.append(x)
-        x = fixture(); x["candles"][0]["volume"] = "-1"; cases.append(x)
-        x = fixture(); x["candles"] = x["candles"][:12]; cases.append(x)
-        x = fixture(); x["candles"][-1]["start"] = NOW.isoformat().replace("+00:00", "Z"); cases.append(x)
-        x = fixture(); x["collected_at"] = (NOW - timedelta(hours=1)).isoformat().replace("+00:00", "Z"); cases.append(x)
-        x = fixture(); x["collected_at"] = (NOW + timedelta(seconds=1)).isoformat().replace("+00:00", "Z"); cases.append(x)
+            x = fixture()
+            x[field] = value
+            cases.append(x)
+        x = fixture()
+        x["account_uuid"] = "secret"
+        cases.append(x)
+        x = fixture()
+        x["candles"][1] = copy.deepcopy(x["candles"][0])
+        cases.append(x)
+        x = fixture()
+        x["candles"][0]["complete"] = False
+        cases.append(x)
+        x = fixture()
+        x["candles"][0]["high"] = "80"
+        cases.append(x)
+        x = fixture()
+        x["candles"][0]["close"] = "NaN"
+        cases.append(x)
+        x = fixture()
+        x["candles"][0]["volume"] = "-1"
+        cases.append(x)
+        x = fixture()
+        x["candles"] = x["candles"][:12]
+        cases.append(x)
+        x = fixture()
+        x["candles"][-1]["start"] = NOW.isoformat().replace("+00:00", "Z")
+        cases.append(x)
+        x = fixture()
+        x["collected_at"] = (NOW - timedelta(hours=1)).isoformat().replace("+00:00", "Z")
+        cases.append(x)
+        x = fixture()
+        x["collected_at"] = (NOW + timedelta(seconds=1)).isoformat().replace("+00:00", "Z")
+        cases.append(x)
         for index, bad in enumerate(cases):
             with self.subTest(index=index), self.assertRaises(ValueError):
                 validate_snapshot(bad, now=NOW)

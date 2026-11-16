@@ -9,3 +9,7 @@ The ledger reserves the issue and nonce before execution. A crash during executi
 ## Ambiguous receipt publication
 
 Before attempting a GitHub receipt, the ledger durably records `publishing_success` or `publishing_failed`. If the network or process fails after this transition, the worker deliberately does **not** retry automatically: GitHub may already have accepted the comment. Operators must inspect the issue and ledger and reconcile manually. This prioritises no duplicate publication over automatic delivery. A crash before this transition leaves the terminal receipt eligible for retry. A crash during read-only execution remains `reserved` and is never automatically re-executed.
+
+## Queue capacity safety gate
+
+The GitHub CLI currently requests up to 100 open signed issues. If the returned queue contains 100 or more entries, v0.5 exits before reconciliation or execution, because additional issues might have been truncated. This is a deliberate fail-closed interim control, **not pagination**. Reduce the queue or implement verified pagination before enabling a larger backlog. GitHub CLI failures already stop the run without executing tasks.

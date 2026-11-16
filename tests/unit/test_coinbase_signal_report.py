@@ -42,6 +42,27 @@ class CoinbaseSignalReportTests(unittest.TestCase):
         self.assertFalse(result["live_execution_authorised"])
         self.assertEqual(result["candle_count"], 60)
 
+    def test_downtrend_remains_halted(self):
+        data = snapshot()
+        for index, candle in enumerate(data["candles"]):
+            base = 200 - index
+            candle["open"] = str(base)
+            candle["high"] = str(base + 2)
+            candle["low"] = str(base - 1)
+            candle["close"] = str(base + 1)
+        result = research_report(data, now=NOW)
+        self.assertEqual(result["trend_observation"], "DOWNTREND_OBSERVED")
+        self.assertEqual(result["decision"], "FLAT")
+        self.assertEqual(result["risk_override"], "HALT")
+        self.assertFalse(result["paper_execution_authorised"])
+        self.assertFalse(result["live_execution_authorised"])
+
+    def test_account_data_is_rejected(self):
+        data = snapshot()
+        data["portfolio_id"] = "private"
+        with self.assertRaises(ValueError):
+            research_report(data, now=NOW)
+
     def test_bad_input_fails_closed(self):
         data = snapshot()
         data["candles"][-1]["complete"] = False

@@ -6,9 +6,9 @@ A research cross-check is *additional* evidence, not a replacement for executabl
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from threading import Lock
+from threading import Event, Lock, Thread
 
-from alpha_lab.data.dual_source_check import ASSETS, MarketDataHalt, crosscheck
+from alpha_lab.data.dual_source_check import MarketDataHalt, crosscheck
 
 PRODUCT_ASSETS = {"BTC-USD": "BTC", "ETH-USD": "ETH", "SOL-USD": "SOL"}
 
@@ -29,6 +29,9 @@ class DualSourcePaperGate:
         self.max_age_seconds = max_age_seconds
         self.lock = Lock()
         self.validated = {}
+        self._refresh_generation = 0
+        self._stop = Event()
+        self._worker = None
 
     def refresh(self, *, now=None):
         now = datetime.now(timezone.utc) if now is None else now
@@ -36,6 +39,8 @@ class DualSourcePaperGate:
             raise ValueError("UTC time required")
         stamp = int(now.timestamp())
         with self.lock:
+            self._refresh_generation += 1
+            generation = self._refresh_generation
             self.validated.clear()  # fail closed throughout refresh
         passed = {}
         for product, asset in PRODUCT_ASSETS.items():
@@ -50,6 +55,8 @@ class DualSourcePaperGate:
             except Exception:
                 continue
         with self.lock:
+            if generation != self._refresh_generation:
+                return {}  # an older, slower refresh cannot overwrite newer evidence
             self.validated = passed
         return dict(passed)
 
@@ -68,7 +75,31 @@ class DualSourcePaperGate:
         return self.feed.poll(pool)
 
     def start(self, on_poll, **kwargs):
-        return self.feed.start(on_poll, **kwargs)
+        if self._worker is not None:
+            raise RuntimeError("dual-source polling already started")
+        if not callable(on_poll):
+            raise ValueError("health callback required")
+        self.feed.start(on_poll, **kwargs)
+
+        def run():
+            while not self._stop.is_set():
+                self.refresh()
+                try:
+                    on_poll()  # propagate new HALT state to the session immediately
+                except Exception:
+                    with self.lock:
+                        self.validated.clear()
+                self._stop.wait(30)
+
+        self._worker = Thread(target=run, name="alpha-dual-source-check", daemon=True)
+        self._worker.start()
 
     def close(self):
-        return self.feed.close()
+        self._stop.set()
+        try:
+            if self._worker is not None:
+                self._worker.join(timeout=35)
+                if self._worker.is_alive():
+                    raise RuntimeError("dual-source worker still active: HALT")
+        finally:
+            self.feed.close()

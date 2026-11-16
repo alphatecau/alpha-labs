@@ -15,6 +15,7 @@ from alpha_lab.research.local_multiasset_catalogue import catalogue
 from alpha_lab.research.local_paper_recovery import JOURNAL_NAME, backup_destination, inspect_journal, publish_verified_file
 from alpha_lab.research.paper_market import COINBASE_MARKET, PaperCosts
 from alpha_lab.research.paper_market_feed import PaperMarketFeed
+from alpha_lab.research.dual_source_paper_gate import DualSourcePaperGate
 
 DEFAULT_ACCOUNT = "localpaperowner0001"
 
@@ -116,9 +117,13 @@ def main(argv=None):
     parser.add_argument("--init", action="store_true", help="explicitly initialise a new working directory")
     parser.add_argument("--account", default=DEFAULT_ACCOUNT)
     parser.add_argument("--synthetic-etfs", action="store_true")
+    parser.add_argument("--dual-source-check", action="store_true",
+                        help="require Binance/CoinGecko research sanity check for Coinbase paper fills")
     parser.add_argument("--fee-bps", default="10")
     parser.add_argument("--slippage-bps", default="5")
     args = parser.parse_args(argv)
+    if args.synthetic_etfs and args.dual_source_check:
+        parser.error("dual-source check is only supported for Coinbase crypto paper mode")
     try:
         costs = PaperCosts(Decimal(args.fee_bps) / 10000, Decimal(args.slippage_bps) / 10000)
     except (DecimalException, ValueError) as exc:
@@ -140,7 +145,7 @@ def main(argv=None):
             session = LivePaperSession(directory, args.account, feed, clock=feed.clock,
                                        market=ETF_FIXTURE_MARKET, costs=costs, migrate=args.init)
         else:
-            feed = PaperMarketFeed()
+            feed = DualSourcePaperGate(PaperMarketFeed()) if args.dual_source_check else PaperMarketFeed()
             session = LivePaperSession(directory, args.account, feed, market=COINBASE_MARKET,
                                        costs=costs, migrate=args.init)
     except (ValueError, KeyError, OSError, sqlite3.Error) as exc:

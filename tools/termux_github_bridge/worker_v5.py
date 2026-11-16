@@ -97,6 +97,45 @@ def check_queue_capacity(issues, limit=100):
         raise v4.Rejected("issue queue at discovery limit; operator must drain or paginate")
     return issues
 
+def fetch_issues(max_issues=1000):
+    """Retrieve all REST pages; reject malformed, duplicate or oversized queues."""
+    pages = json.loads(worker_v2.run([
+        "gh", "api", "--method", "GET",
+        f"repos/{worker_v2.REPOSITORY}/issues",
+        "-f", "state=open", "-f", f"labels={LABEL}",
+        "-f", "per_page=100", "--paginate", "--slurp",
+    ]))
+    if type(pages) is not list:
+        raise v4.Rejected("malformed paginated response")
+    issues, seen = [], set()
+    for page in pages:
+        if type(page) is not list:
+            raise v4.Rejected("malformed issue page")
+        for raw in page:
+            if type(raw) is not dict:
+                raise v4.Rejected("malformed issue")
+            if "pull_request" in raw:
+                continue
+            number, user, labels = raw.get("number"), raw.get("user"), raw.get("labels")
+            if type(number) is not int or number < 1 or number in seen:
+                raise v4.Rejected("invalid or duplicate issue number")
+            if type(user) is not dict or type(user.get("login")) is not str:
+                raise v4.Rejected("invalid issue author")
+            if type(labels) is not list or not all(
+                type(label) is dict and type(label.get("name")) is str for label in labels
+            ):
+                raise v4.Rejected("invalid issue labels")
+            if type(raw.get("body")) not in (str, type(None)):
+                raise v4.Rejected("invalid issue body")
+            if LABEL not in {label["name"] for label in labels}:
+                raise v4.Rejected("issue label mismatch")
+            seen.add(number)
+            issues.append({"number": number, "author": {"login": user["login"]},
+                           "labels": labels, "body": raw.get("body")})
+            if len(issues) > max_issues:
+                raise v4.Rejected("issue queue exceeds configured maximum")
+    return issues
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", required=True)
@@ -108,11 +147,8 @@ def main(argv=None):
     if not keys:
         raise SystemExit("No trusted signing keys; refusing to poll")
     db = connect()
-    issues = json.loads(worker_v2.run(["gh","issue","list","-R",worker_v2.REPOSITORY,
-        "--state","open","--label",LABEL,"--limit","100",
-        "--json","number,author,labels,body"]))
     try:
-        check_queue_capacity(issues)
+        issues = fetch_issues()
     except v4.Rejected as exc:
         raise SystemExit(f"Queue safety halt: {exc}") from exc
     if args.execute:

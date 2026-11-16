@@ -78,6 +78,33 @@ class Tests(unittest.TestCase):
     def test_queue_capacity_rejects_malformed_response(self):
         with self.assertRaises(v4.Rejected):
             w.check_queue_capacity({"issues": []})
+    def test_paginated_queue_multiple_pages(self):
+        def raw(number):
+            x=self.issue()
+            return {"number":number,"user":x["author"],"labels":x["labels"],"body":x["body"]}
+        pages=[[raw(123)],[raw(124)]]
+        with patch("worker_v5.worker_v2.run",return_value=json.dumps(pages)) as run:
+            self.assertEqual([x["number"] for x in w.fetch_issues()], [123,124])
+            self.assertIn("--paginate",run.call_args.args[0])
+            self.assertIn("--slurp",run.call_args.args[0])
+    def test_paginated_queue_rejects_duplicate(self):
+        x=self.issue()
+        raw={"number":123,"user":x["author"],"labels":x["labels"],"body":x["body"]}
+        with patch("worker_v5.worker_v2.run",return_value=json.dumps([[raw],[raw]])):
+            with self.assertRaises(v4.Rejected):w.fetch_issues()
+    def test_paginated_queue_rejects_malformed_page(self):
+        with patch("worker_v5.worker_v2.run",return_value=json.dumps([{}])):
+            with self.assertRaises(v4.Rejected):w.fetch_issues()
+    def test_paginated_queue_rejects_oversized(self):
+        x=self.issue()
+        raw={"number":123,"user":x["author"],"labels":x["labels"],"body":x["body"]}
+        with patch("worker_v5.worker_v2.run",return_value=json.dumps([[raw]])):
+            with self.assertRaises(v4.Rejected):w.fetch_issues(max_issues=0)
+    def test_paginated_queue_ignores_pull_requests(self):
+        x=self.issue()
+        raw={"number":123,"user":x["author"],"labels":x["labels"],"body":x["body"],"pull_request":{}}
+        with patch("worker_v5.worker_v2.run",return_value=json.dumps([[raw]])):
+            self.assertEqual(w.fetch_issues(), [])
     def test_wrong_device(self):
         with self.assertRaises(v4.Rejected):w.process(self.issue(),self.keys,"other-device-01",self.db,True,NOW)
 

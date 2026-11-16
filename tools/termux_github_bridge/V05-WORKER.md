@@ -13,3 +13,7 @@ Before attempting a GitHub receipt, the ledger durably records `publishing_succe
 ## Queue capacity safety gate
 
 The GitHub CLI currently requests up to 100 open signed issues. If the returned queue contains 100 or more entries, v0.5 exits before reconciliation or execution, because additional issues might have been truncated. This is a deliberate fail-closed interim control, **not pagination**. Reduce the queue or implement verified pagination before enabling a larger backlog. GitHub CLI failures already stop the run without executing tasks.
+
+## Paginated queue discovery
+
+The worker now uses `gh api --method GET repos/<owner>/<repo>/issues -f state=open -f labels=termux-bridge-v5-signed -f per_page=100 --paginate --slurp` to retrieve all pages before executing anything. It rejects malformed pages, duplicate issue IDs, missing labels and queues above 1,000 issues; GitHub API failures stop processing. Pull requests returned by the REST issues endpoint are excluded. This replaces the previous 100-issue saturation gate. The public author and label checks remain in place, but are **not** signing authority; Ed25519 verification is still mandatory.

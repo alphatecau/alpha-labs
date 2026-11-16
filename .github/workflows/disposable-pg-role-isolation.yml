@@ -1,5 +1,6 @@
 name: Disposable PostgreSQL 16 tenant isolation
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - 'deployment/research_role_isolation_fixture.sql'

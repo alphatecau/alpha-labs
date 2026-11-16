@@ -89,6 +89,14 @@ def process(issue, keys, device, db, execute=False, now=None):
     publish_once(db, number, task["operation"], task["repo"], status)
     return status
 
+def check_queue_capacity(issues, limit=100):
+    """Refuse truncated issue discovery rather than silently skip tasks."""
+    if type(issues) is not list:
+        raise v4.Rejected("invalid issue list")
+    if len(issues) >= limit:
+        raise v4.Rejected("issue queue at discovery limit; operator must drain or paginate")
+    return issues
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", required=True)
@@ -103,6 +111,10 @@ def main(argv=None):
     issues = json.loads(worker_v2.run(["gh","issue","list","-R",worker_v2.REPOSITORY,
         "--state","open","--label",LABEL,"--limit","100",
         "--json","number,author,labels,body"]))
+    try:
+        check_queue_capacity(issues)
+    except v4.Rejected as exc:
+        raise SystemExit(f"Queue safety halt: {exc}") from exc
     if args.execute:
         reconcile(db, issues)
     for issue in issues:

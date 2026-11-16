@@ -1,5 +1,6 @@
 name: Disposable PostgreSQL 16 tenant isolation
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - 'deployment/research_role_isolation_fixture.sql'
@@ -31,7 +32,7 @@ jobs:
           PGPASSWORD: ci-disposable-only
         run: |
           test "${{ job.services.postgres.id }}" != ""
-          test "${{ github.event_name }}" = "pull_request"
+          test "${{ github.event_name }}" = "pull_request" || { test "${{ github.event_name }}" = "workflow_dispatch" && test "${{ github.ref }}" = "refs/heads/main"; }
           test "$(psql -h 127.0.0.1 -U postgres -d alpha_disposable_ci -Atc 'select current_database()')" = "alpha_disposable_ci"
       - name: Execute real PostgreSQL RLS adversarial fixture
         env:

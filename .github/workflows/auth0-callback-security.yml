@@ -1,5 +1,6 @@
 name: Auth0 callback security acceptance
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - 'deployment/auth0_*.py'

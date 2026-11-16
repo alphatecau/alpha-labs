@@ -1,5 +1,6 @@
 name: Full authenticated BFF and PostgreSQL tenant acceptance
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - 'alpha_lab/research/paper_account_service.py'

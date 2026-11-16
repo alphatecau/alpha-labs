@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 import unittest
 
 from alpha_lab.research.dual_source_paper_gate import DualSourcePaperGate
+from alpha_lab.research.local_paper_terminal import command
 
 NOW = datetime(2026, 11, 16, 0, 0, tzinfo=timezone.utc)
 
@@ -40,6 +41,33 @@ class GateTests(unittest.TestCase):
         gate = DualSourcePaperGate(Feed(), validator=lambda asset, now: {"status": "PASS"})
         gate.refresh(now=NOW)
         self.assertFalse(any(gate.snapshot(NOW)[1].values()))
+
+    def test_terminal_refresh_command_never_auto_arms(self):
+        gate = DualSourcePaperGate(Feed(), validator=lambda asset, now: {
+            "status": "VERIFIED_RESEARCH_DATA", "asset": asset, "observed_at_utc": now})
+        class Session:
+            feed = gate
+            def state(self):
+                return {"risk": {"armed": False}}
+            def control(self, action):
+                raise AssertionError("successful refresh must not change controls")
+        result = command(Session(), "refresh-data")
+        self.assertEqual(result["validation"], "PASS")
+        self.assertFalse(result["armed"])
+
+    def test_terminal_refresh_failure_halts(self):
+        gate = DualSourcePaperGate(Feed(), validator=lambda asset, now: {
+            "status": "VERIFIED_RESEARCH_DATA", "asset": asset, "observed_at_utc": now}
+            if asset != "SOL" else {"status": "HALT"})
+        class Session:
+            feed = gate
+            halted = False
+            def control(self, action):
+                self.halted = action == "halt"
+        session = Session()
+        result = command(session, "refresh-data")
+        self.assertEqual(result["validation"], "HALT")
+        self.assertTrue(session.halted)
 
 
 if __name__ == "__main__":

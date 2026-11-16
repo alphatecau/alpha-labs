@@ -70,6 +70,14 @@ class Tests(unittest.TestCase):
         with patch("worker_v5.worker_v2.execute") as execute:
             with self.assertRaises(v4.Rejected):w.process(x,self.keys,DEVICE,self.db,True,NOW)
             execute.assert_not_called()
+    def test_queue_capacity_accepts_bounded_list(self):
+        self.assertEqual(w.check_queue_capacity([self.issue()], limit=2), [self.issue()])
+    def test_queue_capacity_rejects_truncation(self):
+        with self.assertRaises(v4.Rejected):
+            w.check_queue_capacity([self.issue(), self.issue()], limit=2)
+    def test_queue_capacity_rejects_malformed_response(self):
+        with self.assertRaises(v4.Rejected):
+            w.check_queue_capacity({"issues": []})
     def test_wrong_device(self):
         with self.assertRaises(v4.Rejected):w.process(self.issue(),self.keys,"other-device-01",self.db,True,NOW)
 

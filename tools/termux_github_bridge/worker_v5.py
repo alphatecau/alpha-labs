@@ -56,13 +56,24 @@ def publish(number, operation, repo, status):
     worker_v2.run(["gh","issue","comment",str(number),"-R",worker_v2.REPOSITORY,"--body",body])
     worker_v2.run(["gh","issue","close",str(number),"-R",worker_v2.REPOSITORY,"--reason","completed"])
 
+def publish_once(db, number, operation, repo, status):
+    """Fail closed: a crash after starting publication must not duplicate a comment."""
+    with db:
+        changed = db.execute("UPDATE tasks SET status=? WHERE issue=? AND status=?",
+            ("publishing_" + status, number, status)).rowcount
+    if changed != 1:
+        raise v4.Rejected("receipt publication already attempted or not terminal")
+    publish(number, operation, repo, status)
+    with db:
+        db.execute("UPDATE tasks SET status=? WHERE issue=?", ("published_" + status, number))
+
 def reconcile(db, open_issues):
     # Re-publish recorded terminal receipts without repeating execution.
     open_ids = {issue["number"] for issue in open_issues}
     for number, operation, repo, status in db.execute(
         "SELECT issue, operation, repo, status FROM tasks WHERE status IN ('success','failed')"):
         if number in open_ids:
-            publish(number, operation, repo, status)
+            publish_once(db, number, operation, repo, status)
 
 def process(issue, keys, device, db, execute=False, now=None):
     task = validate(issue, keys, device, now)
@@ -75,7 +86,7 @@ def process(issue, keys, device, db, execute=False, now=None):
     except (RuntimeError, OSError, ValueError, IndexError, json.JSONDecodeError, subprocess.TimeoutExpired):
         status = "failed"
     receipt(db, number, status)
-    publish(number, task["operation"], task["repo"], status)
+    publish_once(db, number, task["operation"], task["repo"], status)
     return status
 
 def main(argv=None):

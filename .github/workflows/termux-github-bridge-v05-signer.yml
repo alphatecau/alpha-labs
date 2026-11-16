@@ -1,0 +1,23 @@
+name: Termux v0.5 offline signer tests
+on:
+  pull_request:
+    paths:
+      - 'tools/termux_github_bridge/offline_signer_v5.py'
+      - 'tools/termux_github_bridge/test_offline_signer_v5.py'
+      - '.github/workflows/termux-github-bridge-v05-signer.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install 'cryptography>=44,<47'
+      - run: cd tools/termux_github_bridge && python -m unittest -v test_offline_signer_v5.py test_ed25519_protocol_v5.py test_signed_protocol_v4.py

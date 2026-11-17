@@ -1,0 +1,20 @@
+name: Stage 16 bounded paper pilot tests
+on:
+  pull_request:
+    paths:
+      - 'packages/alpha_lab/src/alpha_lab/research/stage16_bounded_pilot.py'
+      - 'tests/unit/test_stage16_bounded_pilot.py'
+      - '.github/workflows/stage16-bounded-paper.yml'
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fail-closed pilot tests (no network or orders)
+        run: PYTHONPATH=packages/alpha_lab/src:. python -m unittest discover -s tests/unit -p 'test_stage16_bounded_pilot.py' -v

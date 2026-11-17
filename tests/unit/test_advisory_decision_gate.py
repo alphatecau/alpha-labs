@@ -49,6 +49,20 @@ class AdvisoryDecisionGateTests(unittest.TestCase):
         del report["source_sha256"]
         self.assertEqual(advisory_decision(report, now=NOW)["decision"], "UNVERIFIED")
 
+    def test_unhashable_evidence_fails_closed(self):
+        for field in ("product_id", "trend_observation"):
+            for value in ([], {}, set()):
+                with self.subTest(field=field, value_type=type(value).__name__):
+                    report = fixture()
+                    report[field] = value
+                    result = advisory_decision(report, now=NOW)
+                    self.assertEqual(result["decision"], "UNVERIFIED")
+                    self.assert_halted(result)
+
+    def test_invalid_clock_type_is_rejected(self):
+        with self.assertRaises(ValueError):
+            advisory_decision(fixture(), now="2026-11-17T00:00:00Z")
+
     def test_timestamp_requires_timezone(self):
         with self.assertRaises(ValueError):
             advisory_decision(fixture(), now=datetime(2026, 11, 17))

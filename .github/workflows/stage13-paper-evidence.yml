@@ -1,0 +1,25 @@
+name: Stage 13 offline paper evidence
+on:
+  pull_request:
+    paths:
+      - 'scripts/stage13_paper_evidence.py'
+      - '.github/workflows/stage13-paper-evidence.yml'
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run offline safety suites and collect immutable evidence
+        run: python scripts/stage13_paper_evidence.py --output "$RUNNER_TEMP/stage13-evidence.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage13-paper-evidence
+          path: ${{ runner.temp }}/stage13-evidence.json
+          retention-days: 30

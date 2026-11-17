@@ -23,7 +23,7 @@ def advisory_decision(report: Mapping[str, Any] | None, *, now: datetime | None 
     Valid descriptive observations produce NO_TRADE / HALT, irrespective of trend.
     """
     timestamp = now or datetime.now(timezone.utc)
-    if timestamp.tzinfo is None or timestamp.utcoffset() is None:
+    if not isinstance(timestamp, datetime) or timestamp.tzinfo is None or timestamp.utcoffset() is None:
         raise ValueError("now must be timezone-aware")
     result = {
         "schema_version": 1,
@@ -40,7 +40,9 @@ def advisory_decision(report: Mapping[str, Any] | None, *, now: datetime | None 
     if not isinstance(report, Mapping) or not REQUIRED.issubset(report):
         return result
     if (report.get("status") != "RESEARCH_ONLY_NOT_VALIDATED_ALPHA"
+            or not isinstance(report.get("product_id"), str)
             or report.get("product_id") not in VALID_PRODUCTS
+            or not isinstance(report.get("trend_observation"), str)
             or report.get("trend_observation") not in VALID_TRENDS
             or report.get("decision") != "FLAT"
             or report.get("risk_override") != "HALT"

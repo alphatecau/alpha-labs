@@ -1,4 +1,5 @@
 """Offline safety acceptance: temporary journals only, no network or broker."""
+from contextlib import closing
 import sqlite3
 import tempfile
 import unittest
@@ -79,7 +80,7 @@ class LocalPaperAcceptance(unittest.TestCase):
             path = Path(tmp) / "tampered.sqlite3"
             runtime = PaperRuntime(str(path))
             runtime.close()
-            with sqlite3.connect(path) as db:
+            with closing(sqlite3.connect(path)) as db, db:
                 db.execute("INSERT INTO events(seq,previous_hash,payload,digest) VALUES (1,?,?,?)",
                            ("0" * 64, '{"type":"FILL","simulated":true}', "0" * 64))
             with self.assertRaises((ValueError, sqlite3.Error)):

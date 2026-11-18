@@ -58,6 +58,7 @@ def _database(db_path):
     con.execute("PRAGMA journal_mode=WAL")
     con.execute("PRAGMA synchronous=FULL")
     con.execute("CREATE TABLE IF NOT EXISTS claims (nonce TEXT PRIMARY KEY, state TEXT NOT NULL CHECK(state IN ('claimed','complete')))")
+    con.execute("CREATE TABLE IF NOT EXISTS audit_outbox (nonce TEXT NOT NULL, phase TEXT NOT NULL CHECK(phase IN ('claimed','complete')), path TEXT NOT NULL, sha256 TEXT NOT NULL, PRIMARY KEY(nonce,phase))")
     return con
 
 def apply(root, db_path, public_key_bytes, approval, signature_b64, path, content, now=None):
@@ -89,6 +90,7 @@ def apply(root, db_path, public_key_bytes, approval, signature_b64, path, conten
     try:
         con.execute("BEGIN IMMEDIATE")
         con.execute("INSERT INTO claims(nonce,state) VALUES (?,?)", (nonce, "claimed"))
+        con.execute("INSERT INTO audit_outbox(nonce,phase,path,sha256) VALUES (?,?,?,?)", (nonce,"claimed",path,digest))
         con.execute("COMMIT")
     except BaseException:
         if con.in_transaction:
@@ -114,6 +116,7 @@ def apply(root, db_path, public_key_bytes, approval, signature_b64, path, conten
         updated = con.execute("UPDATE claims SET state='complete' WHERE nonce=? AND state='claimed'", (nonce,)).rowcount
         if updated != 1:
             raise Denied("claim state changed")
+        con.execute("INSERT INTO audit_outbox(nonce,phase,path,sha256) VALUES (?,?,?,?)", (nonce,"complete",path,digest))
         con.execute("COMMIT")
     except BaseException:
         if con.in_transaction:

@@ -1,7 +1,7 @@
 """Offline custody unit tests; no database credentials or network required."""
 import unittest
 import uuid
-from tools.level3_staging.postgres_custody import CustodyDenied,claim,complete,pending,receipt_digest,append_audit
+from tools.level3_staging.postgres_custody import CustodyDenied,claim,complete,pending,receipt_digest,append_audit,verify_audit_chain
 
 class Tx:
     def __init__(self,db):
@@ -24,10 +24,13 @@ class DB:
     def __init__(self):
         self.events=[]
         self.update_row=("a"*64,)
+        self.audit_rows=[]
     def transaction(self):
         return Tx(self)
     def execute(self,sql,params=None):
         self.events.append((sql,params))
+        if sql.startswith("SELECT sequence,event_id"):
+            return Result(self.audit_rows)
         if sql.startswith("SELECT event_hash"):
             return Result(None)
         if sql.startswith("UPDATE"):
@@ -63,6 +66,19 @@ class CustodyTests(unittest.TestCase):
         self.assertEqual(self.db.events[0],"BEGIN")
         self.assertEqual(self.db.events[-1],"COMMIT")
         self.assertIn("pg_advisory_xact_lock",self.db.events[1][0])
+    def test_verify_audit_chain_empty(self):
+        self.assertEqual(verify_audit_chain(self.db),{"count":0,"head_hash":"0"*64})
+    def test_verify_audit_chain_tamper_denied(self):
+        self.db.audit_rows=[(1,str(uuid.uuid4()),"a"*64,"claimed","b"*64,"0"*64,"f"*64)]
+        with self.assertRaises(CustodyDenied):
+            verify_audit_chain(self.db)
+    def test_verify_audit_chain_valid(self):
+        event_id=str(uuid.uuid4())
+        record={"event_id":event_id,"nonce":"a"*64,"phase":"claimed",
+                "payload_sha256":"b"*64,"previous_hash":"0"*64}
+        digest=receipt_digest(record)
+        self.db.audit_rows=[(1,event_id,"a"*64,"claimed","b"*64,"0"*64,digest)]
+        self.assertEqual(verify_audit_chain(self.db)["head_hash"],digest)
     def test_receipt_digest_deterministic(self):
         self.assertEqual(receipt_digest({"a":1,"b":2}),receipt_digest({"b":2,"a":1}))
 

@@ -30,6 +30,8 @@ on:
       - 'tests/test_level3_broker_startup.py'
       - 'tests/test_level3_cloud_probe.py'
       - 'deployment/level3_cloud_probe.py'
+      - 'tests/test_level3_remote_auth.py'
+      - 'tests/test_level3_remote_replay.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -53,6 +55,10 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_level3_broker.py' -v
       - name: Broker Unix socket transport tests
         run: python -m unittest discover -s tests -p 'test_level3_broker_transport.py' -v
+      - name: Remote authentication and durable replay checks
+        run: |
+          python -m unittest discover -s tests -p 'test_level3_remote_auth.py' -v
+          python -m unittest discover -s tests -p 'test_level3_remote_replay.py' -v
       - name: Cloud probe fail-closed HTTP contract
         run: python -m unittest discover -s tests -p 'test_level3_cloud_probe.py' -v
       - name: Broker readiness startup rejection tests

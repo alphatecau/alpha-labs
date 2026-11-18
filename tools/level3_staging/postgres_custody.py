@@ -112,3 +112,17 @@ def verify_audit_chain(conn):
         last_sequence=sequence
         previous=expected
     return {"count":len(rows),"last_sequence":last_sequence,"head_hash":previous}
+
+def claim_with_audit(conn,remote_nonce,approval_nonce,path,digest,event_id):
+    """Commit nonce reservation, approval intent and audit event as one transaction."""
+    with conn.transaction():
+        result=claim(conn,remote_nonce,approval_nonce,path,digest)
+        receipt=append_audit(conn,event_id,approval_nonce,"claimed",digest)
+    return {**result,"audit":receipt}
+
+def complete_with_audit(conn,approval_nonce,path,digest,event_id):
+    """Complete only a claimed intent, atomically recording its audit event."""
+    with conn.transaction():
+        result=complete(conn,approval_nonce,path,digest)
+        receipt=append_audit(conn,event_id,approval_nonce,"complete",digest)
+    return {**result,"audit":receipt}

@@ -7,6 +7,8 @@ on:
     paths:
       - 'tools/level3_staging/drive_custody.py'
       - 'tests/test_level3_drive_custody.py'
+      - 'tools/level3_staging/drive_http.py'
+      - 'tests/test_level3_drive_http.py'
       - '.github/workflows/level3-drive-custody-contract.yml'
 permissions:
   contents: read
@@ -19,6 +21,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Compile custody adapter
-        run: python -m py_compile tools/level3_staging/drive_custody.py tests/test_level3_drive_custody.py
+        run: python -m py_compile tools/level3_staging/drive_custody.py tests/test_level3_drive_custody.py tools/level3_staging/drive_http.py tests/test_level3_drive_http.py
       - name: Run offline integrity and failure tests
-        run: python -m unittest discover -s tests -p 'test_level3_drive_custody.py' -v
+        run: |
+          python -m unittest discover -s tests -p 'test_level3_drive_custody.py' -v
+          python -m unittest discover -s tests -p 'test_level3_drive_http.py' -v

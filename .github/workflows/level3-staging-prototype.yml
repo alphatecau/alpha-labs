@@ -1,5 +1,8 @@
 name: Level 3 staging prototype checks
 on:
+  push:
+    branches:
+      - research/level3-signed-staging-followup-20261118
   pull_request:
     paths:
       - 'tools/level3_staging/**'

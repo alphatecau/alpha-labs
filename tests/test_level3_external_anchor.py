@@ -23,6 +23,18 @@ class ExternalAnchorTests(unittest.TestCase):
     def test_cross_environment_denied(self):
         with self.assertRaises(ValueError):
             verify_anchor(self.signed(),self.public,"alpha-labs-level3:production",self.head)
+    def test_malformed_base64_signature_denied(self):
+        signed=self.signed()
+        signed["signature"]="not-valid-base64!"
+        with self.assertRaisesRegex(ValueError,"invalid auditor signature"):
+            verify_anchor(signed,self.public,self.receipt["audience"],self.head)
+
+    def test_wrong_signature_type_denied(self):
+        signed=self.signed()
+        signed["signature"]=None
+        with self.assertRaisesRegex(ValueError,"invalid auditor signature"):
+            verify_anchor(signed,self.public,self.receipt["audience"],self.head)
+
     def test_signature_tampering_denied(self):
         signed=self.signed()
         signed["receipt"]["count"]=1

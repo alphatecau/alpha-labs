@@ -18,7 +18,7 @@ class StdioTests(unittest.TestCase):
         self.assertNotEqual(proc.returncode,0)
         self.assertEqual(proc.stdout,"")
 
-    def test_tools_list_without_write(self):
+    def test_unsigned_startup_denied(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)/"workspace"
             root.mkdir()
@@ -28,9 +28,8 @@ class StdioTests(unittest.TestCase):
             request={"jsonrpc":"2.0","id":1,"method":"tools/list"}
             proc=subprocess.run([sys.executable,"-m","tools.level3_staging.mcp_signed_stdio"],
                                 input=json.dumps(request)+"\n",text=True,capture_output=True,env=env,timeout=10)
-            self.assertEqual(proc.returncode,0,proc.stderr)
-            reply=json.loads(proc.stdout)
-            self.assertEqual(reply["result"]["tools"][0]["name"],"level3_apply_signed_create")
+            self.assertNotEqual(proc.returncode,0)
+            self.assertEqual(proc.stdout,"")
             self.assertFalse((Path(d)/"ledger.db").exists())
 
 if __name__=="__main__":

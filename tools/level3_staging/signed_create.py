@@ -79,6 +79,12 @@ def apply(root, db_path, public_key_bytes, approval, signature_b64, path, conten
         Ed25519PublicKey.from_public_bytes(public_key_bytes).verify(sig, canonical(approval))
     except (ValueError, TypeError, InvalidSignature) as exc:
         raise Denied("invalid signature") from exc
+    audit_path = os.environ.get("LEVEL3_AUDIT_PATH")
+    if audit_path:
+        from tools.level3_staging.audit_chain import append, verify
+        if Path(audit_path).parent.resolve().is_relative_to(root):
+            raise Denied("audit must be outside workspace")
+        verify(audit_path)
     con = _database(db_path)
     try:
         con.execute("BEGIN IMMEDIATE")
@@ -90,6 +96,8 @@ def apply(root, db_path, public_key_bytes, approval, signature_b64, path, conten
         raise
     finally:
         con.close()
+    if audit_path:
+        append(audit_path, {"phase":"claimed","nonce":nonce,"path":path,"sha256":digest})
     fd, name = _parent(root, path)
     try:
         out = os.open(name, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600, dir_fd=fd)
@@ -113,4 +121,6 @@ def apply(root, db_path, public_key_bytes, approval, signature_b64, path, conten
         raise
     finally:
         con.close()
+    if audit_path:
+        append(audit_path, {"phase":"complete","nonce":nonce,"path":path,"sha256":digest})
     return {"path":path,"sha256":digest,"nonce":nonce,"status":"complete"}

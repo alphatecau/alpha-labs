@@ -6,6 +6,7 @@ The filesystem must be durable and private; Render free ephemeral disk is NOT.
 """
 import hashlib
 import os
+import uuid
 from pathlib import Path
 from tools.level3_staging.postgres_custody import CustodyDenied, _check
 
@@ -38,7 +39,7 @@ def reconcile_intent(root, nonce, path, digest, payload=None, fault=None):
         raise RecoveryConflict("payload exceeds limit")
     if fault=="before_write":
         raise RuntimeError("injected before write")
-    temp=parent/("." + nonce + ".tmp")
+    temp=parent/("." + nonce + "." + uuid.uuid4().hex + ".tmp")
     fd=os.open(temp,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600)
     try:
         with os.fdopen(fd,"wb") as stream:

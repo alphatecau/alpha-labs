@@ -5,6 +5,7 @@ external anchoring have been provisioned and approved. Render free disk is not
 acceptable custody. The caller must supply a validated approved intent.
 """
 import hashlib
+import json
 import uuid
 from tools.level3_staging.remote_auth import verify_keyed
 from tools.level3_staging.postgres_custody import (
@@ -26,6 +27,14 @@ def signed_create(conn,root,envelope,request_body,public_keys,audience,
     digest=hashlib.sha256(payload).hexdigest()
     # Authentication precedes any database or filesystem access.
     remote_nonce=verify_keyed(envelope,request_body,public_keys,audience)
+    try:
+        body=json.loads(request_body)
+    except (ValueError,TypeError) as exc:
+        raise CustodyDenied("invalid request body") from exc
+    if (not isinstance(body,dict) or set(body)!={"approval_nonce","path","payload_sha256"} or
+        body["approval_nonce"]!=approval_nonce or body["path"]!=path or
+        body["payload_sha256"]!=digest):
+        raise CustodyDenied("signed request does not bind approval, path and payload")
     if fault=="before_claim":
         raise RuntimeError("injected before claim")
     claim_with_audit(conn,remote_nonce,approval_nonce,path,digest,str(uuid.uuid4()))

@@ -7,7 +7,7 @@ import stat
 import time
 from pathlib import Path
 
-ALLOW = re.compile(r"^(docs/level3-staging/[A-Za-z0-9_-]+\\.md|tests/level3-staging/[A-Za-z0-9_-]+\\.txt)$")
+ALLOW = re.compile(r"^(docs/level3-staging/[A-Za-z0-9_-]+\.md|tests/level3-staging/[A-Za-z0-9_-]+\.txt)$")
 MAX_BYTES = 32768
 
 class Refused(Exception):
@@ -99,7 +99,7 @@ def apply(root, relative, content, approval_file, audit_file, now=None):
     record = {"operation":"create","path":relative,"sha256":proposal["sha256"],"timestamp":int(clock)}
     audit_fd = os.open(audit_file, os.O_WRONLY | os.O_CREAT | os.O_APPEND | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
     with os.fdopen(audit_fd, "a", encoding="utf-8") as stream:
-        stream.write(json.dumps(record, sort_keys=True) + "\\n")
+        stream.write(json.dumps(record, sort_keys=True) + "\n")
         stream.flush()
         os.fsync(stream.fileno())
     return record

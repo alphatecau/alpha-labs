@@ -61,3 +61,34 @@ def receipt_digest(receipt):
         raise CustodyDenied("invalid receipt")
     raw=json.dumps(receipt,sort_keys=True,separators=(",",":"),ensure_ascii=True).encode()
     return hashlib.sha256(raw).hexdigest()
+
+def append_audit(conn,event_id,nonce,phase,digest):
+    """Serialize chain append in a transaction. Requires an independent anchor to be tamper-evident."""
+    import uuid
+    if not isinstance(event_id,str):
+        raise CustodyDenied("invalid event id")
+    try:
+        event_id=str(uuid.UUID(event_id))
+    except ValueError as exc:
+        raise CustodyDenied("invalid event id") from exc
+    if not isinstance(nonce,str) or not _NONCE.fullmatch(nonce):
+        raise CustodyDenied("invalid nonce")
+    if not isinstance(digest,str) or not _NONCE.fullmatch(digest):
+        raise CustodyDenied("invalid digest")
+    if phase not in ("claimed","complete","recovered"):
+        raise CustodyDenied("invalid phase")
+    with conn.transaction():
+        conn.execute("SELECT pg_advisory_xact_lock(4833443001)")
+        row=conn.execute(
+            "SELECT event_hash FROM level3_custody.audit_event ORDER BY sequence DESC LIMIT 1"
+        ).fetchone()
+        previous=row[0].strip() if row else "0"*64
+        record={"event_id":event_id,"nonce":nonce,"phase":phase,
+                "payload_sha256":digest,"previous_hash":previous}
+        event_hash=receipt_digest(record)
+        conn.execute(
+            "INSERT INTO level3_custody.audit_event "
+            "(event_id,nonce,phase,payload_sha256,previous_hash,event_hash) "
+            "VALUES (%s,%s,%s,%s,%s,%s)",
+            (event_id,nonce,phase,digest,previous,event_hash))
+    return {"event_hash":event_hash,"previous_hash":previous}

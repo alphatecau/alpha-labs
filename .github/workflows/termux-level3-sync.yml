@@ -1,0 +1,23 @@
+name: Termux Level 3 controlled sync
+on:
+  pull_request:
+    paths:
+      - 'tools/termux_level3_sync.py'
+      - 'tests/test_termux_level3_sync.py'
+      - 'docs/TERMUX_LEVEL3_CONTROLLED_SYNC.md'
+      - '.github/workflows/termux-level3-sync.yml'
+  workflow_dispatch:
+jobs:
+  offline-security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile and test deny-by-default behaviour
+        run: |
+          python -m py_compile tools/termux_level3_sync.py tests/test_termux_level3_sync.py
+          python -m unittest discover -s tests -p 'test_termux_level3_sync.py' -v

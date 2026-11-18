@@ -4,9 +4,9 @@ Uses a broker-scoped OAuth access-token supplier. No refresh tokens, credentials
 or independent auditor signing keys may be stored in this module. Google Drive
 is NOT immutable storage. Never set LEVEL3_CUSTODY_MODE based on this transport.
 """
-import base64
 import json
 import re
+import secrets
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -15,7 +15,11 @@ class DriveTransportError(RuntimeError):
     pass
 
 _ID = re.compile(r"^[A-Za-z0-9_-]{10,128}$")
-_NAME = re.compile(r"^[a-f0-9]{64}\\.bin$")
+_NAME = re.compile(r"^[a-f0-9]{64}\.bin$")
+
+class _RejectRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
+        raise DriveTransportError("Google Drive redirect denied")
 
 class GoogleDriveClient:
     def __init__(self, token_supplier, *, timeout=15, opener=None):
@@ -25,7 +29,7 @@ class GoogleDriveClient:
             raise ValueError("invalid timeout")
         self._token_supplier = token_supplier
         self._timeout = timeout
-        self._opener = opener or urllib.request.urlopen
+        self._opener = opener or urllib.request.build_opener(_RejectRedirect()).open
 
     def _request(self, url, *, method="GET", body=None, content_type=None):
         if not url.startswith(("https://www.googleapis.com/drive/v3/",
@@ -88,7 +92,7 @@ class GoogleDriveClient:
         # can still create the same name; reconciliation must detect duplicates.
         if self.lookup(parent_id, name):
             raise DriveTransportError("existing evidence object; reconcile instead")
-        boundary = "alpha_labs_level3_multipart_v1"
+        boundary = "alpha_labs_" + secrets.token_hex(24)
         metadata = json.dumps({"name": name, "parents": [parent_id],
                                "mimeType": "application/octet-stream"},
                               separators=(",", ":")).encode("ascii")

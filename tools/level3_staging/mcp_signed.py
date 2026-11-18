@@ -1,5 +1,6 @@
 """Offline Level 3 signed-create MCP dispatcher; never run without isolated operator approval."""
 import json
+import sqlite3
 from tools.level3_staging.signed_create import Denied, apply, validate
 
 PROTOCOL = "2025-06-18"
@@ -35,7 +36,7 @@ def dispatch(message, root, ledger, public_key):
             receipt = apply(root, ledger, public_key, args["approval"], args["signature"],
                             args["path"], args["content"])
             result = {"content":[{"type":"text","text":json.dumps(receipt,sort_keys=True)}]}
-        except (Denied, OSError, ValueError, TypeError, KeyError, RuntimeError) as exc:
+        except (Denied, OSError, ValueError, TypeError, KeyError, RuntimeError, sqlite3.Error) as exc:
             result = {"isError":True,"content":[{"type":"text","text":"write refused: "+type(exc).__name__}]}
     else:
         return {"jsonrpc":"2.0","id":ident,"error":{"code":-32601,"message":"method not found"}}

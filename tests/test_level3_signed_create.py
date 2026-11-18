@@ -69,6 +69,38 @@ class SignedCreateTests(unittest.TestCase):
             self.invoke()
         self.assertEqual((self.root / self.path).read_text(), "original")
 
+    def test_tampered_approval(self):
+        signature = self.signed()
+        self.approval["path"] = "docs/level3-staging/other.md"
+        with self.assertRaises(Denied):
+            self.invoke(signature=signature)
+
+    def test_invalid_nonce(self):
+        self.approval["nonce"] = "short"
+        with self.assertRaises(Denied):
+            self.invoke()
+
+    def test_symlink_destination(self):
+        outside = Path(self.tmp.name) / "outside"
+        outside.write_text("unchanged")
+        (self.root / self.path).symlink_to(outside)
+        with self.assertRaises(FileExistsError):
+            self.invoke()
+        self.assertEqual(outside.read_text(), "unchanged")
+
+    def test_ledger_outside_workspace(self):
+        self.db = self.root / "ledger.db"
+        with self.assertRaises(Denied):
+            self.invoke()
+
+    def test_claimed_after_failed_write_remains_consumed(self):
+        (self.root / self.path).write_text("existing")
+        with self.assertRaises(FileExistsError):
+            self.invoke()
+        (self.root / self.path).unlink()
+        with self.assertRaises(Exception):
+            self.invoke()
+
     def test_payload_limit(self):
         with self.assertRaises(Denied):
             self.invoke(content="a"*32769)

@@ -6,6 +6,7 @@ acceptable custody. The caller must supply a validated approved intent.
 """
 import hashlib
 import json
+import os
 import uuid
 from tools.level3_staging.remote_auth import verify_keyed
 from tools.level3_staging.postgres_custody import (
@@ -20,7 +21,9 @@ def signed_create(conn,root,envelope,request_body,public_keys,audience,
                   approval_nonce,path,payload,*,durable_storage=False,
                   independent_anchor=False,operator_approved=False,
                   fault=None):
-    if not (durable_storage and independent_anchor and operator_approved):
+    if (os.environ.get('LEVEL3_CUSTODY_MODE') != 'enabled' or
+        audience != 'alpha-labs-level3:staging' or
+        not (durable_storage and independent_anchor and operator_approved)):
         raise BrokerDisabled("durable storage, independent audit anchor and approval required")
     if not isinstance(payload,bytes) or len(payload)>32768:
         raise CustodyDenied("invalid payload size")

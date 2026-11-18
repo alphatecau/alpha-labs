@@ -24,6 +24,14 @@ def main():
         raise SystemExit("invalid public key") from exc
     if len(public_key) != 32:
         raise SystemExit("invalid Ed25519 public key length")
+    audit = os.environ.get("LEVEL3_AUDIT_PATH")
+    if not audit or Path(audit).parent.resolve().is_relative_to(Path(root).resolve()):
+        raise SystemExit("Level 3 startup denied: protected external audit required")
+    from tools.level3_staging.audit_chain import verify
+    try:
+        verify(audit)
+    except (OSError, ValueError) as exc:
+        raise SystemExit("Level 3 startup denied: audit integrity failure") from exc
     verify_startup(os.environ.get('LEVEL3_READINESS_ATTESTATION'), public_key, root, ledger)
     for line in sys.stdin:
         try:

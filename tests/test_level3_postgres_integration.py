@@ -5,7 +5,8 @@ import uuid
 import hashlib
 
 from tools.level3_staging.postgres_custody import (
-    claim, complete, pending, append_audit, verify_audit_chain, CustodyDenied,\n    claim_with_audit, complete_with_audit,
+    claim, complete, pending, append_audit, verify_audit_chain, CustodyDenied,
+    claim_with_audit, complete_with_audit,
 )
 
 @unittest.skipUnless(os.environ.get("LEVEL3_TEST_POSTGRES_DSN"), "isolated test DSN required")

@@ -13,7 +13,7 @@ class DriveCustodyDenied(ValueError):
 
 _ID = re.compile(r"^[A-Za-z0-9_-]{10,128}$")
 _DIGEST = re.compile(r"^[a-f0-9]{64}$")
-_NAME = re.compile(r"^[a-f0-9]{64}\\.bin$")
+_NAME = re.compile(r"^[a-f0-9]{64}\.bin$")
 
 def _validate(folder_id, nonce, digest, payload):
     if not isinstance(folder_id, str) or not _ID.fullmatch(folder_id):

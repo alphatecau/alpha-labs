@@ -5,6 +5,7 @@ A signature alone is NOT an independent anchor: the receipt must also be
 persisted in an external append-only store inaccessible to the broker.
 """
 import base64
+import binascii
 import json
 import re
 from cryptography.exceptions import InvalidSignature
@@ -30,6 +31,6 @@ def verify_anchor(signed,public_key,expected_audience,current_head):
     try:
         sig=base64.b64decode(signed["signature"],validate=True)
         Ed25519PublicKey.from_public_bytes(public_key).verify(sig,canonical_receipt(receipt))
-    except (InvalidSignature,ValueError,TypeError) as exc:
+    except (InvalidSignature, ValueError, TypeError, binascii.Error) as exc:
         raise ValueError("invalid auditor signature") from exc
     return True

@@ -24,6 +24,7 @@ on:
       - 'tests/test_level3_process_kill.py'
       - '.github/workflows/level3-staging-prototype.yml'
       - 'tools/level3_staging/android_probe.py'
+      - 'tests/test_level3_isolation_guard.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -41,6 +42,8 @@ jobs:
         run: python -m py_compile tools/level3_staging/controlled_write.py tools/level3_staging/mcp_proposals.py tools/level3_staging/approval_ledger.py tools/level3_staging/signed_create.py tools/level3_staging/mcp_signed.py tools/level3_staging/mcp_signed_stdio.py tools/level3_staging/operator_approval.py tools/level3_staging/readiness.py tools/level3_staging/startup_guard.py tools/level3_staging/audit_chain.py tools/level3_staging/recovery.py tools/level3_staging/audit_reconcile.py tests/test_level3_staging_write.py tests/test_level3_mcp_proposals.py tests/test_level3_approval_ledger.py tests/test_level3_ledger_recovery.py tests/test_level3_signed_create.py tests/test_level3_mcp_signed.py tests/test_level3_stdio.py tests/test_level3_operator_approval.py tests/test_level3_readiness.py tests/test_level3_startup_guard.py tests/test_level3_audit_chain.py tests/test_level3_recovery_inspection.py tests/test_level3_audit_integration.py tests/test_level3_fault_injection.py tests/test_level3_audit_outbox.py tests/test_level3_audit_reconcile.py
       - name: Signed runtime compatibility probe
         run: python -m tools.level3_staging.android_probe
+      - name: Broker custody isolation gate tests
+        run: python -m unittest discover -s tests -p 'test_level3_isolation_guard.py' -v
       - name: Run offline staging tests
         run: |
           python -m unittest discover -s tests -p 'test_level3_staging_write.py' -v

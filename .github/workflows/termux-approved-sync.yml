@@ -1,0 +1,25 @@
+name: Termux approved sync checks
+on:
+  pull_request:
+    paths:
+      - 'tools/termux_approved_sync.py'
+      - 'docs/TERMUX_APPROVED_SYNC.md'
+      - '.github/workflows/termux-approved-sync.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile and CLI smoke tests
+        run: |
+          python -m py_compile tools/termux_approved_sync.py
+          python tools/termux_approved_sync.py --help
+          python tools/termux_approved_sync.py plan --help
+          python tools/termux_approved_sync.py apply --help
+          python tools/termux_approved_sync.py rollback --help

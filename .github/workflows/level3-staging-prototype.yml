@@ -4,6 +4,7 @@ on:
     paths:
       - 'tools/level3_staging/**'
       - 'tests/test_level3_staging_write.py'
+      - 'tests/test_level3_mcp_proposals.py'
       - '.github/workflows/level3-staging-prototype.yml'
   workflow_dispatch:
 permissions:
@@ -17,6 +18,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Compile
-        run: python -m py_compile tools/level3_staging/controlled_write.py tests/test_level3_staging_write.py
+        run: python -m py_compile tools/level3_staging/controlled_write.py tools/level3_staging/mcp_proposals.py tests/test_level3_staging_write.py tests/test_level3_mcp_proposals.py
       - name: Run offline staging tests
-        run: python -m unittest discover -s tests -p 'test_level3_staging_write.py' -v
+        run: |
+          python -m unittest discover -s tests -p 'test_level3_staging_write.py' -v
+          python -m unittest discover -s tests -p 'test_level3_mcp_proposals.py' -v

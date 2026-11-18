@@ -92,3 +92,23 @@ def append_audit(conn,event_id,nonce,phase,digest):
             "VALUES (%s,%s,%s,%s,%s,%s)",
             (event_id,nonce,phase,digest,previous,event_hash))
     return {"event_hash":event_hash,"previous_hash":previous}
+
+def verify_audit_chain(conn):
+    """Read-only full-chain verification. Return a verifiable head receipt."""
+    rows=conn.execute(
+        "SELECT sequence,event_id,nonce,phase,payload_sha256,previous_hash,event_hash "
+        "FROM level3_custody.audit_event ORDER BY sequence"
+    ).fetchall()
+    previous="0"*64
+    last_sequence=0
+    for sequence,event_id,nonce,phase,digest,stored_previous,stored_hash in rows:
+        if sequence!=last_sequence+1 or stored_previous.strip()!=previous:
+            raise CustodyDenied("audit sequence or previous hash mismatch")
+        record={"event_id":str(event_id),"nonce":nonce.strip(),"phase":phase,
+                "payload_sha256":digest.strip(),"previous_hash":previous}
+        expected=receipt_digest(record)
+        if expected!=stored_hash.strip():
+            raise CustodyDenied("audit event hash mismatch")
+        last_sequence=sequence
+        previous=expected
+    return {"count":last_sequence,"head_hash":previous}

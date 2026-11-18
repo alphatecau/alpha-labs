@@ -12,6 +12,10 @@ from tools.level3_staging.mcp_signed import dispatch
 from tools.level3_staging.startup_guard import verify_startup
 
 def main():
+    # This legacy direct-ledger worker cannot enforce independent custody.
+    # No production deployment path exists until a broker-backed worker is implemented.
+    if os.environ.get('LEVEL3_OFFLINE_TEST_ONLY') != '1':
+        raise SystemExit('Level 3 startup denied: broker-backed custody not implemented')
     root = os.environ.get("LEVEL3_STAGING_ROOT")
     ledger = os.environ.get("LEVEL3_LEDGER_PATH")
     public_b64 = os.environ.get("LEVEL3_APPROVER_PUBLIC_KEY_B64")

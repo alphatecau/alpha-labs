@@ -1,5 +1,8 @@
 name: Level 3 staging prototype checks
 on:
+  push:
+    branches:
+      - research/level3-signed-staging-followup-20261118
   pull_request:
     paths:
       - 'tools/level3_staging/**'
@@ -34,7 +37,14 @@ on:
       - 'tests/test_level3_remote_replay.py'
       - 'tests/test_level3_custody_schema.py'
       - 'tests/test_level3_postgres_custody.py'
+      - 'tests/test_level3_postgres_integration.py'
+      - 'tests/test_level3_intent_recovery.py'
+      - 'tests/test_level3_external_anchor.py'
+      - 'tests/test_level3_signed_broker_pipeline.py'
       - 'tools/level3_staging/postgres_custody.py'
+      - 'tools/level3_staging/intent_recovery.py'
+      - 'tools/level3_staging/external_anchor.py'
+      - 'tools/level3_staging/signed_broker_pipeline.py'
       - 'deployment/level3_custody_schema.sql'
   workflow_dispatch:
 permissions:
@@ -67,6 +77,12 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_level3_remote_auth.py' -v
           python -m unittest discover -s tests -p 'test_level3_remote_replay.py' -v
+      - name: Crash-injected file intent recovery
+        run: python -m unittest discover -s tests -p 'test_level3_intent_recovery.py' -v
+      - name: Independent audit anchor verification
+        run: python -m unittest discover -s tests -p 'test_level3_external_anchor.py' -v
+      - name: Signed broker safety gate checks
+        run: python -m unittest discover -s tests -p 'test_level3_signed_broker_pipeline.py' -v
       - name: Cloud probe fail-closed HTTP contract
         run: python -m unittest discover -s tests -p 'test_level3_cloud_probe.py' -v
       - name: Broker readiness startup rejection tests
@@ -93,3 +109,31 @@ jobs:
           python -m unittest discover -s tests -p 'test_level3_audit_reconcile.py' -v
           python -m unittest discover -s tests -p 'test_level3_audit_concurrency.py' -v
           python -m unittest discover -s tests -p 'test_level3_process_kill.py' -v
+
+  postgres-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: level3_ci
+          POSTGRES_PASSWORD: ephemeral_ci_only
+          POSTGRES_DB: level3_ci_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U level3_ci -d level3_ci_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      LEVEL3_TEST_POSTGRES_DSN: postgresql://level3_ci:ephemeral_ci_only@localhost:5432/level3_ci_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated database test dependency
+        run: python -m pip install 'psycopg[binary]>=3.2,<4'
+      - name: Run real PostgreSQL custody integration tests
+        run: python -m unittest discover -s tests -p 'test_level3_postgres_integration.py' -v

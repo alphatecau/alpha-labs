@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'tools/termux_approved_sync.py'
+      - 'tools/termux_mcp_reconnect_check.py'
+      - 'tests/test_termux_sync_recovery.py'
       - 'docs/TERMUX_APPROVED_SYNC.md'
       - '.github/workflows/termux-approved-sync.yml'
   workflow_dispatch:
@@ -23,3 +25,6 @@ jobs:
           python tools/termux_approved_sync.py plan --help
           python tools/termux_approved_sync.py apply --help
           python tools/termux_approved_sync.py rollback --help
+          python tools/termux_approved_sync.py recover --help
+          python -m py_compile tools/termux_mcp_reconnect_check.py tests/test_termux_sync_recovery.py
+          python -m unittest discover -s tests -p 'test_termux_sync_recovery.py' -v

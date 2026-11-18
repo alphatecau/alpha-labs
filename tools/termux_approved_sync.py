@@ -79,6 +79,22 @@ def write_state(path, data):
             tmp.unlink()
 
 
+def write_state_replace(path, data):
+    """Atomically replace an existing state record without exposing credentials."""
+    tmp = path.with_name(path.name + ".new")
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(fd, "w") as out:
+            json.dump(data, out, indent=2)
+            out.write("\n")
+            out.flush()
+            os.fsync(out.fileno())
+        os.replace(tmp, path)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="action", required=True)
@@ -87,6 +103,8 @@ def main():
     apply = sub.add_parser("apply", help="Apply a previously planned SHA with explicit approval")
     apply.add_argument("--commit", required=True)
     apply.add_argument("--approve", action="store_true")
+    recover = sub.add_parser("recover", help="Inspect or resolve an interrupted approved sync")
+    recover.add_argument("--approve", action="store_true")
     rollback = sub.add_parser("rollback", help="Undo only the last recorded clean sync")
     rollback.add_argument("--approve", action="store_true")
     args = parser.parse_args()
@@ -128,17 +146,41 @@ def main():
             raise SyncError("HEAD changed during verification.")
         backup = "termux-sync-backup/" + dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         git("branch", backup, head)
+        write_state(state_path, {"before": head, "after": target, "backup": backup, "phase": "pending"})
         git("merge", "--ff-only", target)
-        write_state(state_path, {"before": head, "after": target, "backup": backup})
+        write_state_replace(state_path, {"before": head, "after": target, "backup": backup, "phase": "applied"})
         print(f"SYNC PASS: {head} -> {target}\nBACKUP: {backup}")
         print("Local runtime and test verification are still required.")
         return
+
+    if args.action == "recover":
+        if not state_path.is_file():
+            raise SyncError("No sync record exists. Inspect backup branches and reflog manually.")
+        data = json.loads(state_path.read_text())
+        if data.get("phase") != "pending":
+            raise SyncError("No interrupted sync pending.")
+        if head == data["before"]:
+            print("RECOVERY: merge not applied; previous HEAD intact.")
+            if args.approve:
+                state_path.unlink()
+                print("RECOVERY PASS: pending record cleared; backup branch retained.")
+            return
+        if head == data["after"]:
+            print("RECOVERY: merge completed; state finalisation pending.")
+            if args.approve:
+                data["phase"] = "applied"
+                write_state_replace(state_path, data)
+                print("RECOVERY PASS: sync state finalised; rollback available.")
+            return
+        raise SyncError("HEAD does not match recorded before/after SHA; manual review required.")
 
     if not args.approve:
         raise SyncError("Explicit --approve required.")
     if not state_path.is_file():
         raise SyncError("No recorded sync to roll back.")
     data = json.loads(state_path.read_text())
+    if data.get("phase", "applied") != "applied":
+        raise SyncError("Interrupted sync pending; run recover first.")
     if head != data["after"]:
         raise SyncError("HEAD differs from last synced SHA; rollback refused.")
     if not ancestor(data["before"], head):

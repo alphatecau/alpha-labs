@@ -41,6 +41,14 @@ def main():
         verify(audit)
     except (OSError, ValueError) as exc:
         raise SystemExit("Level 3 startup denied: audit integrity failure") from exc
+    if Path(ledger).exists():
+        from tools.level3_staging.audit_reconcile import inspect_outbox
+        try:
+            audit_status = inspect_outbox(ledger, audit)
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            raise SystemExit("Level 3 startup denied: audit reconciliation error") from exc
+        if audit_status["blocked"]:
+            raise SystemExit("Level 3 startup denied: unreconciled audit evidence")
     verify_startup(os.environ.get('LEVEL3_READINESS_ATTESTATION'), public_key, root, ledger)
     for line in sys.stdin:
         try:

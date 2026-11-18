@@ -1,6 +1,7 @@
 """Offline custody unit tests; no database credentials or network required."""
 import unittest
-from tools.level3_staging.postgres_custody import CustodyDenied,claim,complete,pending,receipt_digest
+import uuid
+from tools.level3_staging.postgres_custody import CustodyDenied,claim,complete,pending,receipt_digest,append_audit
 
 class Tx:
     def __init__(self,db):
@@ -27,6 +28,8 @@ class DB:
         return Tx(self)
     def execute(self,sql,params=None):
         self.events.append((sql,params))
+        if sql.startswith("SELECT event_hash"):
+            return Result(None)
         if sql.startswith("UPDATE"):
             return Result(self.update_row)
         if sql.startswith("SELECT"):
@@ -54,6 +57,12 @@ class CustodyTests(unittest.TestCase):
     def test_pending_never_mutates(self):
         self.assertEqual(len(pending(self.db)),1)
         self.assertTrue(self.db.events[0][0].startswith("SELECT"))
+    def test_audit_chain_append_is_serialised(self):
+        receipt=append_audit(self.db,str(uuid.uuid4()),"a"*64,"claimed","b"*64)
+        self.assertEqual(receipt["previous_hash"],"0"*64)
+        self.assertEqual(self.db.events[0],"BEGIN")
+        self.assertEqual(self.db.events[-1],"COMMIT")
+        self.assertIn("pg_advisory_xact_lock",self.db.events[1][0])
     def test_receipt_digest_deterministic(self):
         self.assertEqual(receipt_digest({"a":1,"b":2}),receipt_digest({"b":2,"a":1}))
 

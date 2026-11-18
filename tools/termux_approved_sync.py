@@ -86,7 +86,7 @@ def write_state_replace(path, data):
     try:
         with os.fdopen(fd, "w") as out:
             json.dump(data, out, indent=2)
-            out.write("\\n")
+            out.write("\n")
             out.flush()
             os.fsync(out.fileno())
         os.replace(tmp, path)

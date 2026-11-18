@@ -2,6 +2,7 @@
 import hashlib
 import json
 import unittest
+from unittest.mock import patch
 from tools.level3_staging.signed_broker_pipeline import signed_create,BrokerDisabled
 from tools.level3_staging.postgres_custody import CustodyDenied
 
@@ -19,6 +20,16 @@ class PipelineTests(unittest.TestCase):
     def test_disabled_by_default(self):
         with self.assertRaises(BrokerDisabled):
             self.call()
+    def test_caller_cannot_override_server_disabled_mode(self):
+        with patch.dict("os.environ",{"LEVEL3_CUSTODY_MODE":"disabled"}):
+            with self.assertRaises(BrokerDisabled):
+                self.call(durable_storage=True,independent_anchor=True,operator_approved=True)
+    def test_production_audience_denied(self):
+        with patch.dict("os.environ",{"LEVEL3_CUSTODY_MODE":"enabled"}):
+            with self.assertRaises(BrokerDisabled):
+                signed_create(None,"/nonexistent",{},self.body,{},
+                    "alpha-labs-level3:production",self.nonce,self.path,self.payload,
+                    durable_storage=True,independent_anchor=True,operator_approved=True)
     def test_no_anchor_denied(self):
         with self.assertRaises(BrokerDisabled):
             self.call(durable_storage=True,operator_approved=True)

@@ -39,11 +39,17 @@ class PipelineTests(unittest.TestCase):
     def test_no_durable_storage_denied(self):
         with self.assertRaises(BrokerDisabled):
             self.call(independent_anchor=True,operator_approved=True)
-    def test_oversized_payload_denied_before_db(self):
-        with self.assertRaises(CustodyDenied):
-            signed_create(None,"/nonexistent",{},self.body,{},
-                "alpha-labs-level3:staging",self.nonce,self.path,b"x"*32769,
-                durable_storage=True,independent_anchor=True,operator_approved=True)
+    def test_oversized_payload_denied_before_auth_or_db(self):
+        # Exercise the payload-size gate, not the disabled-mode gate.
+        with patch.dict("os.environ",{"LEVEL3_CUSTODY_MODE":"enabled"}):
+            with patch("tools.level3_staging.signed_broker_pipeline.verify_keyed") as auth:
+                with patch("tools.level3_staging.signed_broker_pipeline.claim_with_audit") as db:
+                    with self.assertRaises(CustodyDenied):
+                        signed_create(None,"/nonexistent",{},self.body,{},
+                            "alpha-labs-level3:staging",self.nonce,self.path,b"x"*32769,
+                            durable_storage=True,independent_anchor=True,operator_approved=True)
+                    auth.assert_not_called()
+                    db.assert_not_called()
 
 if __name__=="__main__":
     unittest.main()

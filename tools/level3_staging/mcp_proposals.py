@@ -7,7 +7,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from tools.level3_staging.controlled_write import propose
+from tools.level3_staging.controlled_write import Refused, propose
 
 PROTOCOL = "2025-06-18"
 TOOLS = [
@@ -54,7 +54,7 @@ def dispatch(message, root):
         else:
             return {"jsonrpc": "2.0", "id": ident, "error": {"code": -32601, "message": "method not found"}}
         return {"jsonrpc": "2.0", "id": ident, "result": result}
-    except (ValueError, OSError, TypeError, KeyError) as exc:
+    except (Refused, ValueError, OSError, TypeError, KeyError) as exc:
         return {"jsonrpc": "2.0", "id": ident, "result": {"isError": True, "content": [{"type": "text", "text": "proposal refused: " + type(exc).__name__}]}} if method == "tools/call" else {"jsonrpc": "2.0", "id": ident, "error": {"code": -32602, "message": "invalid request"}}
 
 def main():

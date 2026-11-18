@@ -92,3 +92,37 @@ def append_audit(conn,event_id,nonce,phase,digest):
             "VALUES (%s,%s,%s,%s,%s,%s)",
             (event_id,nonce,phase,digest,previous,event_hash))
     return {"event_hash":event_hash,"previous_hash":previous}
+
+def verify_audit_chain(conn):
+    """Read-only full-chain verification. Return a verifiable head receipt."""
+    rows=conn.execute(
+        "SELECT sequence,event_id,nonce,phase,payload_sha256,previous_hash,event_hash "
+        "FROM level3_custody.audit_event ORDER BY sequence"
+    ).fetchall()
+    previous="0"*64
+    last_sequence=0
+    for sequence,event_id,nonce,phase,digest,stored_previous,stored_hash in rows:
+        if sequence<=last_sequence or stored_previous.strip()!=previous:
+            raise CustodyDenied("audit ordering or previous hash mismatch")
+        record={"event_id":str(event_id),"nonce":nonce.strip(),"phase":phase,
+                "payload_sha256":digest.strip(),"previous_hash":previous}
+        expected=receipt_digest(record)
+        if expected!=stored_hash.strip():
+            raise CustodyDenied("audit event hash mismatch")
+        last_sequence=sequence
+        previous=expected
+    return {"count":len(rows),"last_sequence":last_sequence,"head_hash":previous}
+
+def claim_with_audit(conn,remote_nonce,approval_nonce,path,digest,event_id):
+    """Commit nonce reservation, approval intent and audit event as one transaction."""
+    with conn.transaction():
+        result=claim(conn,remote_nonce,approval_nonce,path,digest)
+        receipt=append_audit(conn,event_id,approval_nonce,"claimed",digest)
+    return {**result,"audit":receipt}
+
+def complete_with_audit(conn,approval_nonce,path,digest,event_id):
+    """Complete only a claimed intent, atomically recording its audit event."""
+    with conn.transaction():
+        result=complete(conn,approval_nonce,path,digest)
+        receipt=append_audit(conn,event_id,approval_nonce,"complete",digest)
+    return {**result,"audit":receipt}

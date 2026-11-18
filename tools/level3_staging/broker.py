@@ -63,9 +63,9 @@ def serve(socket_path, root, ledger, audit, public_key, worker_uid):
                         if not part:
                             break
                         raw.extend(part)
-                        if b"\\n" in part:
+                        if b"\n" in part:
                             break
-                    if len(raw)>=MAX_REQUEST or raw.count(b"\\n")!=1 or not raw.endswith(b"\\n"):
+                    if len(raw)>=MAX_REQUEST or raw.count(b"\n")!=1 or not raw.endswith(b"\n"):
                         raise Denied("invalid request framing")
                     request=json.loads(raw)
                     if not isinstance(request,dict) or set(request)!={"path","content","approval","signature"}:
@@ -88,7 +88,7 @@ def serve(socket_path, root, ledger, audit, public_key, worker_uid):
                     response={"ok":True,"receipt":result}
                 except (Denied,ValueError,TypeError,KeyError,OSError) as exc:
                     response={"ok":False,"error":type(exc).__name__}
-                conn.sendall(json.dumps(response,separators=(",",":")).encode()+b"\\n")
+                conn.sendall(json.dumps(response,separators=(",",":")).encode()+b"\n")
     finally:
         server.close()
         sock.unlink(missing_ok=True)
@@ -96,7 +96,7 @@ def serve(socket_path, root, ledger, audit, public_key, worker_uid):
 def request(socket_path, arguments, timeout=5):
     if not isinstance(arguments,dict) or set(arguments)!={"path","content","approval","signature"}:
         raise Denied("invalid broker arguments")
-    payload=json.dumps(arguments,separators=(",",":")).encode()+b"\\n"
+    payload=json.dumps(arguments,separators=(",",":")).encode()+b"\n"
     if len(payload)>MAX_REQUEST:
         raise Denied("request too large")
     with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as client:
@@ -109,9 +109,9 @@ def request(socket_path, arguments, timeout=5):
             if not chunk:
                 break
             data.extend(chunk)
-            if b"\\n" in chunk:
+            if b"\n" in chunk:
                 break
-    if not data.endswith(b"\\n") or data.count(b"\\n")!=1:
+    if not data.endswith(b"\n") or data.count(b"\n")!=1:
         raise Denied("invalid broker response")
     result=json.loads(data)
     if not isinstance(result,dict) or result.get("ok") is not True:

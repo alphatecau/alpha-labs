@@ -15,7 +15,7 @@ class ConcurrentAuditTests(unittest.TestCase):
                 digests=list(pool.map(write,range(32)))
             self.assertEqual(len(set(digests)),32)
             self.assertEqual(len(journal.read_text().splitlines()),32)
-            self.assertEqual(verify(journal),digests[-1] if False else verify(journal))
+            self.assertIn(verify(journal),digests)
 
     def test_corruption_denied(self):
         with tempfile.TemporaryDirectory() as d:

@@ -5,7 +5,7 @@ import uuid
 import hashlib
 
 from tools.level3_staging.postgres_custody import (
-    claim, complete, pending, append_audit, verify_audit_chain, CustodyDenied,
+    claim, complete, pending, append_audit, verify_audit_chain, CustodyDenied,\n    claim_with_audit, complete_with_audit,
 )
 
 @unittest.skipUnless(os.environ.get("LEVEL3_TEST_POSTGRES_DSN"), "isolated test DSN required")
@@ -67,6 +67,21 @@ class PostgreSQLCustodyIntegration(unittest.TestCase):
             complete(self.conn,nonce,path,digest)
         append_audit(self.conn,str(uuid.uuid4()),nonce,"complete",digest)
         self.assertGreaterEqual(verify_audit_chain(self.conn)["count"],1)
+
+    def test_audited_claim_and_completion_atomic(self):
+        nonce=hashlib.sha256(uuid.uuid4().bytes).hexdigest()
+        remote=hashlib.sha256(uuid.uuid4().bytes).hexdigest()
+        path="docs/level3-staging/audited.md"
+        digest="d"*64
+        before=verify_audit_chain(self.conn)["count"]
+        claimed=claim_with_audit(self.conn,remote,nonce,path,digest,str(uuid.uuid4()))
+        self.assertEqual(claimed["state"],"claimed")
+        finished=complete_with_audit(self.conn,nonce,path,digest,str(uuid.uuid4()))
+        self.assertEqual(finished["state"],"complete")
+        self.assertEqual(verify_audit_chain(self.conn)["count"],before+2)
+        with self.assertRaises(Exception):
+            complete_with_audit(self.conn,nonce,path,digest,str(uuid.uuid4()))
+        self.assertEqual(verify_audit_chain(self.conn)["count"],before+2)
 
     def test_atomic_claim_rollback_on_approval_conflict(self):
         nonce=hashlib.sha256(uuid.uuid4().bytes).hexdigest()

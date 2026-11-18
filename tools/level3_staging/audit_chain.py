@@ -54,7 +54,7 @@ def append(path,event):
         fd=os.open(p,flags,0o600)
         try:
             with os.fdopen(fd,"ab",closefd=False) as out:
-                out.write(canonical(record)+b"\\n")
+                out.write(canonical(record)+b"\n")
                 out.flush()
                 os.fsync(out.fileno())
         finally:

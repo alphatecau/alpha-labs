@@ -7,6 +7,8 @@ on:
       - 'tests/test_level3_mcp_proposals.py'
       - 'tests/test_level3_approval_ledger.py'
       - 'tests/test_level3_ledger_recovery.py'
+      - 'tools/level3_staging/signed_create.py'
+      - 'tests/test_level3_signed_create.py'
       - '.github/workflows/level3-staging-prototype.yml'
   workflow_dispatch:
 permissions:
@@ -20,10 +22,11 @@ jobs:
         with:
           python-version: '3.12'
       - name: Compile
-        run: python -m py_compile tools/level3_staging/controlled_write.py tools/level3_staging/mcp_proposals.py tools/level3_staging/approval_ledger.py tests/test_level3_staging_write.py tests/test_level3_mcp_proposals.py tests/test_level3_approval_ledger.py tests/test_level3_ledger_recovery.py
+        run: python -m py_compile tools/level3_staging/controlled_write.py tools/level3_staging/mcp_proposals.py tools/level3_staging/approval_ledger.py tools/level3_staging/signed_create.py tests/test_level3_staging_write.py tests/test_level3_mcp_proposals.py tests/test_level3_approval_ledger.py tests/test_level3_ledger_recovery.py tests/test_level3_signed_create.py
       - name: Run offline staging tests
         run: |
           python -m unittest discover -s tests -p 'test_level3_staging_write.py' -v
           python -m unittest discover -s tests -p 'test_level3_mcp_proposals.py' -v
           python -m unittest discover -s tests -p 'test_level3_approval_ledger.py' -v
           python -m unittest discover -s tests -p 'test_level3_ledger_recovery.py' -v
+          python -m unittest discover -s tests -p 'test_level3_signed_create.py' -v

@@ -67,7 +67,15 @@ class CustodyTests(unittest.TestCase):
         self.assertEqual(self.db.events[-1],"COMMIT")
         self.assertIn("pg_advisory_xact_lock",self.db.events[1][0])
     def test_verify_audit_chain_empty(self):
-        self.assertEqual(verify_audit_chain(self.db),{"count":0,"head_hash":"0"*64})
+        self.assertEqual(verify_audit_chain(self.db),{"count":0,"last_sequence":0,"head_hash":"0"*64})
+    def test_verify_audit_chain_identity_gap_is_valid(self):
+        event_id=str(uuid.uuid4())
+        record={"event_id":event_id,"nonce":"a"*64,"phase":"claimed",
+                "payload_sha256":"b"*64,"previous_hash":"0"*64}
+        digest=receipt_digest(record)
+        self.db.audit_rows=[(7,event_id,"a"*64,"claimed","b"*64,"0"*64,digest)]
+        self.assertEqual(verify_audit_chain(self.db)["count"],1)
+        self.assertEqual(verify_audit_chain(self.db)["last_sequence"],7)
     def test_verify_audit_chain_tamper_denied(self):
         self.db.audit_rows=[(1,str(uuid.uuid4()),"a"*64,"claimed","b"*64,"0"*64,"f"*64)]
         with self.assertRaises(CustodyDenied):

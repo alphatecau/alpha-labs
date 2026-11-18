@@ -4,7 +4,7 @@ import hashlib
 import unittest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
-from tools.level3_staging.remote_auth import RemoteDenied,canonical,verify
+from tools.level3_staging.remote_auth import RemoteDenied,canonical,verify,verify_keyed
 
 class RemoteAuthTests(unittest.TestCase):
     def setUp(self):
@@ -19,6 +19,33 @@ class RemoteAuthTests(unittest.TestCase):
     def envelope(self):
         return {"claims":self.claims.copy(),
             "signature":base64.b64encode(self.private.sign(canonical(self.claims))).decode()}
+    def keyed_envelope(self):
+        claims={**self.claims,"audience":"alpha-labs-level3:staging","key_id":"operator-1"}
+        return {"claims":claims,"signature":base64.b64encode(
+            self.private.sign(canonical(claims))).decode()}
+
+    def test_keyed_valid(self):
+        self.assertEqual(verify_keyed(self.keyed_envelope(),self.body,
+            {"operator-1":self.public},"alpha-labs-level3:staging",now=1000),"a"*64)
+
+    def test_keyed_prod_replay_denied(self):
+        with self.assertRaises(RemoteDenied):
+            verify_keyed(self.keyed_envelope(),self.body,
+                {"operator-1":self.public},"alpha-labs-level3:production",now=1000)
+
+    def test_keyed_unknown_key_denied(self):
+        with self.assertRaises(RemoteDenied):
+            verify_keyed(self.keyed_envelope(),self.body,
+                {"other":self.public},"alpha-labs-level3:staging",now=1000)
+
+    def test_keyed_key_id_tampering_denied(self):
+        envelope=self.keyed_envelope()
+        envelope["claims"]["key_id"]="operator-2"
+        with self.assertRaises(RemoteDenied):
+            verify_keyed(envelope,self.body,
+                {"operator-1":self.public,"operator-2":self.public},
+                "alpha-labs-level3:staging",now=1000)
+
     def test_valid(self):
         self.assertEqual(verify(self.envelope(),self.body,self.public,"alpha-labs-level3",now=1000),"a"*64)
     def test_tampered_body(self):

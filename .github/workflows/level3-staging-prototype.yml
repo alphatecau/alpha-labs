@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - research/level3-signed-staging-followup-20261118
+      - fix/level3-postmerge-reconciliation-20261119
   pull_request:
     paths:
       - 'tools/level3_staging/**'

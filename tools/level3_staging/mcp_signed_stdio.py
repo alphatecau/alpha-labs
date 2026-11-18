@@ -6,6 +6,7 @@ import base64
 import json
 import os
 import sys
+import stat
 from pathlib import Path
 from tools.level3_staging.mcp_signed import dispatch
 from tools.level3_staging.startup_guard import verify_startup
@@ -27,6 +28,14 @@ def main():
     audit = os.environ.get("LEVEL3_AUDIT_PATH")
     if not audit or Path(audit).parent.resolve().is_relative_to(Path(root).resolve()):
         raise SystemExit("Level 3 startup denied: protected external audit required")
+    ledger_parent = Path(ledger).parent.resolve(strict=True)
+    audit_parent = Path(audit).parent.resolve(strict=True)
+    for directory in (ledger_parent, audit_parent):
+        mode = directory.stat().st_mode
+        if not stat.S_ISDIR(mode) or mode & 0o077:
+            raise SystemExit("Level 3 startup denied: private storage directory required")
+    if Path(ledger).is_symlink() or Path(audit).is_symlink():
+        raise SystemExit("Level 3 startup denied: storage symlink")
     from tools.level3_staging.audit_chain import verify
     try:
         verify(audit)

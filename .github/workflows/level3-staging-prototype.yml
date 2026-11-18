@@ -1,0 +1,29 @@
+name: Level 3 staging prototype checks
+on:
+  pull_request:
+    paths:
+      - 'tools/level3_staging/**'
+      - 'tests/test_level3_staging_write.py'
+      - 'tests/test_level3_mcp_proposals.py'
+      - 'tests/test_level3_approval_ledger.py'
+      - 'tests/test_level3_ledger_recovery.py'
+      - '.github/workflows/level3-staging-prototype.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile
+        run: python -m py_compile tools/level3_staging/controlled_write.py tools/level3_staging/mcp_proposals.py tools/level3_staging/approval_ledger.py tests/test_level3_staging_write.py tests/test_level3_mcp_proposals.py tests/test_level3_approval_ledger.py tests/test_level3_ledger_recovery.py
+      - name: Run offline staging tests
+        run: |
+          python -m unittest discover -s tests -p 'test_level3_staging_write.py' -v
+          python -m unittest discover -s tests -p 'test_level3_mcp_proposals.py' -v
+          python -m unittest discover -s tests -p 'test_level3_approval_ledger.py' -v
+          python -m unittest discover -s tests -p 'test_level3_ledger_recovery.py' -v

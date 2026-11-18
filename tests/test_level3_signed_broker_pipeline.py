@@ -51,5 +51,38 @@ class PipelineTests(unittest.TestCase):
                     auth.assert_not_called()
                     db.assert_not_called()
 
+    def test_signed_body_mismatch_denied_without_custody(self):
+        # Auth succeeds, but signed body must match the exact approved intent.
+        with patch.dict("os.environ",{"LEVEL3_CUSTODY_MODE":"enabled"}):
+            with patch("tools.level3_staging.signed_broker_pipeline.verify_keyed",return_value="b"*64) as auth:
+                with patch("tools.level3_staging.signed_broker_pipeline.claim_with_audit") as db:
+                    with self.assertRaises(CustodyDenied):
+                        signed_create(None,"/nonexistent",{},self.body,{},
+                            "alpha-labs-level3:staging",self.nonce,
+                            "docs/level3-staging/different.md",self.payload,
+                            durable_storage=True,independent_anchor=True,operator_approved=True)
+                    auth.assert_called_once()
+                    db.assert_not_called()
+
+    def test_malformed_signed_body_denied_without_custody(self):
+        with patch.dict("os.environ",{"LEVEL3_CUSTODY_MODE":"enabled"}):
+            with patch("tools.level3_staging.signed_broker_pipeline.verify_keyed",return_value="b"*64):
+                with patch("tools.level3_staging.signed_broker_pipeline.claim_with_audit") as db:
+                    with self.assertRaises(CustodyDenied):
+                        signed_create(None,"/nonexistent",{},b"{invalid",{},
+                            "alpha-labs-level3:staging",self.nonce,self.path,self.payload,
+                            durable_storage=True,independent_anchor=True,operator_approved=True)
+                    db.assert_not_called()
+
+    def test_auth_failure_denied_before_custody(self):
+        from tools.level3_staging.remote_auth import RemoteDenied
+        with patch.dict("os.environ",{"LEVEL3_CUSTODY_MODE":"enabled"}):
+            with patch("tools.level3_staging.signed_broker_pipeline.verify_keyed",
+                       side_effect=RemoteDenied("invalid signature")):
+                with patch("tools.level3_staging.signed_broker_pipeline.claim_with_audit") as db:
+                    with self.assertRaises(RemoteDenied):
+                        self.call(durable_storage=True,independent_anchor=True,operator_approved=True)
+                    db.assert_not_called()
+
 if __name__=="__main__":
     unittest.main()

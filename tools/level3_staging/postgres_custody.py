@@ -102,8 +102,8 @@ def verify_audit_chain(conn):
     previous="0"*64
     last_sequence=0
     for sequence,event_id,nonce,phase,digest,stored_previous,stored_hash in rows:
-        if sequence!=last_sequence+1 or stored_previous.strip()!=previous:
-            raise CustodyDenied("audit sequence or previous hash mismatch")
+        if sequence<=last_sequence or stored_previous.strip()!=previous:
+            raise CustodyDenied("audit ordering or previous hash mismatch")
         record={"event_id":str(event_id),"nonce":nonce.strip(),"phase":phase,
                 "payload_sha256":digest.strip(),"previous_hash":previous}
         expected=receipt_digest(record)
@@ -111,4 +111,4 @@ def verify_audit_chain(conn):
             raise CustodyDenied("audit event hash mismatch")
         last_sequence=sequence
         previous=expected
-    return {"count":last_sequence,"head_hash":previous}
+    return {"count":len(rows),"last_sequence":last_sequence,"head_hash":previous}

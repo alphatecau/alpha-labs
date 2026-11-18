@@ -18,23 +18,40 @@ class PostgreSQLCustodyIntegration(unittest.TestCase):
         db = cls.conn.execute("SELECT current_database()").fetchone()[0]
         if db != "level3_ci_test":
             raise RuntimeError("refusing to mutate non-ephemeral database")
-        with cls.conn.transaction():
-            cls.conn.execute("CREATE SCHEMA level3_custody")
-            cls.conn.execute("""CREATE TABLE level3_custody.remote_nonce(
-                nonce char(64) PRIMARY KEY, claimed_at timestamptz NOT NULL DEFAULT now())""")
-            cls.conn.execute("""CREATE TABLE level3_custody.approval_claim(
-                nonce char(64) PRIMARY KEY, path text NOT NULL, payload_sha256 char(64) NOT NULL,
-                state text NOT NULL CHECK(state IN ('claimed','complete')),
-                created_at timestamptz NOT NULL DEFAULT now(), completed_at timestamptz)""")
-            cls.conn.execute("""CREATE TABLE level3_custody.audit_event(
-                sequence bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-                event_id uuid NOT NULL UNIQUE, nonce char(64) NOT NULL, phase text NOT NULL,
-                payload_sha256 char(64) NOT NULL, previous_hash char(64) NOT NULL,
-                event_hash char(64) NOT NULL UNIQUE, created_at timestamptz NOT NULL DEFAULT now())""")
+        from pathlib import Path
+        migration=Path("deployment/level3_custody_schema.sql").read_text()
+        cls.conn.execute(migration)
+        cls.conn.execute("CREATE ROLE level3_ci_broker NOLOGIN")
+        cls.conn.execute("CREATE ROLE level3_ci_auditor NOLOGIN")
+        cls.conn.execute("GRANT USAGE ON SCHEMA level3_custody TO level3_ci_broker,level3_ci_auditor")
+        cls.conn.execute("GRANT SELECT,INSERT ON level3_custody.remote_nonce TO level3_ci_broker")
+        cls.conn.execute("GRANT SELECT,INSERT,UPDATE ON level3_custody.approval_claim TO level3_ci_broker")
+        cls.conn.execute("GRANT SELECT,INSERT ON level3_custody.audit_event TO level3_ci_broker")
+        cls.conn.execute("GRANT USAGE ON SEQUENCE level3_custody.audit_event_sequence_seq TO level3_ci_broker")
+        cls.conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA level3_custody TO level3_ci_auditor")
 
     @classmethod
     def tearDownClass(cls):
         cls.conn.close()
+
+    def test_effective_role_grants(self):
+        checks=[
+            ("level3_ci_broker","INSERT",True),
+            ("level3_ci_broker","UPDATE",False),
+            ("level3_ci_broker","DELETE",False),
+            ("level3_ci_broker","TRUNCATE",False),
+            ("level3_ci_auditor","SELECT",True),
+            ("level3_ci_auditor","INSERT",False),
+            ("level3_ci_auditor","UPDATE",False),
+            ("level3_ci_auditor","DELETE",False),
+            ("level3_ci_auditor","TRUNCATE",False),
+        ]
+        for role,privilege,expected in checks:
+            with self.subTest(role=role,privilege=privilege):
+                actual=self.conn.execute(
+                    "SELECT has_table_privilege(%s,'level3_custody.audit_event',%s)",
+                    (role,privilege)).fetchone()[0]
+                self.assertEqual(actual,expected)
 
     def test_claim_replay_completion_and_audit(self):
         nonce=hashlib.sha256(uuid.uuid4().bytes).hexdigest()

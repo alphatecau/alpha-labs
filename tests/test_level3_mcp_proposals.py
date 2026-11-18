@@ -27,6 +27,12 @@ class TestProposalMCP(unittest.TestCase):
         self.assertIn("sha256", result["result"]["content"][0]["text"])
         self.assertFalse(target.exists())
 
+    def test_refuses_existing_target_without_crash(self):
+        (self.root / 'docs/level3-staging/existing.md').write_text('original')
+        result = self.request('tools/call', {'name':'level3_propose_create','arguments':{'path':'docs/level3-staging/existing.md','content':'replacement'}})
+        self.assertTrue(result['result']['isError'])
+        self.assertEqual((self.root / 'docs/level3-staging/existing.md').read_text(), 'original')
+
     def test_refuses_unlisted_tool(self):
         result = self.request("tools/call", {"name":"level3_apply_create","arguments":{}})
         self.assertTrue(result["result"]["isError"])

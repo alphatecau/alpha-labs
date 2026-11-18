@@ -21,6 +21,7 @@ on:
       - 'tests/test_level3_audit_outbox.py'
       - 'tests/test_level3_audit_reconcile.py'
       - 'tests/test_level3_audit_concurrency.py'
+      - 'tests/test_level3_process_kill.py'
       - '.github/workflows/level3-staging-prototype.yml'
   workflow_dispatch:
 permissions:
@@ -56,3 +57,4 @@ jobs:
           python -m unittest discover -s tests -p 'test_level3_audit_outbox.py' -v
           python -m unittest discover -s tests -p 'test_level3_audit_reconcile.py' -v
           python -m unittest discover -s tests -p 'test_level3_audit_concurrency.py' -v
+          python -m unittest discover -s tests -p 'test_level3_process_kill.py' -v

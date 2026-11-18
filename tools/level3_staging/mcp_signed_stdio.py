@@ -8,6 +8,7 @@ import os
 import sys
 from pathlib import Path
 from tools.level3_staging.mcp_signed import dispatch
+from tools.level3_staging.startup_guard import verify_startup
 
 def main():
     root = os.environ.get("LEVEL3_STAGING_ROOT")
@@ -23,6 +24,7 @@ def main():
         raise SystemExit("invalid public key") from exc
     if len(public_key) != 32:
         raise SystemExit("invalid Ed25519 public key length")
+    verify_startup(os.environ.get('LEVEL3_READINESS_ATTESTATION'), public_key, root, ledger)
     for line in sys.stdin:
         try:
             message = json.loads(line)

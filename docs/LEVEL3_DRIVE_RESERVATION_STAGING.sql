@@ -13,4 +13,8 @@ CREATE TABLE IF NOT EXISTS level3_custody.drive_upload_reservation (
     CHECK ((state = 'reserved' AND file_id IS NULL AND verified_at IS NULL)
         OR (state = 'verified' AND file_id IS NOT NULL AND verified_at IS NOT NULL))
 );
--- No GRANT statements: explicit role and RLS review required before use.
+-- Explicitly remove inherited/default SELECT grants on this sensitive table.
+-- The reservation owner token must not be visible to broker/auditor logins.
+REVOKE SELECT ON TABLE level3_custody.drive_upload_reservation
+    FROM level3_broker_login, level3_auditor_login;
+-- No GRANT statements: a separately reviewed uploader identity is required.

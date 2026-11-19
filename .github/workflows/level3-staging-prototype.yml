@@ -16,6 +16,7 @@ on:
       - 'tools/level3_staging/auditor_file_store.py'
       - 'tests/test_level3_auditor_file_store.py'
       - 'tests/test_level3_auditor_checkpoint_store_integration.py'
+      - 'tests/test_level3_auditor_postgres_checkpoint_e2e.py'
       - 'docs/LEVEL3_DRIVE_RESERVATION_STAGING.sql'
       - 'docs/LEVEL3_CUSTODY_ACCEPTANCE_MATRIX.md'
       - 'docs/LEVEL3_GOOGLE_OAUTH_RECOVERY.md'
@@ -176,3 +177,4 @@ jobs:
           python -m unittest discover -s tests -p 'test_level3_postgres_integration.py' -v
           python -m unittest discover -s tests -p 'test_level3_drive_reservation_postgres_integration.py' -v
           python -m unittest discover -s tests -p 'test_level3_drive_pipeline_postgres_e2e.py' -v
+    python -m unittest discover -s tests -p 'test_level3_auditor_postgres_checkpoint_e2e.py' -v

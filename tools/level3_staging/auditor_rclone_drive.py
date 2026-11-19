@@ -4,7 +4,6 @@ Requires user-configured rclone OAuth remote. Never handles OAuth tokens itself.
 Google Drive has no atomic create-if-absent guarantee; this is a best-effort
 mirror only, NOT immutable/WORM or safe against a malicious concurrent writer.
 """
-import hashlib
 import json
 import re
 import subprocess
@@ -25,7 +24,7 @@ class RcloneAuditorDrive:
         self.runner = runner or subprocess.run
 
     def _run(self, *args, input_bytes=None):
-        cmd = ["rclone", *args, "--config", ""] if False else ["rclone", *args]
+        cmd = ["rclone", *args]
         result = self.runner(
             cmd, input=input_bytes, capture_output=True, check=False, timeout=60
         )
@@ -47,9 +46,10 @@ class RcloneAuditorDrive:
         target = self._target(name)
         # Root folder ID is pinned; no path traversal or parent-directory access.
         options = ["--drive-root-folder-id", self.folder]
-        listing = self._run("lsjson", target, *options)
+        parent, basename = name.rsplit("/", 1)
+        listing = self._run("lsjson", f"{self.remote}:/{parent}", *options)
         existing = json.loads(listing)
-        if existing:
+        if any(entry.get("Name") == basename for entry in existing):
             raise RcloneDriveDenied("checkpoint already exists")
         self._run("rcat", target, *options, input_bytes=raw)
         # Return opaque checkpoint name; read() resolves under pinned folder.

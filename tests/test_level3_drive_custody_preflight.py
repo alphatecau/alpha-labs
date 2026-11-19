@@ -38,6 +38,20 @@ class CustodyPreflightTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             verify_independent_custody(data, AUDITOR, PRIMARY, FOLDER)
 
+    def test_duplicate_reader_principal_denied(self):
+        data = folder()
+        data["permissions"].append({
+            "type": "user", "role": "reader", "emailAddress": PRIMARY,
+        })
+        with self.assertRaisesRegex(ValueError, "duplicate permission"):
+            verify_independent_custody(data, AUDITOR, PRIMARY, FOLDER)
+
+    def test_empty_permission_identity_denied(self):
+        data = folder()
+        data["permissions"][1]["emailAddress"] = ""
+        with self.assertRaises(ValueError):
+            verify_independent_custody(data, AUDITOR, PRIMARY, FOLDER)
+
     def test_same_account_denied(self):
         with self.assertRaises(ValueError):
             verify_independent_custody(folder(), AUDITOR, AUDITOR, FOLDER)

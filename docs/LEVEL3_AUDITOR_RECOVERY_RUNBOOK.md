@@ -6,9 +6,9 @@ Status: **STAGING ONLY / PRODUCTION NO-GO**. This document does not authorise tr
 
 - Neon project `frosty-river-38771873`, branch `br-solitary-hall-a7h0lefq`, database `level3custody`.
 - Two synthetic staging audit events, sequence 1 `claimed` and 2 `complete`.
-- Verified audit head: `aadf7076b832da487534fd9cd94371c2250046899f554d44118e5e207eda5ca3`.
-- Independently signed local/Drive checkpoint SHA-256: `01dcf7338d982375410c88786f32d3c10fa848e80460fe3d107ac23671448d1`.
-- Auditor Ed25519 public key: `e48e95f7e6024b162b562b0a1e952150b2d810774948229bdc39fe03aa5986c4`.
+- Verified audit head: recorded in the operator's successful read-only checkpoint verification output (not duplicated in source control).
+- Signed checkpoint SHA-256: recorded in the operator's successful read-only checkpoint verification output (not duplicated in source control).
+- Auditor public key: pinned in the staging verifier; never commit private key material.
 - User confirmed Android local and Drive byte-for-byte readback PASS.
 - No WORM or immutable-retention claim.
 

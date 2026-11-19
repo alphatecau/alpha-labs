@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS level3_custody.drive_upload_reservation (
     sha256 text NOT NULL CHECK (sha256 ~ '^[0-9a-f]{64}$'),
     owner_token text NOT NULL CHECK (owner_token ~ '^[0-9a-f]{32}$'),
     state text NOT NULL CHECK (state IN ('reserved', 'verified')),
-    file_id text,
+    file_id text CHECK (file_id IS NULL OR length(file_id) BETWEEN 1 AND 256),
     created_at timestamptz NOT NULL DEFAULT now(),
     verified_at timestamptz,
     PRIMARY KEY (parent_id, sha256),

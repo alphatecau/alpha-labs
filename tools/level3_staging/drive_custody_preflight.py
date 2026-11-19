@@ -13,11 +13,15 @@ def verify_independent_custody(metadata, auditor_email, primary_email, folder_id
         raise ValueError("auditor folder identity mismatch")
     verify_auditor_folder(metadata, auditor_email)
     permissions = metadata["permissions"]
-    roles = {
-        item["emailAddress"].lower(): item["role"]
-        for item in permissions
-        if isinstance(item.get("emailAddress"), str)
-    }
+    roles = {}
+    for item in permissions:
+        email = item.get("emailAddress")
+        if not isinstance(email, str) or not email.strip():
+            raise ValueError("missing permission identity")
+        email = email.lower()
+        if email in roles:
+            raise ValueError("duplicate permission identity")
+        roles[email] = item["role"]
     if not isinstance(primary_email, str) or not primary_email:
         raise ValueError("missing primary account")
     if auditor_email.lower() == primary_email.lower():

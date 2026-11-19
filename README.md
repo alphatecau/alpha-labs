@@ -32,7 +32,15 @@ python -m http.server 8000
 # separately: node --test tests/*.test.cjs
 ```
 
-The main page at `/` is now the mobile-first Research-mode operator dashboard. The original seven-section research interface remains at `/advanced/index.html`. Use Settings > Research preview for clearly labelled synthetic interface data. The Python engine is not yet connected to the frontend. See `docs/ui/UI_SPRINT_001_COMPLETION.md`.
+The portable dashboard in this repository has a mobile-first research view at `/` and the original seven-section interface at `/advanced/index.html`. Its optional research preview uses labelled synthetic data. See `docs/ui/UI_SPRINT_001_COMPLETION.md`.
+
+## Hosted Alpha Labs Site and research API
+
+The [hosted Site](https://alpha-labs-intelligence.alpha-tec-au86.chatgpt.site) has its own Sites source repository. Its research integration uses a same-origin GET to `/api/v1/research/results`. The Site Worker calls that one route on the existing Render staging service, checks its Git revision and report digest, and returns selected historical metrics. The source is the [reproduction audit](docs/evidence/2026-11-05_REPRODUCTION_AUDIT.json) for the unsealed EMA(12,48) test window. Each report revision fixes the input digest in Python. The portfolio, private account research and paper controls have separate access requirements.
+
+The staging entry point is `python deployment/staging_probe.py`. Render supplies `PORT` and `RENDER_GIT_COMMIT`. Store a dedicated random 32-byte lowercase hex value as `ALPHA_RESEARCH_TOKEN` in the Render and Site secret stores. Set `ALPHA_RESEARCH_EXPECTED_COMMIT` on the Site to the full deployed backend commit. Keep credentials out of client code. The service exposes health and authenticated report reads only. An unavailable file, mismatched digest or missing configuration makes the report unavailable.
+
+Keep Render auto-deploy off during acceptance. The deployed staging entry point and the saved Site version can be rolled back independently. To revoke report reads immediately, remove the dedicated backend token. Publication of the public Site is a separate operation.
 
 ## Architecture boundary
 

@@ -32,6 +32,17 @@ def main():
         )),
     )
     with psycopg.connect(dsn, autocommit=True, connect_timeout=10) as conn:
+        role = conn.execute("SELECT current_user").fetchone()[0]
+        if role != "level3_auditor_login":
+            raise RuntimeError("BLOCKED: expected dedicated level3_auditor_login role")
+        privileges = conn.execute(
+            "SELECT has_table_privilege(current_user, 'level3_custody.audit_event', 'SELECT'), "
+            "has_table_privilege(current_user, 'level3_custody.audit_event', 'INSERT'), "
+            "has_table_privilege(current_user, 'level3_custody.audit_event', 'UPDATE'), "
+            "has_table_privilege(current_user, 'level3_custody.audit_event', 'DELETE')"
+        ).fetchone()
+        if tuple(privileges) != (True, False, False, False):
+            raise RuntimeError("BLOCKED: auditor role has unsafe audit table privileges")
         conn.execute("SET default_transaction_read_only = on")
         result = verify_sign_and_retain(
             conn, "alpha-labs-level3:staging", signer, store, signer.public_key

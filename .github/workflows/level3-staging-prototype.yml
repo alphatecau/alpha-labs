@@ -174,7 +174,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install isolated database test dependency
-        run: python -m pip install 'psycopg[binary]>=3.2,<4'
+        run: python -m pip install 'psycopg[binary]>=3.2,<4' 'cryptography>=44,<47'
       - name: Run real PostgreSQL custody integration tests
         run: |
           python -m unittest discover -s tests -p 'test_level3_postgres_integration.py' -v

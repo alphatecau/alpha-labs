@@ -101,6 +101,22 @@ class DriveUploaderTests(unittest.TestCase):
         with self.assertRaises(CustodyReadbackDenied):
             upload_and_verify(FakeDrive(), "", b"x")
 
+    def test_overlong_parent_denied_before_network(self):
+        drive = FakeDrive()
+        with self.assertRaises(CustodyReadbackDenied):
+            upload_and_verify(drive, "p" * 257, b"x")
+        self.assertEqual(drive.create_calls, 0)
+
+    def test_overlong_created_file_id_denied(self):
+        class LongIdDrive(FakeDrive):
+            def create(self, parent_id, name, payload):
+                created = super().create(parent_id, name, payload)
+                created["id"] = "i" * 257
+                return created
+
+        with self.assertRaisesRegex(CustodyReadbackDenied, "identity mismatch"):
+            upload_and_verify(LongIdDrive(), "folder", b"x")
+
     def test_bad_payload_denied(self):
         with self.assertRaises(CustodyReadbackDenied):
             upload_and_verify(FakeDrive(), "folder", "plaintext")

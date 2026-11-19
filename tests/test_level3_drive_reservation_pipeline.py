@@ -9,7 +9,7 @@ class ReservationPipelineTests(unittest.TestCase):
     @patch("tools.level3_staging.drive_reservation_pipeline.upload_and_verify")
     @patch("tools.level3_staging.drive_reservation_pipeline.reserve")
     def test_success_order(self, reserve, upload, complete):
-        upload.return_value = {"name": "a" * 64 + ".bin", "parent_id": "folder", "file_id": "file"}
+        upload.return_value = {"name": "a" * 64 + ".bin", "parent_id": "folder", "file_id": "file", "sha256": "a" * 64, "size": len(b"ciphertext")}
         with patch("tools.level3_staging.drive_reservation_pipeline.hashlib.sha256") as sha:
             sha.return_value.hexdigest.return_value = "a" * 64
             reserved_upload_and_verify(object(), object(), "folder", b"ciphertext")
@@ -32,8 +32,22 @@ class ReservationPipelineTests(unittest.TestCase):
     @patch("tools.level3_staging.drive_reservation_pipeline.reserve")
     def test_receipt_mismatch_blocks_completion(self, reserve, upload, complete):
         upload.return_value = {"name": "wrong.bin", "parent_id": "folder", "file_id": "file"}
-        with self.assertRaisesRegex(ValueError, "receipt identity mismatch"):
+        with self.assertRaisesRegex(ValueError, "receipt identity or readback mismatch"):
             reserved_upload_and_verify(object(), object(), "folder", b"ciphertext")
+        complete.assert_not_called()
+
+    @patch("tools.level3_staging.drive_reservation_pipeline.complete_reservation")
+    @patch("tools.level3_staging.drive_reservation_pipeline.upload_and_verify")
+    @patch("tools.level3_staging.drive_reservation_pipeline.reserve")
+    def test_wrong_readback_digest_blocks_completion(self, reserve, upload, complete):
+        upload.return_value = {
+            "name": "a" * 64 + ".bin", "parent_id": "folder", "file_id": "file",
+            "sha256": "b" * 64, "size": len(b"ciphertext"),
+        }
+        with patch("tools.level3_staging.drive_reservation_pipeline.hashlib.sha256") as sha:
+            sha.return_value.hexdigest.return_value = "a" * 64
+            with self.assertRaisesRegex(ValueError, "readback mismatch"):
+                reserved_upload_and_verify(object(), object(), "folder", b"ciphertext")
         complete.assert_not_called()
 
     @patch("tools.level3_staging.drive_reservation_pipeline.complete_reservation")

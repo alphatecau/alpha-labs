@@ -64,3 +64,12 @@ User explicitly authorised operations in Render workspace `Shannon's workspace` 
 - No Render environment values, database credentials, or live Render-to-Neon TLS handshake were inspected. Neither staging nor production is cleared.
 
 GitHub commit `a6ecd6fa`: seven workflows successful. Preserve auto-deploy off until evidence and operator approval are complete.
+
+
+## Isolated staging migration executed (19 November 2026)
+
+On Neon project `frosty-river-38771873`, branch `br-solitary-hall-a7h0lefq`, database `level3custody`, the additive `CREATE TABLE IF NOT EXISTS level3_custody.drive_upload_reservation` migration was applied with the same checks as `docs/LEVEL3_DRIVE_RESERVATION_STAGING.sql`, including the newer `file_id` length constraint.
+
+Read-only post-migration queries verified: table exists, owned by `level3_owner`; 12 PostgreSQL constraints reported; both `level3_broker_login` and `level3_auditor_login` have `INSERT=false`; table contains **zero** reservation rows. No role grants or production changes were made.
+
+**Not yet proven:** real transaction contention/recovery on this staging instance, Drive upload/download, and an authorised isolated uploader role. Keep the database table inaccessible to broker and auditor logins until a separate least-privilege uploader design is accepted. This schema migration does not pass the release gate by itself.

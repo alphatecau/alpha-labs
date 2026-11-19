@@ -38,3 +38,16 @@ Status: **NO-GO**. This document does not authorise production or broker activat
 ## Acceptance artefacts
 
 Retain: exact folder ID, role/permission snapshot, source payload digest and size, Drive object ID, Drive readback digest and size, reservation transaction record, audit chain head, signed checkpoint, verifier identity, timestamps, and approval decision. Never store tokens or private keys in the artefacts.
+
+
+## Live read-only staging observations (19 November 2026)
+
+- GitHub commit `897f0a4e`: all seven workflows succeeded.
+- Neon project `frosty-river-38771873`, database `level3custody`, branch `br-solitary-hall-a7h0lefq`: existing schema `level3_custody` has `approval_claim`, `audit_event`, and `remote_nonce`; **`drive_upload_reservation` does not exist**. No live reservation test is possible until the separately reviewed migration is applied.
+- Roles `level3_broker_login` and `level3_auditor_login` exist. Auditor has SELECT and not INSERT on those three tables; broker has SELECT and INSERT. These privilege checks do not demonstrate end-to-end tenant isolation.
+- Existing three tables report `relrowsecurity=false` and zero RLS policies. A separate authorisation/isolation design review is required before release.
+- The Neon connector's own SQL session reported `pg_stat_ssl.ssl=false`. This does **not** measure Render-to-Neon TLS and must not be used to pass or fail that specific gate.
+- Render account exposes workspace `Shannon's workspace` (`tea-dbloi19srm7s73f93bgg`), but no workspace was selected for resource inspection. Do not infer Render staging configuration from Neon metadata.
+- No cloud object was created, no production mutation was made, and no signing key was handled.
+
+**Decision:** Release remains NO-GO. Do not set any release gate to true solely on the basis of this document.

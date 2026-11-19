@@ -77,3 +77,22 @@ def sign_and_retain(receipt, signer, store, public_key, previous=None):
     if not store.advance_latest(receipt["audience"], expected, loaded):
         raise CheckpointDenied("concurrent checkpoint advance or stale trusted head")
     return {"key": key, "sha256": hashlib.sha256(recovered).hexdigest(), "signed": loaded}
+
+
+def verify_sign_and_retain(conn, audience, signer, store, public_key):
+    """Full audit-chain verification to signed durable checkpoint, fail-closed.
+
+    The auditor reads the trusted latest receipt from independent storage,
+    verifies its signature before using it as an ancestry constraint, and
+    advances the head only after the new checkpoint's readback succeeds.
+    """
+    latest = store.read_latest(audience)
+    previous = None
+    if latest is not None:
+        if not isinstance(latest, dict) or not isinstance(latest.get("receipt"), dict):
+            raise CheckpointDenied("invalid stored latest checkpoint")
+        previous = latest["receipt"]
+        verify_anchor(latest, public_key, audience,
+                      {k: previous[k] for k in ("count", "last_sequence", "head_hash")})
+    receipt = build_checkpoint(conn, audience, previous=previous)
+    return sign_and_retain(receipt, signer, store, public_key, previous=previous)

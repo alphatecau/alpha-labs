@@ -85,3 +85,8 @@ Remediation proposal (not yet executed): identify inherited role membership and 
 ## Reservation SELECT remediation verified (19 November 2026)
 
 With operator authorisation, ran `REVOKE SELECT ON TABLE level3_custody.drive_upload_reservation FROM level3_broker_login, level3_auditor_login` against **isolated staging only**. Prior ACL was `level3_broker_login=r` and `level3_auditor_login=r`, granted directly by `level3_owner`. Follow-up SQL confirmed reservation SELECT=false for both logins, `audit_event` SELECT=true for both, and reservation INSERT=true for owner. This resolves the specific reservation-token read exposure documented above; it does not establish tenant isolation, uploader integration, or general RLS readiness. Production unchanged.
+
+
+## Isolated uploader database role provisioned (19 November 2026)
+
+Created `level3_drive_uploader` as `NOLOGIN NOINHERIT` on isolated Neon staging and granted schema USAGE and reservation-table SELECT/INSERT/UPDATE only. SQL verified DELETE=false, direct LOGIN=false, and broker/auditor reservation SELECT/INSERT/UPDATE/DELETE all false. This is an intentionally inert privilege role: **no login credentials, role membership, uploader service, Google OAuth write scope or live upload were provisioned**. A separately authenticated executor and real Drive readback remain required. Never treat role creation as custody acceptance.

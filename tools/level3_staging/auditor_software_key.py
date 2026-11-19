@@ -10,6 +10,7 @@ from pathlib import Path
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 
 
@@ -100,7 +101,7 @@ class EncryptedAuditorSigner:
                 b"alpha-labs-level3-auditor-key-v1",
             )
             key = Ed25519PrivateKey.from_private_bytes(raw)
-        except (ValueError, TypeError) as exc:
+        except (ValueError, TypeError, InvalidTag) as exc:
             raise AuditorKeyDenied("invalid passphrase or damaged key") from exc
         signer = cls(key)
         if signer.public_key.hex() != payload["public_key"]:

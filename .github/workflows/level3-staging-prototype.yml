@@ -126,6 +126,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_level3_auditor_staging_workaround.py' -v
       - name: Auditor rclone Drive transport offline tests
         run: python -m unittest discover -s tests -p 'test_level3_auditor_rclone_drive.py' -v
+      - name: Android Neon checkpoint fail-closed entrypoint
+        run: python -m unittest discover -s tests -p 'test_level3_auditor_android_checkpoint.py' -v
       - name: Cloud probe fail-closed HTTP contract
         run: python -m unittest discover -s tests -p 'test_level3_cloud_probe.py' -v
       - name: Broker readiness startup rejection tests

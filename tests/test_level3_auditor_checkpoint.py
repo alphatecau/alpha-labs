@@ -11,6 +11,7 @@ from tools.level3_staging.auditor_checkpoint import (
 class MemoryCreateOnlyStore:
     def __init__(self):
         self.data = {}
+        self.latest = {}
 
     def create_once(self, key, raw):
         if key in self.data:
@@ -19,6 +20,18 @@ class MemoryCreateOnlyStore:
 
     def read(self, key):
         return self.data[key]
+
+    def read_latest(self, audience):
+        return self.latest.get(audience)
+
+    def advance_latest(self, audience, expected, new):
+        current = self.latest.get(audience)
+        if (current is None) != (expected is None):
+            return False
+        if current is not None and current["receipt"] != expected:
+            return False
+        self.latest[audience] = new
+        return True
 
 
 class AuditorCheckpointTests(unittest.TestCase):
@@ -36,6 +49,17 @@ class AuditorCheckpointTests(unittest.TestCase):
         result = sign_and_retain(self.receipt, self.key, self.store, self.public)
         self.assertIn(result["key"], self.store.data)
         self.assertEqual(json.loads(self.store.read(result["key"]))["receipt"], self.receipt)
+
+    def test_stale_head_cannot_advance(self):
+        self.store.latest[self.receipt["audience"]] = {"receipt": {**self.receipt, "head_hash": "b" * 64}}
+        with self.assertRaises(CheckpointDenied):
+            sign_and_retain(self.receipt, self.key, self.store, self.public)
+
+    def test_concurrent_advance_denied(self):
+        self.store.advance_latest = lambda audience, expected, new: False
+        with self.assertRaisesRegex(CheckpointDenied, "concurrent checkpoint"):
+            sign_and_retain(self.receipt, self.key, self.store, self.public)
+        self.assertEqual(len(self.store.data), 1)
 
     def test_wrong_signer_key_denied_before_store(self):
         with self.assertRaises(ValueError):

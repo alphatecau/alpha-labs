@@ -134,6 +134,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_level3_staging_custody_smoke.py' -v
       - name: Auditor checkpoint integrity and tamper regression
         run: python -m unittest discover -s tests -p 'test_level3_auditor_checkpoint_verify.py' -v
+      - name: Interrupted checkpoint recovery and replay denial
+        run: python -m unittest discover -s tests -p 'test_level3_auditor_recovery.py' -v
       - name: Cloud probe fail-closed HTTP contract
         run: python -m unittest discover -s tests -p 'test_level3_cloud_probe.py' -v
       - name: Broker readiness startup rejection tests

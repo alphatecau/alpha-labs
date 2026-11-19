@@ -102,6 +102,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_level3_drive_permission_guard.py' -v
           python -m unittest discover -s tests -p 'test_level3_drive_custody_preflight.py' -v
           python -m unittest discover -s tests -p 'test_level3_drive_upload_reservation.py' -v
+          python -m unittest discover -s tests -p 'test_level3_drive_reservation_schema.py' -v
           python -m unittest discover -s tests -p 'test_level3_drive_reservation_pipeline.py' -v
           python -m unittest discover -s tests -p 'test_level3_custody_manifest.py' -v
           python -m unittest discover -s tests -p 'test_level3_custody_release_gate.py' -v

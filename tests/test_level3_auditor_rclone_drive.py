@@ -14,6 +14,8 @@ class FakeRunner:
         self.calls.append(command)
         action = command[1]
         target = command[2]
+        if action == "mkdir":
+            return subprocess.CompletedProcess(command, 0, b"", b"")
         if action == "lsjson":
             prefix = target.rstrip("/") + "/"
             listing = [{"Name": name[len(prefix):]} for name in self.files

@@ -67,6 +67,36 @@ class DriveUploaderTests(unittest.TestCase):
         with self.assertRaisesRegex(CustodyReadbackDenied, "digest mismatch"):
             upload_and_verify(drive, "folder", b"encrypted-test")
 
+    def test_concurrent_duplicate_after_create_denied(self):
+        class RacingDrive(FakeDrive):
+            def create(self, parent_id, name, payload):
+                created = super().create(parent_id, name, payload)
+                self.objects.append({
+                    "metadata": {"id": "racer", "name": name,
+                                 "parents": [parent_id], "trashed": False},
+                    "payload": payload,
+                })
+                return created
+
+        with self.assertRaisesRegex(CustodyReadbackDenied, "reconciliation"):
+            upload_and_verify(RacingDrive(), "folder", b"encrypted-test")
+
+    def test_identity_changed_after_create_denied(self):
+        class ReplacingDrive(FakeDrive):
+            def __init__(self):
+                super().__init__()
+                self.lookups = 0
+
+            def find_by_name(self, parent_id, name):
+                self.lookups += 1
+                matches = super().find_by_name(parent_id, name)
+                if self.lookups == 2 and matches:
+                    return [{**matches[0], "id": "replaced"}]
+                return matches
+
+        with self.assertRaisesRegex(CustodyReadbackDenied, "identity changed"):
+            upload_and_verify(ReplacingDrive(), "folder", b"encrypted-test")
+
     def test_bad_parent_denied(self):
         with self.assertRaises(CustodyReadbackDenied):
             upload_and_verify(FakeDrive(), "", b"x")

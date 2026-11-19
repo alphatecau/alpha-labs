@@ -26,6 +26,8 @@ def verify_independent_custody(metadata, auditor_email, primary_email, folder_id
         raise ValueError("missing primary account")
     if auditor_email.lower() == primary_email.lower():
         raise ValueError("auditor and primary identities must differ")
+    if roles.get(auditor_email.lower()) != "owner":
+        raise ValueError("auditor must have explicit owner permission")
     if roles.get(primary_email.lower()) != "reader":
         raise ValueError("primary account must have reader-only access")
     if len(roles) != len(permissions) or set(roles) != {

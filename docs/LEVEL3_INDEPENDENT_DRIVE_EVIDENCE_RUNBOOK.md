@@ -51,3 +51,16 @@ Retain: exact folder ID, role/permission snapshot, source payload digest and siz
 - No cloud object was created, no production mutation was made, and no signing key was handled.
 
 **Decision:** Release remains NO-GO. Do not set any release gate to true solely on the basis of this document.
+
+
+## Render workspace verification (19 November 2026)
+
+User explicitly authorised operations in Render workspace `Shannon's workspace` (`tea-dbloi19srm7s73f93bgg`). Read-only inventory confirmed:
+
+- `alpha-labs-level3-broker-probe`, service `srv-dbus2ve1egvs73ehtp50`, Singapore, free plan, manual deployment, branch `research/level3-signed-staging-followup-20261118`, latest deployment `e22fe58d3eaf00b2a0b7aeb5966dbe9a61d5eca8` marked live.
+- `alpha-labs`, service `srv-dbop6f3bc2fs73cqfksg`, Singapore, free plan, manual deployment, branch `research/render-safe-staging-entry-20261109`, latest deployment `0c129c6f09b9859b4464086bc97fd7f6215f9d49` marked live.
+- Both services have public inbound allowlist `0.0.0.0/0`. This is network reachability, not proof that signed-write operations are exposed. Restrict network access only after confirming a viable health-check and operator access path.
+- The deployed Level 3 probe source implements GET `/healthz` (200) and GET `/readyz` (503, independent custody not configured); other GET routes return 404, POST returns 405. These are **source-code expectations**, not independently verified live HTTP responses.
+- No Render environment values, database credentials, or live Render-to-Neon TLS handshake were inspected. Neither staging nor production is cleared.
+
+GitHub commit `a6ecd6fa`: seven workflows successful. Preserve auto-deploy off until evidence and operator approval are complete.

@@ -31,6 +31,7 @@ def main():
         role = conn.execute("SELECT current_user").fetchone()[0]
         if role != "level3_broker_login":
             raise SystemExit("BLOCKED: expected dedicated level3_broker_login role")
+        verify_audit_chain(conn)
         with conn.transaction():
             claimed = claim_with_audit(conn, remote_nonce, nonce, path, digest, str(uuid.uuid4()))
             completed = complete_with_audit(conn, nonce, path, digest, str(uuid.uuid4()))

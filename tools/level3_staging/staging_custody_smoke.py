@@ -24,6 +24,10 @@ def main():
     digest = hashlib.sha256(("level3-staging-custody-smoke-v1:" + nonce).encode()).hexdigest()
     path = "tests/level3-staging/synthetic_custody_smoke.txt"
     with psycopg.connect(dsn, autocommit=True, connect_timeout=10) as conn:
+        conn.execute("SET statement_timeout = '15s'")
+        db = conn.execute("SELECT current_database()").fetchone()[0]
+        if db != "level3custody":
+            raise SystemExit("BLOCKED: expected isolated level3custody database")
         role = conn.execute("SELECT current_user").fetchone()[0]
         if role != "level3_broker_login":
             raise SystemExit("BLOCKED: expected dedicated level3_broker_login role")

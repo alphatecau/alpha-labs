@@ -60,7 +60,7 @@ class PaperCommitBoundaryTests(unittest.TestCase):
     def test_tampered_identity_schema_is_rejected_and_writer_lock_released(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "forged.sqlite3"
-            with sqlite3.connect(path) as connection:
+            with closing(sqlite3.connect(path)) as connection, connection:
                 connection.execute("CREATE TABLE events(seq INTEGER PRIMARY KEY, previous_hash TEXT NOT NULL, payload TEXT NOT NULL, digest TEXT NOT NULL, order_id TEXT GENERATED ALWAYS AS (NULL) VIRTUAL)")
             for _ in range(2):
                 with self.assertRaisesRegex(ValueError, "generated order identity"):
@@ -224,7 +224,7 @@ class PaperCommitBoundaryTests(unittest.TestCase):
             path = Path(directory) / "old.sqlite3"
             payload = '{"type":"TEST","order_id":"legacy_unique_order_0001"}'
             digest = sha256(("0" * 64 + payload).encode()).hexdigest()
-            with sqlite3.connect(path) as connection:
+            with closing(sqlite3.connect(path)) as connection, connection:
                 connection.execute("CREATE TABLE events(seq INTEGER PRIMARY KEY, previous_hash TEXT NOT NULL, payload TEXT NOT NULL, digest TEXT NOT NULL)")
                 connection.execute("INSERT INTO events VALUES(1,?,?,?)", ("0" * 64, payload, digest))
             journal = PaperJournal(path)

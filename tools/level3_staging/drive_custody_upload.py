@@ -16,7 +16,7 @@ from tools.level3_staging.drive_readback import (
 def _check_file(record, parent_id, name):
     if not isinstance(record, dict):
         raise CustodyReadbackDenied("invalid Drive file record")
-    if (not isinstance(record.get("id"), str) or not record["id"]
+    if (not isinstance(record.get("id"), str) or not 1 <= len(record["id"]) <= 256
             or record.get("name") != name
             or record.get("parents") != [parent_id]
             or record.get("trashed") is not False):
@@ -30,7 +30,7 @@ def upload_and_verify(adapter, parent_id, payload):
     A retry after an ambiguous upload must find exactly one matching object.
     Duplicate names are never accepted as proof of conditional creation.
     """
-    if not isinstance(parent_id, str) or not parent_id:
+    if not isinstance(parent_id, str) or not 1 <= len(parent_id) <= 256:
         raise CustodyReadbackDenied("invalid parent folder")
     if not isinstance(payload, bytes):
         raise CustodyReadbackDenied("payload must be bytes")

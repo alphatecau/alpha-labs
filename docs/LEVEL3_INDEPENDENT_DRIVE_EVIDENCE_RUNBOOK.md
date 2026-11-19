@@ -90,3 +90,14 @@ With operator authorisation, ran `REVOKE SELECT ON TABLE level3_custody.drive_up
 ## Isolated uploader database role provisioned (19 November 2026)
 
 Created `level3_drive_uploader` as `NOLOGIN NOINHERIT` on isolated Neon staging and granted schema USAGE and reservation-table SELECT/INSERT/UPDATE only. SQL verified DELETE=false, direct LOGIN=false, and broker/auditor reservation SELECT/INSERT/UPDATE/DELETE all false. This is an intentionally inert privilege role: **no login credentials, role membership, uploader service, Google OAuth write scope or live upload were provisioned**. A separately authenticated executor and real Drive readback remain required. Never treat role creation as custody acceptance.
+
+
+## First real synthetic Google Drive upload/readback (19 November 2026)
+
+**Verified manual connector acceptance, not automated reservation-pipeline acceptance.**
+- Auditor-connected account: `alpha.tec.au869@gmail.com`; destination folder ID `118pwq_VOAGeeS1NOTXmoA4ZVEx4AcMo6`.
+- Source: auditor-owned native Google Doc `1-IJOXiA1_Bsp46TDY5unXTgRyfwWYJ1HGwIOa7drKcY`, populated with synthetic non-sensitive text and exported as `text/plain` to an actual connector `file_uri`.
+- Uploaded binary object: `15mDOH5xv7qmQQc5_ytlp366OuvAKRx6d`, filename `10b89e6dd56e29b4922682afd3132d8d364e871022d665a17b75547dc29d303a.bin`, 102 bytes; https://drive.google.com/file/d/15mDOH5xv7qmQQc5_ytlp366OuvAKRx6d/view.
+- Independently downloaded the uploaded object through the auditor-connected Drive fetch API with raw-file streaming. The downloaded file was 102 bytes, SHA-256 `10b89e6dd56e29b4922682afd3132d8d364e871022d665a17b75547dc29d303a`; original source file SHA-256 identical; local byte-for-byte `cmp` exit status 0.
+- The connector handoff used a real exported `sediment://file_...` reference accepted by `upload_file`; this resolves the previous missing-file-reference blocker.
+- **Unverified**: reservation-before-upload DB lifecycle, concurrency/ambiguous-retry controls, signed external checkpoint, independent credential and service automation, full chain and Android acceptance. Do not mark the full `drive_upload_readback` production gate true solely from this manual synthetic test.

@@ -80,3 +80,8 @@ Read-only post-migration queries verified: table exists, owned by `level3_owner`
 Follow-up SQL against isolated Neon staging showed that `level3_broker_login` and `level3_auditor_login` each have effective `SELECT` on `level3_custody.drive_upload_reservation`, despite having `INSERT=false`. The table stores `owner_token`; unrestricted reads could expose reservation ownership material. No RLS policies were returned for any `level3_custody` table. **Treat this as a least-privilege blocker, not proof of cross-tenant exploitability.**
 
 Remediation proposal (not yet executed): identify inherited role membership and default privileges, then remove unnecessary reservation SELECT from both login roles without disturbing their existing audit-table reads. Verify `has_table_privilege(...,'SELECT')=false` for both identities and exercise a separately scoped uploader identity before activation. Do not publish tokens or connection strings. The prior note only verified INSERT=false; it did not verify SELECT=false.
+
+
+## Reservation SELECT remediation verified (19 November 2026)
+
+With operator authorisation, ran `REVOKE SELECT ON TABLE level3_custody.drive_upload_reservation FROM level3_broker_login, level3_auditor_login` against **isolated staging only**. Prior ACL was `level3_broker_login=r` and `level3_auditor_login=r`, granted directly by `level3_owner`. Follow-up SQL confirmed reservation SELECT=false for both logins, `audit_event` SELECT=true for both, and reservation INSERT=true for owner. This resolves the specific reservation-token read exposure documented above; it does not establish tenant isolation, uploader integration, or general RLS readiness. Production unchanged.

@@ -7,6 +7,12 @@ on:
   pull_request:
     paths:
       - 'tools/level3_staging/**'
+      - 'tests/test_level3_drive_*.py'
+      - 'tests/test_level3_custody_*.py'
+      - 'tests/test_level3_audit_checkpoint_policy.py'
+      - 'docs/LEVEL3_DRIVE_RESERVATION_STAGING.sql'
+      - 'docs/LEVEL3_CUSTODY_ACCEPTANCE_MATRIX.md'
+      - 'docs/LEVEL3_GOOGLE_OAUTH_RECOVERY.md'
       - 'tests/test_level3_staging_write.py'
       - 'tests/test_level3_mcp_proposals.py'
       - 'tests/test_level3_approval_ledger.py'
@@ -88,6 +94,15 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_level3_anchor_continuity.py' -v
       - name: Signed broker safety gate checks
         run: python -m unittest discover -s tests -p 'test_level3_signed_broker_pipeline.py' -v
+      - name: Drive custody, reservation, and independent audit policy tests
+        run: |
+          python -m unittest discover -s tests -p 'test_level3_drive_readback.py' -v
+          python -m unittest discover -s tests -p 'test_level3_drive_custody_upload.py' -v
+          python -m unittest discover -s tests -p 'test_level3_drive_permission_guard.py' -v
+          python -m unittest discover -s tests -p 'test_level3_drive_upload_reservation.py' -v
+          python -m unittest discover -s tests -p 'test_level3_custody_manifest.py' -v
+          python -m unittest discover -s tests -p 'test_level3_custody_release_gate.py' -v
+          python -m unittest discover -s tests -p 'test_level3_audit_checkpoint_policy.py' -v
       - name: Cloud probe fail-closed HTTP contract
         run: python -m unittest discover -s tests -p 'test_level3_cloud_probe.py' -v
       - name: Broker readiness startup rejection tests

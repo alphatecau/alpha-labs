@@ -91,3 +91,16 @@ class ReservationTests(unittest.TestCase):
     def test_missing_reservation_denied(self):
         with self.assertRaises(UploadReservationDenied):
             complete_reservation(self.conn, "folder", self.digest, self.owner, "file")
+
+    def test_invalid_file_ids_denied(self):
+        reserve(self.conn, "folder", self.digest, self.owner)
+        for file_id in ("", "x" * 257, None):
+            with self.subTest(file_id=file_id):
+                with self.assertRaises(UploadReservationDenied):
+                    complete_reservation(self.conn, "folder", self.digest, self.owner, file_id)
+
+    def test_invalid_parent_ids_denied(self):
+        for parent in ("", "x" * 257, None):
+            with self.subTest(parent=parent):
+                with self.assertRaises(UploadReservationDenied):
+                    reserve(self.conn, parent, self.digest, self.owner)

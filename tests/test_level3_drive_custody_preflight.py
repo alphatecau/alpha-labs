@@ -26,6 +26,12 @@ class CustodyPreflightTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             verify_independent_custody(folder(), AUDITOR, PRIMARY, "other")
 
+    def test_auditor_reader_denied(self):
+        data = folder()
+        data["permissions"][0]["role"] = "reader"
+        with self.assertRaisesRegex(ValueError, "explicit owner"):
+            verify_independent_custody(data, AUDITOR, PRIMARY, FOLDER)
+
     def test_primary_writer_denied(self):
         data = folder()
         data["permissions"][1]["role"] = "writer"

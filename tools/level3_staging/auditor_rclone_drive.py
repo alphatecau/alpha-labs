@@ -34,7 +34,7 @@ class RcloneAuditorDrive:
 
     def _target(self, name):
         if not isinstance(name, str) or not re.fullmatch(
-            r"level3-checkpoints/alpha-labs-level3_[A-Za-z0-9_-]+/[0-9]{20}-[0-9a-f]{64}\\.json",
+            r"level3-checkpoints/alpha-labs-level3_[A-Za-z0-9_-]+/[0-9]{20}-[0-9a-f]{64}\.json",
             name,
         ):
             raise RcloneDriveDenied("invalid checkpoint name")

@@ -48,6 +48,8 @@ def inspect_recovery(local_store, drive, key, audience, public_key):
     if latest is None:
         state = "unanchored_candidate_manual_review"
     else:
+        if not isinstance(latest, dict) or not isinstance(latest.get("receipt"), dict):
+            raise RecoveryDenied("invalid trusted latest checkpoint")
         verify_anchor(latest, public_key, audience, latest["receipt"])
         if latest == candidate:
             state = "already_committed"

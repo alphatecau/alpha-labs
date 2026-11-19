@@ -15,6 +15,14 @@ CREATE TABLE IF NOT EXISTS level3_custody.drive_upload_reservation (
 );
 -- Explicitly remove inherited/default SELECT grants on this sensitive table.
 -- The reservation owner token must not be visible to broker/auditor logins.
-REVOKE SELECT ON TABLE level3_custody.drive_upload_reservation
-    FROM level3_broker_login, level3_auditor_login;
+DO $level3_revoke$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'level3_broker_login') THEN
+        REVOKE SELECT ON TABLE level3_custody.drive_upload_reservation FROM level3_broker_login;
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'level3_auditor_login') THEN
+        REVOKE SELECT ON TABLE level3_custody.drive_upload_reservation FROM level3_auditor_login;
+    END IF;
+END
+$level3_revoke$;
 -- No GRANT statements: a separately reviewed uploader identity is required.

@@ -1,0 +1,28 @@
+name: Level 3 Drive custody contract
+on:
+  push:
+    branches:
+      - research/level3-drive-custody-adapter-20261119
+  pull_request:
+    paths:
+      - 'tools/level3_staging/drive_custody.py'
+      - 'tests/test_level3_drive_custody.py'
+      - 'tools/level3_staging/drive_http.py'
+      - 'tests/test_level3_drive_http.py'
+      - '.github/workflows/level3-drive-custody-contract.yml'
+permissions:
+  contents: read
+jobs:
+  offline-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile custody adapter
+        run: python -m py_compile tools/level3_staging/drive_custody.py tests/test_level3_drive_custody.py tools/level3_staging/drive_http.py tests/test_level3_drive_http.py
+      - name: Run offline integrity and failure tests
+        run: |
+          python -m unittest discover -s tests -p 'test_level3_drive_custody.py' -v
+          python -m unittest discover -s tests -p 'test_level3_drive_http.py' -v

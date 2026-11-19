@@ -39,3 +39,22 @@ class PermissionGuardTests(unittest.TestCase):
         self.folder.pop("permissions")
         with self.assertRaises(DrivePermissionDenied):
             verify_auditor_folder(self.folder, "auditor@example.com")
+
+    def test_nonstring_owner_identity_denied(self):
+        self.folder["owners"][0]["emailAddress"] = None
+        with self.assertRaises(DrivePermissionDenied):
+            verify_auditor_folder(self.folder, "auditor@example.com")
+
+    def test_nonstring_permission_identity_denied(self):
+        self.folder["permissions"][0]["emailAddress"] = None
+        with self.assertRaises(DrivePermissionDenied):
+            verify_auditor_folder(self.folder, "auditor@example.com")
+
+    def test_empty_auditor_identity_denied(self):
+        with self.assertRaises(DrivePermissionDenied):
+            verify_auditor_folder(self.folder, "")
+
+    def test_missing_reader_identity_denied(self):
+        self.folder["permissions"][1].pop("emailAddress")
+        with self.assertRaises(DrivePermissionDenied):
+            verify_auditor_folder(self.folder, "auditor@example.com")

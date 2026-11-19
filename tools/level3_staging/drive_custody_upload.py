@@ -49,6 +49,14 @@ def upload_and_verify(adapter, parent_id, payload):
             # Do not retry writes blindly: fail closed and reconcile on next run.
             raise CustodyReadbackDenied("ambiguous upload; reconcile before retry") from None
         file_id = _check_file(created, parent_id, name)
-    # Re-query after creation/recovery to detect visible concurrent duplicates.\n    # This is detection, NOT atomic create-if-absent: eventual consistency\n    # and a concurrent writer can still race after this observation.\n    final_matches = adapter.find_by_name(parent_id, name)\n    if not isinstance(final_matches, list) or len(final_matches) != 1:\n        raise CustodyReadbackDenied("post-upload identity reconciliation failed")\n    if _check_file(final_matches[0], parent_id, name) != file_id:\n        raise CustodyReadbackDenied("post-upload file identity changed")\n    downloaded = adapter.download(file_id)
+    # Re-query after creation/recovery to detect visible concurrent duplicates.
+    # This is detection, NOT atomic create-if-absent: eventual consistency
+    # and a concurrent writer can still race after this observation.
+    final_matches = adapter.find_by_name(parent_id, name)
+    if not isinstance(final_matches, list) or len(final_matches) != 1:
+        raise CustodyReadbackDenied("post-upload identity reconciliation failed")
+    if _check_file(final_matches[0], parent_id, name) != file_id:
+        raise CustodyReadbackDenied("post-upload file identity changed")
+    downloaded = adapter.download(file_id)
     result = verify_drive_readback(digest, payload, downloaded)
     return {"file_id": file_id, "parent_id": parent_id, "name": name, **result}

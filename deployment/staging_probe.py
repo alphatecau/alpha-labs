@@ -51,8 +51,8 @@ def application(environ, start_response):
 
 
 if __name__ == "__main__":
-    # Render supplies PORT. An isolated local run can bind to loopback and port zero.
-    host = os.environ.get("ALPHA_RESEARCH_BIND", "0.0.0.0")  # nosec B104: Render ingress
+    # Render requires a wildcard listener behind its TLS ingress. Local runs use loopback.
+    host = "0.0.0.0" if os.environ.get("RENDER") == "true" else "127.0.0.1"  # nosec B104
     with make_server(host, int(os.environ.get("PORT", "10000")), application) as server:
         print(f"Research HTTP port {server.server_port}", flush=True)
         server.serve_forever()

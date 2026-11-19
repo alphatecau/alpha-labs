@@ -2,8 +2,8 @@ import json
 import os
 import secrets
 import unittest
-from tempfile import TemporaryDirectory
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from deployment import staging_probe as api

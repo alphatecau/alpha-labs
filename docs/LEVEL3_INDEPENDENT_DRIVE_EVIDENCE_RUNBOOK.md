@@ -73,3 +73,10 @@ On Neon project `frosty-river-38771873`, branch `br-solitary-hall-a7h0lefq`, dat
 Read-only post-migration queries verified: table exists, owned by `level3_owner`; 12 PostgreSQL constraints reported; both `level3_broker_login` and `level3_auditor_login` have `INSERT=false`; table contains **zero** reservation rows. No role grants or production changes were made.
 
 **Not yet proven:** real transaction contention/recovery on this staging instance, Drive upload/download, and an authorised isolated uploader role. Keep the database table inaccessible to broker and auditor logins until a separate least-privilege uploader design is accepted. This schema migration does not pass the release gate by itself.
+
+
+## Security finding: inherited reservation SELECT (19 November 2026)
+
+Follow-up SQL against isolated Neon staging showed that `level3_broker_login` and `level3_auditor_login` each have effective `SELECT` on `level3_custody.drive_upload_reservation`, despite having `INSERT=false`. The table stores `owner_token`; unrestricted reads could expose reservation ownership material. No RLS policies were returned for any `level3_custody` table. **Treat this as a least-privilege blocker, not proof of cross-tenant exploitability.**
+
+Remediation proposal (not yet executed): identify inherited role membership and default privileges, then remove unnecessary reservation SELECT from both login roles without disturbing their existing audit-table reads. Verify `has_table_privilege(...,'SELECT')=false` for both identities and exercise a separately scoped uploader identity before activation. Do not publish tokens or connection strings. The prior note only verified INSERT=false; it did not verify SELECT=false.

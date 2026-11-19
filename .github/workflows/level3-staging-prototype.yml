@@ -11,6 +11,8 @@ on:
       - 'tests/test_level3_custody_*.py'
       - 'tests/test_level3_audit_checkpoint_policy.py'
       - 'tests/test_level3_checkpoint_advance.py'
+      - 'tests/test_level3_auditor_checkpoint.py'
+      - 'tools/level3_staging/auditor_checkpoint.py'
       - 'docs/LEVEL3_DRIVE_RESERVATION_STAGING.sql'
       - 'docs/LEVEL3_CUSTODY_ACCEPTANCE_MATRIX.md'
       - 'docs/LEVEL3_GOOGLE_OAUTH_RECOVERY.md'
@@ -108,6 +110,8 @@ jobs:
           python -m unittest discover -s tests -p 'test_level3_custody_release_gate.py' -v
           python -m unittest discover -s tests -p 'test_level3_audit_checkpoint_policy.py' -v
           python -m unittest discover -s tests -p 'test_level3_checkpoint_advance.py' -v
+      - name: Auditor checkpoint cryptographic and retention protocol
+        run: python -m unittest discover -s tests -p 'test_level3_auditor_checkpoint.py' -v
       - name: Cloud probe fail-closed HTTP contract
         run: python -m unittest discover -s tests -p 'test_level3_cloud_probe.py' -v
       - name: Broker readiness startup rejection tests

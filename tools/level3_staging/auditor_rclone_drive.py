@@ -47,6 +47,7 @@ class RcloneAuditorDrive:
         # Root folder ID is pinned; no path traversal or parent-directory access.
         options = ["--drive-root-folder-id", self.folder]
         parent, basename = name.rsplit("/", 1)
+        self._run("mkdir", f"{self.remote}:/{parent}", *options)
         listing = self._run("lsjson", f"{self.remote}:/{parent}", *options)
         existing = json.loads(listing)
         if any(entry.get("Name") == basename for entry in existing):

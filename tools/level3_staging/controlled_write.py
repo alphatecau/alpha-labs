@@ -76,8 +76,27 @@ def apply(root, relative, content, approval_file, audit_file, now=None):
     consumed = approval_file.with_name(approval_file.name + ".consumed")
     if consumed.exists():
         raise Refused("consumed record already exists")
-    os.link(approval_file, consumed, follow_symlinks=False)
+    # Android/Termux may not expose os.link(). Reserve the consumed record
+    # exclusively, persist its contents, then remove the original approval.
+    # Any interrupted operation leaves a consumed marker and fails closed.
     try:
+        consumed_fd = os.open(
+            consumed, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600
+        )
+    except FileExistsError as exc:
+        raise Refused("consumed record already exists") from exc
+    try:
+        with os.fdopen(consumed_fd, "wb") as stream:
+            stream.write(approval_file.read_bytes())
+            stream.flush()
+            os.fsync(stream.fileno())
+        consumed_dir_fd = os.open(
+            approval_file.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+        )
+        try:
+            os.fsync(consumed_dir_fd)
+        finally:
+            os.close(consumed_dir_fd)
         approval_file.unlink()
         dfd = os.open(approval_file.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
         try:

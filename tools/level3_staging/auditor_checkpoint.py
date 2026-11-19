@@ -45,10 +45,12 @@ def sign_and_retain(receipt, signer, store, public_key, previous=None):
 
     signer.sign(data) must be backed by independently controlled persistent KMS.
     store.create_once(key, bytes) must reject overwrites; store.read(key) must
-    return the exact durable bytes. No automatic retries after ambiguous writes.
+    return the exact durable bytes. store.advance_latest must be an atomic CAS. No automatic retries after ambiguous writes.
     """
     if not isinstance(receipt, dict):
         raise CheckpointDenied("invalid receipt")
+    if previous is None and store.read_latest(receipt["audience"]) is not None:
+        raise CheckpointDenied("existing checkpoint requires trusted previous head")
     if previous is not None:
         if verify_continuity(previous, receipt) == "unchanged":
             raise CheckpointDenied("duplicate checkpoint")
@@ -69,4 +71,9 @@ def sign_and_retain(receipt, signer, store, public_key, previous=None):
     loaded = json.loads(recovered)
     verify_anchor(loaded, public_key, receipt["audience"],
                   {k: receipt[k] for k in ("count", "last_sequence", "head_hash")})
+    # Atomic compare-and-swap prevents two writers from advancing the same head.
+    # Failure leaves a durable orphan object for explicit auditor reconciliation.
+    expected = None if previous is None else previous
+    if not store.advance_latest(receipt["audience"], expected, loaded):
+        raise CheckpointDenied("concurrent checkpoint advance or stale trusted head")
     return {"key": key, "sha256": hashlib.sha256(recovered).hexdigest(), "signed": loaded}

@@ -164,3 +164,4 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_level3_postgres_integration.py' -v
           python -m unittest discover -s tests -p 'test_level3_drive_reservation_postgres_integration.py' -v
+          python -m unittest discover -s tests -p 'test_level3_drive_pipeline_postgres_e2e.py' -v

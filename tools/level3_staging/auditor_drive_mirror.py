@@ -6,6 +6,8 @@ No broker credentials are accepted. Drive is mutable; local trusted head
 remains authoritative. A successful mirror is NOT WORM retention.
 """
 import hashlib
+import json
+import re
 
 
 class MirrorDenied(ValueError):
@@ -17,7 +19,7 @@ class DriveCheckpointMirror:
         self.transport = transport
 
     def retain_and_verify(self, key, raw):
-        if not isinstance(raw, bytes) or not key.startswith("level3-checkpoints/"):
+        if not isinstance(raw, bytes) or not re.fullmatch(r"level3-checkpoints/alpha-labs-level3_[A-Za-z0-9_-]+/[0-9]{20}-[0-9a-f]{64}\.json", key):
             raise MirrorDenied("invalid checkpoint")
         file_id = self.transport.create_once(key, raw)
         if not isinstance(file_id, str) or not file_id:
@@ -47,12 +49,20 @@ class MirroredAuditorStore:
         return self.local_store.read(key)
 
     def advance_latest(self, audience, expected, new):
-        # Acknowledgement requires a mirrored, readback-verified checkpoint
-        # from this process, not merely a pre-existing local object.
-        import hashlib
-        import json
+        # Require evidence for this exact signed object, not another object
+        # with coincidentally matching bytes or a stale prior operation.
+        if not isinstance(new, dict) or not isinstance(new.get("receipt"), dict):
+            raise MirrorDenied("invalid signed checkpoint")
+        receipt = new["receipt"]
+        if receipt.get("audience") != audience:
+            raise MirrorDenied("checkpoint audience mismatch")
         raw = json.dumps(new, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
         digest = hashlib.sha256(raw).hexdigest()
-        if not any(item["sha256"] == digest for item in self._pending.values()):
+        key = (f"level3-checkpoints/{audience.replace(':', '_')}/"
+               f"{receipt['last_sequence']:020d}-{digest}.json")
+        if self._pending.get(key, {}).get("sha256") != digest:
             raise MirrorDenied("checkpoint has no verified external mirror")
-        return self.local_store.advance_latest(audience, expected, new)
+        advanced = self.local_store.advance_latest(audience, expected, new)
+        if advanced:
+            self._pending.pop(key, None)
+        return advanced

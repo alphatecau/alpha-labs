@@ -27,7 +27,9 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     port=int(os.environ.get("PORT","10000"))
-    ThreadingHTTPServer(("0.0.0.0",port),Handler).serve_forever()
+    # Only the hosted read-only probe listens on Render's ingress interface.
+    host = "0.0.0.0" if os.environ.get("RENDER") == "true" else "127.0.0.1"  # nosec B104
+    ThreadingHTTPServer((host,port),Handler).serve_forever()
 
 if __name__=="__main__":
     main()

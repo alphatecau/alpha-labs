@@ -122,13 +122,13 @@ class IntegratedAuth0BFFTests(unittest.TestCase):
             self.flow, self.controller, self.sessions, reader, origin=self.origin,
             authorize_owner=lambda owner: owner in self.active)
 
-    def request(self, path, *, method="GET", cookie="", query="", origin=None):
+    def request(self, path, *, method="GET", cookie="", query="", origin=None, accept=""):
         response = {}
         def start(status, headers):
             response["status"] = int(status.split()[0])
             response["headers"] = headers
         env = {"PATH_INFO": path, "REQUEST_METHOD": method, "HTTP_COOKIE": cookie,
-               "QUERY_STRING": query}
+               "QUERY_STRING": query, "HTTP_ACCEPT": accept}
         if origin is not None:
             env["HTTP_ORIGIN"] = origin
         response["body"] = b"".join(self.app(env, start))
@@ -167,6 +167,25 @@ class IntegratedAuth0BFFTests(unittest.TestCase):
         self.assertEqual(self.request("/auth/logout", method="POST", cookie=sid,
                                       origin=self.origin)["status"], 204)
         self.assertNotEqual(self.request("/api/v1/research/runs", cookie=sid)["status"], 200)
+
+    def test_browser_landing_dashboard_and_logout(self):
+        entry = self.request("/dashboard")
+        self.assertEqual((entry["status"], dict(entry["headers"])["Location"]), (303, "/auth/login"))
+        _, _, sid = self.login()
+        for path in ("/", "/dashboard"):
+            page = self.request(path, cookie=sid)
+            self.assertEqual(page["status"], 200)
+            self.assertIn(b"run-a", page["body"])
+            self.assertIn(b'action="/auth/logout"', page["body"])
+            self.assertEqual(dict(page["headers"])["Cache-Control"], "no-store")
+            self.assertNotIn(sid.encode(), page["body"])
+        logout = self.request("/auth/logout", method="POST", cookie=sid, origin=self.origin, accept="text/html")
+        dest = urlsplit(dict(logout["headers"])["Location"])
+        self.assertEqual((logout["status"], dest.netloc, dest.path), (303, "auth.example", "/v2/logout"))
+        self.assertEqual(parse_qs(dest.query)["returnTo"], [self.origin + "/signed-out"])
+        self.assertIn("Max-Age=0", dict(logout["headers"])["Set-Cookie"])
+        self.assertEqual(self.request("/dashboard", cookie=sid)["status"], 403)
+        self.assertIn(b"Your Alpha Labs session has ended", self.request("/signed-out")["body"])
 
     def test_missing_cookie_and_deprovisioned_owner_denied(self):
         self.assertEqual(self.request("/api/v1/research/runs")["status"], 401)

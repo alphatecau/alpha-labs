@@ -2,6 +2,10 @@ name: Auth0 integrated BFF disposable acceptance
 on:
   pull_request:
     paths:
+      - 'deployment/staging_authenticated_bff.py'
+      - 'deployment/research_dashboard.py'
+      - 'packages/alpha_lab/src/alpha_lab/research/paper_account_service.py'
+      - 'packages/alpha_lab/src/alpha_lab/research/postgres_paper_security.py'
       - 'tests/integration/test_auth0_integrated_bff.py'
       - '.github/workflows/auth0-integrated-bff.yml'
   workflow_dispatch:
@@ -29,6 +33,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'psycopg[binary]>=3.2,<4'
+      - run: python -m pip install . 'psycopg[binary]>=3.2,<4'
       - name: Integrated Auth0 login and research BFF acceptance
         run: PYTHONPATH=. python -m unittest discover -s tests/integration -p 'test_auth0_integrated_bff.py' -v

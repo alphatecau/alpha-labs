@@ -93,5 +93,12 @@ def application(environ, start_response):
     if _app is None:
         with _lock:
             if _app is None:
-                _app = build_isolated_app()
+                try:
+                    _app = build_isolated_app()
+                except Exception:
+                    body = b'{"error":"research_auth_unavailable"}'
+                    start_response("503 Service Unavailable", [
+                        ("Content-Type", "application/json"), ("Content-Length", str(len(body))),
+                        ("Cache-Control", "no-store"), ("X-Content-Type-Options", "nosniff")])
+                    return [body]
     return _app(environ, start_response)

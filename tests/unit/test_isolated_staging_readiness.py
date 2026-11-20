@@ -69,8 +69,12 @@ class IsolatedStagingReadinessTests(unittest.TestCase):
             previous = isolated_auth0_wsgi._app
             isolated_auth0_wsgi._app = None
             try:
-                with self.assertRaises(PermissionError):
-                    isolated_auth0_wsgi.application({"PATH_INFO": "/healthz"}, lambda *args: None)
+                responses = []
+                body = b"".join(isolated_auth0_wsgi.application(
+                    {"PATH_INFO": "/healthz"}, lambda status, headers: responses.append(status)))
+                self.assertEqual(responses, ["503 Service Unavailable"])
+                self.assertEqual(body, b'{"error":"research_auth_unavailable"}')
+                self.assertIsNone(isolated_auth0_wsgi._app)
             finally:
                 isolated_auth0_wsgi._app = previous
 

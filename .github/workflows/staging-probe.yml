@@ -1,0 +1,23 @@
+name: Staging health-only probe (research only)
+on:
+  push:
+    branches:
+      - "research/render-safe-staging-entry-*"
+  pull_request:
+    paths:
+      - "deployment/staging_probe.py"
+      - "tests/unit/test_staging_probe.py"
+      - ".github/workflows/staging-probe.yml"
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run isolated WSGI probe tests
+        run: python -m unittest discover -s tests/unit -p 'test_staging_probe.py' -v

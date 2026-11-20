@@ -36,7 +36,7 @@ The portable dashboard in this repository has a mobile-first research view at `/
 
 ## Hosted Alpha Labs Site and research API
 
-The [hosted Site](https://alpha-labs-intelligence.alpha-tec-au86.chatgpt.site) has its own Sites source repository. The integration prepared in Site version 5 uses a same-origin GET to `/api/v1/research/results`. The Site Worker calls that one route on the existing Render staging service, checks its Git revision and report digest, and returns selected historical metrics. The source is the [reproduction audit](docs/evidence/2026-11-05_REPRODUCTION_AUDIT.json) for the unsealed EMA(12,48) test window. Each report revision fixes the input digest in Python. The portfolio, private account research and paper controls have separate access requirements.
+The [hosted Site](https://alpha-labs-intelligence.alpha-tec-au86.chatgpt.site) has its own Sites source repository. The published dashboard uses a same-origin GET to `/api/v1/research/results`. The Site Worker calls that one route on the existing Render staging service, checks its Git revision and report digest, and returns selected historical metrics. The source is the [reproduction audit](docs/evidence/2026-11-05_REPRODUCTION_AUDIT.json) for the unsealed EMA(12,48) test window. Each report revision fixes the input digest in Python. The portfolio, private account research and paper controls have separate access requirements.
 
 The staging entry point is `python deployment/staging_probe.py`. Render supplies `PORT` and `RENDER_GIT_COMMIT`. Set `ALPHA_RESEARCH_TOKEN_EXPIRES_AT` on Render to a future Unix timestamp in seconds and rotate the shared credential before expiry. Store a dedicated random 32-byte lowercase hex value as `ALPHA_RESEARCH_TOKEN` in the Render and Site secret stores. Set `ALPHA_RESEARCH_EXPECTED_COMMIT` on the Site to the full deployed backend commit. Keep credentials out of client code. The service exposes health and authenticated report reads only. An unavailable file, mismatched digest or missing configuration makes the report unavailable.
 
@@ -44,29 +44,32 @@ Keep Render auto-deploy off during acceptance. The deployed staging entry point 
 
 ### Acceptance record (20 November 2026)
 
-Site version 5 is saved from `369f44fe0f6417ec7ffc0b719ed9d4ee406c786c`.
-Its two-file deployment archive has SHA-256
-`c68df133aba256d524b50360796cc3fc0ff29ad60c93324f219835dbfe4d8bd6`.
-Version 4 is the published baseline. The free Render service `alpha-labs`
-(`srv-dbop6f3bc2fs73cqfksg`) uses manual deployments from
-`research/render-safe-staging-entry-20261109`. Its live revision
-`0c129c6f09b9859b4464086bc97fd7f6215f9d49` returned 200 on
-`/healthz` and 404 on the research route. A request to the published
-Site's research route from the test environment returned HTTP 403 at the edge.
+Site version 7 (source `1cbbe8509099a07369fb671308d20dd605d624b1`) was
+published in deployment `appgdep_6b0008fa6bf481919cf279089e2407f4`.
+Its Worker uses manual redirect handling, rejects non-200 upstream responses
+and verifies the digest before rendering results. The free Render service
+`alpha-labs` (`srv-dbop6f3bc2fs73cqfksg`) serves release
+`91ce4ad54fb93956f4001df0b88e533dd59dcb85` from its existing deployment
+branch. The entry point and evidence bytes match [PR #185](https://github.com/alphatecau/alpha-labs/pull/185).
 
-Chromium exercised the built Site Worker and a loopback Python WSGI server
-using a temporary credential and a test transport mapping the fixed upstream
-origin to loopback. At widths 320, 390 and 1440 px the cards matched the
-unsealed audit's BTC, ETH and SOL strategy returns (−11.01%, −0.71% and
-−7.35%) and passive returns. A failed request left the cards empty.
+The deployed health check returned HTTP 200 with trading disabled. Missing and
+incorrect bearers returned 401. The authenticated response returned 200 and
+matched all 13,608 audit bytes, with SHA-256
+`e1f03b0caf41e86d90ba582465ab038a93ce9be09669adce3b4fac8692c3e06f`.
+The research service returned 404 on the paper order path.
 
-For hosted acceptance, select the reviewed backend revision on the existing
-service, retain the current start command, keep automatic deploys off, and
-configure the server-side settings above. Require 401 without a bearer and
-200 with the correct bearer. Hash the response body and check both revision and
-digest headers before publishing the saved Site. Confirm the same three cards
-and review timestamp from the hosted browser. Restore Site version 4 and the
-recorded Render revision if acceptance fails.
+Through Sites service access, the published research relay returned 200 and the
+expected Render revision. Chromium rendered the hosted page, scripts and relay
+response using a TLS-verified test transport with the Site credential confined
+to its own origin. At 320, 390 and 1440 pixels, all cards matched the source
+strategy and passive returns and the audit timestamp. Modelled strategy returns
+were −11.01% BTC, −0.71% ETH and −7.35% SOL. The unauthenticated cloud test
+client received an edge 403. This check did not exercise a signed-in owner session.
+
+Rotate the shared credential before 20 December 2026 at 08:37 UTC. After
+rotation, check health, denial without credentials and exact bytes with the new
+credential, then verify the hosted Site relay. Version 4 and Render commit
+`0c129c6f09b9859b4464086bc97fd7f6215f9d49` are the pre-integration rollback points.
 
 The local paper terminal and its crash recovery are covered by the unit suite.
 The public research endpoint cannot serve personal portfolios or accept orders.

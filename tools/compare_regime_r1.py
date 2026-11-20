@@ -1,6 +1,5 @@
 """Research-only comparison on explicitly supplied development CSV. Refuses reserved holdout."""
 import argparse
-import hashlib
 import json
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -19,20 +18,18 @@ def compare(path, quote, provenance):
     bars = dataset.bars
     if any(RESERVED_START <= b.time < RESERVED_END for b in bars):
         raise ValueError("reserved prospective holdout cannot be accessed")
-    if len(bars) < 1000:
-        raise ValueError("R1 requires >=1000 completed candles for comparison")
-    closes = [b.close for b in bars]
-    candidates = {"EMA_12_48_FROZEN": ema_signal(closes), "R1_PREREGISTERED": r1_signal(closes)}
     # Development-only: first 70% for training, final 30% descriptive unsealed.
     split = int(len(bars) * Decimal("0.70"))
     folds = {"development_training": (769, split), "development_unsealed": (split, len(bars))}
-    if split <= 770:
+    if split <= 769:
         raise ValueError("insufficient training after R1 warmup")
-    out = {"dataset_sha256": dataset.sha256, "quote": quote, "provenance_unverified": provenance,
+    closes = [b.close for b in bars]
+    candidates = {"EMA_12_48_FROZEN": ema_signal(closes), "R1_PREREGISTERED": r1_signal(closes)}
+    out = {"dataset_sha256": dataset.sha256, "quote": dataset.quote_currency, "provenance_unverified": provenance,
            "independently_sealed": False, "candidate_profitability_verified": False, "folds": {}}
     for fold, (start, end) in folds.items():
         out["folds"][fold] = {}
-        for costs_name, costs in [("reference", CostModel()), ("double_cost", CostModel(Decimal(20), Decimal(20)))]:
+        for costs_name, costs in [("reference", CostModel()), ("double_cost", CostModel().twice())]:
             scores = {}
             for name, signal in candidates.items():
                 result = replay(bars, signal, start, end, costs=costs)
@@ -55,4 +52,7 @@ if __name__ == "__main__":
     output = Path(a.output)
     if output.resolve() == Path(a.csv).resolve():
         p.error("cannot overwrite input")
-    output.write_text(json.dumps(compare(a.csv, a.quote, a.provenance), indent=2, sort_keys=True) + "\n")
+    report = compare(a.csv, a.quote, a.provenance)
+    with output.open("x", encoding="utf-8") as stream:
+        json.dump(report, stream, indent=2, sort_keys=True)
+        stream.write("\n")

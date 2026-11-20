@@ -38,4 +38,4 @@ backfill of this window is authorised by this document.
 ## Blockers
 No independently sealed evaluation, no verified execution-quality historical
 bid/ask observations, no venue fee calibration, no demonstrated R1 performance.
-Candidate implementation, replay parity and walk-forward evaluation remain pending.
+The comparator implements the registered signal. Independent walk-forward evaluation and prospective custody remain pending.

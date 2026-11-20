@@ -1,6 +1,7 @@
 import json
 import os
 import secrets
+import time
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -13,7 +14,8 @@ class SiteResearchResultsTests(unittest.TestCase):
     def setUp(self):
         self.token = secrets.token_hex(32)
         self.commit = "a" * 40
-        self.enterContext(patch.dict(os.environ, ALPHA_RESEARCH_TOKEN=self.token, RENDER_GIT_COMMIT=self.commit))
+        self.enterContext(patch.dict(os.environ, ALPHA_RESEARCH_TOKEN=self.token, RENDER_GIT_COMMIT=self.commit,
+                                     ALPHA_RESEARCH_TOKEN_EXPIRES_AT=str(int(time.time()) + 60)))
 
     def request(self, path=api.RESULTS_PATH, method="GET", query="", auth=""):
         meta = {}
@@ -48,6 +50,11 @@ class SiteResearchResultsTests(unittest.TestCase):
             self.assertEqual(self.request(auth=value)[0], "401")
         for name in ["RENDER_GIT_COMMIT", "ALPHA_RESEARCH_TOKEN"]:
             with patch.dict(os.environ, {name: ""}):
+                self.assertEqual(self.request(auth="Bearer " + self.token)[0], "503")
+
+    def test_expiry_is_required_and_enforced(self):
+        for expiry in ("", "invalid", "0", "100", "99999999999"):
+            with self.subTest(expiry=expiry), patch.dict(os.environ, ALPHA_RESEARCH_TOKEN_EXPIRES_AT=expiry):
                 self.assertEqual(self.request(auth="Bearer " + self.token)[0], "503")
 
     def test_unavailable_or_modified_evidence(self):

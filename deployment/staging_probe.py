@@ -5,6 +5,7 @@ import hmac
 import json
 import os
 import re
+import time
 from pathlib import Path
 from wsgiref.simple_server import make_server
 
@@ -35,6 +36,9 @@ def application(environ, start_response):
     commit = os.environ.get("RENDER_GIT_COMMIT", "")
     if not re.fullmatch("[a-f0-9]{64}", token) or not re.fullmatch("[a-f0-9]{40}", commit):
         return reply("503 Service Unavailable", {"error": "research_unconfigured"})
+    expiry = os.environ.get("ALPHA_RESEARCH_TOKEN_EXPIRES_AT", "")
+    if not re.fullmatch("[1-9][0-9]{0,9}", expiry) or int(expiry) <= time.time():
+        return reply("503 Service Unavailable", {"error": "research_credential_unavailable"})
     supplied = environ.get("HTTP_AUTHORIZATION", "").encode()
     if not hmac.compare_digest(supplied, f"Bearer {token}".encode()):
         return reply("401 Unauthorized", {"error": "unauthorised"}, [("WWW-Authenticate", "Bearer")])

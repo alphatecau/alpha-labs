@@ -12,7 +12,6 @@ import os
 from pathlib import Path
 import re
 import sys
-import tempfile
 from urllib.request import Request, urlopen
 
 REPO = "alphatecau/alpha-labs"
@@ -67,6 +66,14 @@ def install(root, commit, relative, expected_sha, fetcher=fetch):
         for fd in reversed(directory_fds):
             os.close(fd)
 
+def audit_result(root, result):
+    try:
+        from .github_staging_audit import record
+    except ImportError:
+        from github_staging_audit import record
+    record(root, result["status"], "completed", result["commit"], result["path"],
+           result.get("old_sha256"), result.get("new_sha256", result.get("sha256")))
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", default=str(Path.home() / "termux-level3-staging"))
@@ -80,7 +87,9 @@ def main():
         print("EXPECTED SHA-256:", args.sha256)
         if input("Type INSTALL to create this staging file: ").strip() != "INSTALL":
             raise ValueError("operator declined")
-        print(json.dumps(install(args.root, args.commit, args.path, args.sha256), sort_keys=True))
+        result = install(args.root, args.commit, args.path, args.sha256)
+        audit_result(args.root, result)
+        print(json.dumps(result, sort_keys=True))
     except (ValueError, OSError) as exc:
         print(f"DENIED: {exc}", file=sys.stderr)
         return 1

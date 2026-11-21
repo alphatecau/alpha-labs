@@ -10,7 +10,6 @@ import json
 import os
 from pathlib import Path
 import sys
-import tempfile
 
 try:
     from .github_pinned_install import ALLOWED, SHA, DIGEST, MAX_BYTES, fetch
@@ -85,6 +84,14 @@ def update(root, commit, relative, old_sha, new_sha, fetcher=fetch):
         for fd in reversed(fds):
             os.close(fd)
 
+def audit_result(root, result):
+    try:
+        from .github_staging_audit import record
+    except ImportError:
+        from github_staging_audit import record
+    record(root, result["status"], "completed", result["commit"], result["path"],
+           result.get("old_sha256"), result.get("new_sha256", result.get("sha256")))
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", default=str(Path.home() / "termux-level3-staging"))
@@ -98,7 +105,9 @@ def main():
                           "old_sha256": a.old_sha256, "new_sha256": a.new_sha256}, indent=2))
         if input("Type UPDATE to replace this staging file: ").strip() != "UPDATE":
             raise ValueError("operator declined")
-        print(json.dumps(update(a.root, a.commit, a.path, a.old_sha256, a.new_sha256)))
+        result = update(a.root, a.commit, a.path, a.old_sha256, a.new_sha256)
+        audit_result(a.root, result)
+        print(json.dumps(result))
     except (ValueError, OSError) as exc:
         print(f"DENIED: {exc}", file=sys.stderr)
         return 1

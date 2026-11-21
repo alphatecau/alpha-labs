@@ -1,13 +1,13 @@
 """Read-only Level 3 audit reconciliation tests."""
 import hashlib
 import importlib.util
+import sys
 from pathlib import Path
 import tempfile
 import unittest
 
 TOOLS = Path(__file__).resolve().parents[1] / "tools/level3_staging"
 spec = importlib.util.spec_from_file_location("github_staging_reconcile", TOOLS / "github_staging_reconcile.py")
-import sys
 sys.path.insert(0, str(TOOLS))
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)

@@ -69,7 +69,9 @@ class StagingResearchBFF:
             return reply("302 Found", headers=[("Location", url), ("Set-Cookie", cookie)])
         if path == "/auth/callback" and method == "GET":
             params = parse_qs(env.get("QUERY_STRING", ""), keep_blank_values=True)
-            if set(params) != {"code", "state"} or any(len(v) != 1 for v in params.values()):
+            if (set(params) not in ({"code", "state"}, {"code", "state", "iss"}) or
+                    any(len(v) != 1 for v in params.values()) or
+                    ("iss" in params and params["iss"][0] != self.flow.issuer)):
                 return reply("401 Unauthorized")
             state_cookie = self._cookie(env, "__Host-alpha_oauth_state")
             state = params["state"][0]

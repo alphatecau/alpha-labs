@@ -1,9 +1,8 @@
 """Best-effort local audit journal for manually approved Level 3 staging operations.
 
 This log is not tamper-proof against other processes with the same Android UID.
-Entries are fsynced and include a hash chain to detect accidental alteration.
+Entries are fsynced, but are not independently tamper-evident.
 """
-import hashlib
 import json
 import os
 from pathlib import Path

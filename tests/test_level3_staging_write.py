@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 from tools.level3_staging.controlled_write import Refused, apply, digest, propose
 
 class TestStagingWrite(unittest.TestCase):
@@ -35,6 +36,31 @@ class TestStagingWrite(unittest.TestCase):
         apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
         with self.assertRaises((Refused, FileNotFoundError)):
             apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+
+    def test_android_atomic_create_and_replay(self):
+        self.approve()
+        with mock.patch.object(os, "link", create=True):
+            # Force the Android code path even on CPython builds with os.link.
+            with mock.patch("tools.level3_staging.controlled_write.hasattr",
+                            side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key)):
+                apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+        self.assertEqual((self.root / self.path).read_text(), "hello")
+        self.assertFalse(self.approval.exists())
+        self.assertTrue(Path(str(self.approval) + ".consumed").exists())
+        with self.assertRaises((Refused, FileNotFoundError)):
+            apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+
+    def test_android_atomic_no_replace(self):
+        self.approve()
+        consumed = Path(str(self.approval) + ".consumed")
+        consumed.write_text("prior")
+        with mock.patch("tools.level3_staging.controlled_write.hasattr",
+                        side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key)):
+            with self.assertRaises(Refused):
+                apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+        self.assertEqual(consumed.read_text(), "prior")
+        self.assertTrue(self.approval.exists())
+        self.assertFalse((self.root / self.path).exists())
 
     def test_traversal(self):
         with self.assertRaises(Refused):

@@ -3,6 +3,7 @@ import json
 import unittest
 from unittest.mock import Mock
 
+from deployment.paper_site import RelayBudget
 from deployment.staging_authenticated_bff import StagingResearchBFF
 
 OWNER = "oidc_" + "a" * 64
@@ -22,6 +23,8 @@ def make_app(*, reader=None, owner=OWNER, authorised=True):
     app.sessions.resolve_owner.return_value = owner
     app.authorize_owner = lambda value: authorised
     app.paper_reader = reader
+    app.paper_budget = RelayBudget()
+    app.revision = "a" * 40
     return app
 
 
@@ -32,7 +35,7 @@ class PaperRelayTests(unittest.TestCase):
 
     def test_unverified_identity_refused(self):
         status, _ = request(make_app(reader=Mock(), owner="unknown"))
-        self.assertEqual(status, "403 Forbidden")
+        self.assertEqual(status, "401 Unauthorized")
 
     def test_revoked_ownership_refused(self):
         reader = Mock()

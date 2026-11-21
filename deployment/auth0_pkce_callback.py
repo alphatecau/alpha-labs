@@ -34,8 +34,8 @@ class Auth0PKCEFlow:
         self.state_store = state_store
         self.clock = clock
 
-    def begin(self):
-        state = secrets.token_urlsafe(32)
+    def begin(self, *, for_site=False):
+        state = ("site." if for_site else "") + secrets.token_urlsafe(32)
         verifier = secrets.token_urlsafe(64)
         nonce = secrets.token_urlsafe(32)
         # The store must implement atomic, expiring, one-time consume.
@@ -48,6 +48,10 @@ class Auth0PKCEFlow:
             "code_challenge": _b64(hashlib.sha256(verifier.encode()).digest()),
         }
         return self.issuer + "authorize?" + urlencode(params)
+
+
+class ResearchAccountNotProvisioned(PermissionError):
+    """The provider verified the identity but research access is absent."""
 
 
 class Auth0CallbackController:
@@ -78,6 +82,6 @@ class Auth0CallbackController:
             raise PermissionError("missing ID token")
         principal = self.token_verifier.verify(tokens["id_token"], expected_nonce=nonce)
         if self.authorise_principal(principal) is not True:
-            raise PermissionError("unprovisioned identity")
+            raise ResearchAccountNotProvisioned("unprovisioned identity")
         sid = self.sessions.create(principal.subject, principal.issuer)
         return "__Host-alpha_session=" + sid + "; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=1800"

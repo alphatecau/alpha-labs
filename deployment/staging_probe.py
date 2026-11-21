@@ -10,8 +10,11 @@ from pathlib import Path
 from wsgiref.simple_server import make_server
 
 RESULTS_PATH = "/api/v1/research/results"
+ECONOMICS_PATH = "/api/v1/research/economics"
 AUDIT = Path(__file__).resolve().parents[1] / "docs/evidence/2026-11-05_REPRODUCTION_AUDIT.json"
 AUDIT_SHA256 = "e1f03b0caf41e86d90ba582465ab038a93ce9be09669adce3b4fac8692c3e06f"
+ECONOMICS = AUDIT.with_name("2026-11-21_DASHBOARD_ECONOMICS.json")
+ECONOMICS_SHA256 = "6cf236a6013bacfe07ff393bc2f828a220ef34cdbdec35ca9558ebbbe1321ee7"
 
 
 def application(environ, start_response):
@@ -27,7 +30,7 @@ def application(environ, start_response):
     method = environ.get("REQUEST_METHOD")
     if path == "/healthz" and method == "GET":
         return reply("200 OK", {"status": "ok", "mode": "research_only", "trading": "disabled"})
-    if path != RESULTS_PATH or environ.get("QUERY_STRING"):
+    if path not in (RESULTS_PATH, ECONOMICS_PATH) or environ.get("QUERY_STRING"):
         return reply("404 Not Found", {"error": "unavailable"})
     if method != "GET":
         return reply("405 Method Not Allowed", {"error": "method_not_allowed"}, [("Allow", "GET")])
@@ -43,14 +46,15 @@ def application(environ, start_response):
     if not hmac.compare_digest(supplied, f"Bearer {token}".encode()):
         return reply("401 Unauthorized", {"error": "unauthorised"}, [("WWW-Authenticate", "Bearer")])
 
+    source, digest = (AUDIT, AUDIT_SHA256) if path == RESULTS_PATH else (ECONOMICS, ECONOMICS_SHA256)
     try:
-        evidence = AUDIT.read_bytes()
+        evidence = source.read_bytes()
     except OSError:
         return reply("503 Service Unavailable", {"error": "evidence_unavailable"})
-    if hashlib.sha256(evidence).hexdigest() != AUDIT_SHA256:
+    if hashlib.sha256(evidence).hexdigest() != digest:
         return reply("503 Service Unavailable", {"error": "evidence_unverified"})
     return reply("200 OK", evidence, [
-        ("X-Alpha-Research-Commit", commit), ("X-Alpha-Evidence-SHA256", AUDIT_SHA256),
+        ("X-Alpha-Research-Commit", commit), ("X-Alpha-Evidence-SHA256", digest),
     ])
 
 

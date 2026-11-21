@@ -8,7 +8,12 @@ import unittest
 
 TOOLS = Path(__file__).resolve().parents[1] / "tools/level3_staging"
 sys.path.insert(0, str(TOOLS))
-from github_pinned_update import update
+import importlib.util
+
+spec = importlib.util.spec_from_file_location("github_pinned_update", TOOLS / "github_pinned_update.py")
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+update = module.update
 
 COMMIT = "a" * 40
 PATH = "docs/level3-staging/approved.md"

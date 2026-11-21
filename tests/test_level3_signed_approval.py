@@ -3,7 +3,6 @@ import base64
 import hashlib
 import importlib.util
 from pathlib import Path
-import sys
 import unittest
 
 TOOLS = Path(__file__).resolve().parents[1] / "tools/level3_staging"

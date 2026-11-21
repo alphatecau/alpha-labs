@@ -160,6 +160,12 @@ class RoleIsolationTests(unittest.TestCase):
         self.assertEqual(status, "200 OK")
         self.assertEqual([r["run_id"] for r in json.loads(body)["data"]["provenance"]["records"]], ["test-1"])
         self.assertEqual(request(tokens[2]), ("403 Forbidden", b""))
+        for index in (0, 1):
+            status, page = request(tokens[index], PATH_INFO="/dashboard")
+            self.assertEqual(status, "200 OK")
+            self.assertIn(f"test-{index}".encode(), page)
+            self.assertNotIn(f"test-{1-index}".encode(), page)
+        self.assertEqual(request(tokens[2], PATH_INFO="/dashboard")[0], "403 Forbidden")
         self.assertEqual(request("x" * 48, HTTP_X_OWNER_ID=self.a), ("403 Forbidden", b""))
 
         self.admin.execute("ALTER TABLE public.alpha_role_research RENAME TO alpha_unavailable")
@@ -177,6 +183,9 @@ class RoleIsolationTests(unittest.TestCase):
         self.assertEqual(request(tokens[0]), ("403 Forbidden", b""))
         now += timedelta(minutes=31)
         self.assertEqual(request(tokens[1], "summary"), ("403 Forbidden", b""))
+        status, page = request(tokens[1], PATH_INFO="/dashboard")
+        self.assertEqual(status, "403 Forbidden")
+        self.assertNotIn(b"test-1", page)
 
 
 if __name__ == "__main__":

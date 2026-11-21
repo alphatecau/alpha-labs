@@ -4,10 +4,12 @@ Not deployed by this commit. All values are server-side environment variables.
 The existing health-only Render service must not point at this entrypoint.
 """
 import json
+import logging
 import os
 import threading
 from urllib.parse import urlsplit
 
+from deployment.research_dashboard import access_message
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.isolated_auth0_role_audit import audit_runtime_roles
 from deployment.tenant_credential_broker import TenantCredentialBroker
@@ -70,7 +72,24 @@ def build_isolated_app(env=None, *, pg_connect=None):
             raise PermissionError("tenant not provisioned")
         return credentials[owner]
 
-    reader = AccountRoleResearchReader(TenantCredentialBroker(secret_for, pg_connect))
+    broker = TenantCredentialBroker(secret_for, pg_connect)
+    # Optional operator preflight on the isolated service. It reads no account data.
+    probe_owner = config.get("ALPHA_STAGING_VERIFY_READER")
+    if probe_owner:
+        try:
+            with broker(probe_owner):
+                pass
+        except Exception as exc:
+            # Never log connection strings, passwords, account identifiers or raw exceptions.
+            known_causes = ("certificate", "password authentication", "timeout", "hostname",
+                            "read-only", "tenant table policy", "database identity", "not provisioned",
+                            "invalid tenant credential", "connection refused")
+            cause = next((label for label in known_causes if label in str(exc).lower()), "unknown")
+            logging.getLogger(__name__).error("staging_reader_check failed type=%s sqlstate=%s cause=%s",
+                                             type(exc).__name__, getattr(exc, "sqlstate", None), cause)
+        else:
+            logging.getLogger("gunicorn.error").info("staging_reader_check passed")
+    reader = AccountRoleResearchReader(broker)
     from deployment.auth0_staging_composition import compose_auth0_staging
     return compose_auth0_staging(
         issuer=config["AUTH0_ISSUER"],
@@ -93,5 +112,21 @@ def application(environ, start_response):
     if _app is None:
         with _lock:
             if _app is None:
-                _app = build_isolated_app()
+                try:
+                    _app = build_isolated_app()
+                except Exception:
+                    body = b'{"error":"research_auth_unavailable"}'
+                    content_type = "application/json"
+                    if (environ.get("REQUEST_METHOD") == "GET"
+                            and environ.get("PATH_INFO") in ("/", "/dashboard", "/auth/login", "/auth/callback")
+                            and "text/html" in environ.get("HTTP_ACCEPT", "")):
+                        body = access_message("Sign-in temporarily unavailable",
+                                              "Your research account could not be opened. Please try again later.")
+                        content_type = "text/html; charset=utf-8"
+                    start_response("503 Service Unavailable", [
+                        ("Content-Type", content_type), ("Content-Length", str(len(body))),
+                        ("Cache-Control", "no-store"), ("Referrer-Policy", "no-referrer"),
+                        ("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'"),
+                        ("X-Content-Type-Options", "nosniff")])
+                    return [body]
     return _app(environ, start_response)

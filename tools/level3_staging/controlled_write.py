@@ -1,4 +1,6 @@
 """Level 3 staging-only file creation prototype. NOT safe to expose as a network MCP server."""
+import ctypes
+import errno
 import hashlib
 import json
 import os
@@ -49,6 +51,39 @@ def propose(root, relative, content):
     finally:
         os.close(fd)
 
+def _consume_approval(approval_file, consumed):
+    """Atomically claim approval without replacing an existing consumed record."""
+    if hasattr(os, "link"):
+        os.link(approval_file, consumed, follow_symlinks=False)
+        try:
+            approval_file.unlink()
+        except BaseException as exc:
+            raise Refused("approval consumption incomplete; manual inspection required") from exc
+    else:
+        # Android/Termux Python may omit os.link. Linux renameat2 with
+        # RENAME_NOREPLACE is atomic and refuses an existing destination.
+        try:
+            libc = ctypes.CDLL(None, use_errno=True)
+            renameat2 = libc.renameat2
+        except (AttributeError, OSError) as exc:
+            raise Refused("atomic approval consumption unavailable") from exc
+        renameat2.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
+        renameat2.restype = ctypes.c_int
+        at_fdcwd = -100
+        if renameat2(at_fdcwd, os.fsencode(approval_file),
+                     at_fdcwd, os.fsencode(consumed), 1) != 0:
+            error = ctypes.get_errno()
+            raise Refused("atomic approval consumption refused") from OSError(error, os.strerror(error))
+    try:
+        dfd = os.open(approval_file.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            os.fsync(dfd)
+        finally:
+            os.close(dfd)
+    except BaseException as exc:
+        raise Refused("approval consumption incomplete; manual inspection required") from exc
+
+
 def apply(root, relative, content, approval_file, audit_file, now=None):
     """Offline proof of concept. Approval ledger and audit are NOT production-hardened."""
     proposal = propose(root, relative, content)
@@ -76,16 +111,7 @@ def apply(root, relative, content, approval_file, audit_file, now=None):
     consumed = approval_file.with_name(approval_file.name + ".consumed")
     if consumed.exists():
         raise Refused("consumed record already exists")
-    os.link(approval_file, consumed, follow_symlinks=False)
-    try:
-        approval_file.unlink()
-        dfd = os.open(approval_file.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-        try:
-            os.fsync(dfd)
-        finally:
-            os.close(dfd)
-    except BaseException:
-        raise Refused("approval consumption incomplete; manual inspection required")
+    _consume_approval(approval_file, consumed)
     fd, name = _directory(root, relative)
     try:
         out = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600, dir_fd=fd)

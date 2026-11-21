@@ -1,33 +1,30 @@
 # GitHub-mediated Level 3: Android staging acceptance
 
-Status: **development only**. No direct MCP write tool is enabled. Existing Level 2 tunnel and adapter remain unchanged.
+Status: **core create/update acceptance PASSED; security and operational acceptance PENDING**. No direct MCP write tool is enabled.
 
 ## Design and trust boundary
 
-- The operator reviews a GitHub pull request, identifies an immutable **full 40-character commit SHA**, and independently verifies the expected SHA-256 of the exact file.
-- An operator-run Termux CLI fetches the pinned file from GitHub, checks its digest and allowlisted relative path, and requires an explicit confirmation word.
-- Creation is exclusive (never overwrite). Updating requires both expected old and new SHA-256 and rechecks the target before replacement.
-- Both commands are limited to `docs/level3-staging/[A-Za-z0-9_-]+.md` and `tests/level3-staging/[A-Za-z0-9_-]+.txt`, at most 32 KiB.
-- GitHub PR approval **is not independently verified by these scripts**. A full commit SHA and content digest alone do not prove human review. The operator must check them outside the untrusted worker.
-- A compromised process under the same Android UID can potentially tamper with staging files, the installer, or local confirmations. These scripts do **not** establish independent security isolation.
-- No arbitrary shell commands, trading operations, GitHub token access or production writes are provided.
+- The operator independently reviews the GitHub file at an immutable full 40-character commit SHA and verifies its SHA-256.
+- An operator-run Termux CLI fetches the pinned file, checks its digest and allowlisted path, and requires an explicit confirmation.
+- Creation is exclusive (no overwrite). Updating checks old and new SHA-256, refusing stale changes.
+- Allowed: `docs/level3-staging/[A-Za-z0-9_-]+.md` and `tests/level3-staging/[A-Za-z0-9_-]+.txt`, max 32 KiB.
+- **A commit SHA does not prove GitHub PR approval**. The installer does not query or cryptographically attest to PR approval. A compromised same-UID Android process can potentially tamper with files or approval prompts; no independent security boundary exists.
+- The installer currently has no durable audit log, rollback journal or automatic crash reconciliation.
+- No arbitrary shell commands, trading operations, credentials, or production writes are provided.
 
-## Android acceptance (operator's existing third Termux session only)
+## Verified on Android (operator-provided Termux output, 2026-11-21)
 
-1. Keep the existing first and second Termux sessions running.
-2. Fetch these three files from a reviewed **pinned commit**, into `~/termux-level3-source/tools/level3_staging` and `~/termux-level3-source/tests` respectively:
-   - `tools/level3_staging/github_pinned_install.py`
-   - `tools/level3_staging/github_pinned_update.py`
-   - `tests/test_level3_github_pinned_install.py`
-   - `tests/test_level3_github_pinned_update.py`
-3. Run `python -m unittest discover -s tests -p 'test_level3_github_pinned_*.py' -v`. Expected: **14 tests**. This is an expectation, not an observed result.
-4. Verify Level 2 adapter is still listening on `127.0.0.1:8765` and all three existing read tools work.
-5. For real create/update, independently inspect the target file in the reviewed GitHub commit, verify the content SHA-256, and run the CLI with `--commit`, `--path`, `--sha256` for create, or `--old-sha256` and `--new-sha256` for update.
-6. Do not use the current installer to update code or any non-staging workspace. Do not enable direct MCP write tools.
+- Downloaded both installers and both test modules from pinned commit `d3dd284287748b420c25477df25f2e97e1b3414a`.
+- `python -m unittest discover -s tests -p 'test_level3_github_pinned_*.py' -v` reported **14 tests passed** in 0.136 seconds.
+- Created `docs/level3-staging/github_acceptance.md` from pinned commit `bab50e39520231047e133e4a1240a5538d1bf7e4`, after explicit `INSTALL`. Reported SHA-256 `90411fd66d43e62b6348676094b2173c89ae055778c18b4235d79c37a45b61ed`; result `status: created`.
+- Updated the same staging file from pinned commit `5a77f94c244cd336807811bfd0d88834ebb9dbef`, after explicit `UPDATE`. New reported SHA-256 `7fbe05567fcc7266ed24061e0c5fa13a296210cbcdd7f5ab96266e5902b9e7b7`; result `status: updated`.
+- Repeated the identical update: **`DENIED: existing file changed: update refused`**. This confirms optimistic-concurrency replay rejection, not a cryptographic nonce-replay guarantee.
+- Existing Level 2 adapter had previously been verified listening on `127.0.0.1:8765`; no restart or configuration changes requested during this sequence.
 
 ## Remaining before operational acceptance
 
-- Run tests on actual Android and perform one approved create and one approved update with verified hashes.
-- Add durable append-only audit/reconciliation and a rollback/recovery procedure.
-- Confirm GitHub review status using a separate trusted channel; verify commit identity, not just branch names.
-- Design independently held approval credentials before any direct MCP write exposure.
+1. Durable append-only audit and reconciliation of interrupted operations.
+2. Documented backup and rollback with independent content-hash verification.
+3. Independent GitHub review/approval verification (or explicitly maintain the operator-trusted manual mode).
+4. Independent authorisation and key custody before direct MCP write exposure.
+5. Re-run regression and end-to-end acceptance after security changes.

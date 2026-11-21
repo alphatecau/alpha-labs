@@ -14,6 +14,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment import research_dashboard
+from deployment.auth0_pkce_callback import ResearchAccountNotProvisioned
 
 
 class StagingResearchBFF:
@@ -49,6 +50,13 @@ class StagingResearchBFF:
             start_response(status, base + list(headers))
             return [data]
 
+        def login_error(status, headers=()):
+            if "text/html" in env.get("HTTP_ACCEPT", ""):
+                return reply(status, research_dashboard.access_message(
+                    "Sign-in could not be completed",
+                    "Try signing in again with your provisioned research account."), headers, html=True)
+            return reply(status, headers=headers)
+
         path, method = env.get("PATH_INFO", ""), env.get("REQUEST_METHOD", "")
         if path == "/dashboard.css" and method == "GET":
             return reply("200 OK", research_dashboard.CSS, [("Content-Type", "text/css; charset=utf-8")])
@@ -63,7 +71,7 @@ class StagingResearchBFF:
                 params = parse_qs(urlsplit(url).query)
                 state = params["state"][0]
             except Exception:
-                return reply("503 Service Unavailable")
+                return login_error("503 Service Unavailable")
             # Bind the single-use server-side state to the initiating browser.
             cookie = "__Host-alpha_oauth_state=" + state + "; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=300"
             return reply("302 Found", headers=[("Location", url), ("Set-Cookie", cookie)])
@@ -72,15 +80,23 @@ class StagingResearchBFF:
             if (set(params) not in ({"code", "state"}, {"code", "state", "iss"}) or
                     any(len(v) != 1 for v in params.values()) or
                     ("iss" in params and params["iss"][0] != self.flow.issuer)):
-                return reply("401 Unauthorized")
+                return login_error("401 Unauthorized")
             state_cookie = self._cookie(env, "__Host-alpha_oauth_state")
             state = params["state"][0]
             if not state_cookie or not hmac.compare_digest(state_cookie.encode(), state.encode()):
-                return reply("401 Unauthorized")
+                return login_error("401 Unauthorized")
             try:
                 session_cookie = self.controller.complete(state, params["code"][0])
+            except ResearchAccountNotProvisioned:
+                headers = [("Set-Cookie", self._clear_state())]
+                if "text/html" in env.get("HTTP_ACCEPT", ""):
+                    return reply("403 Forbidden", research_dashboard.access_message(
+                        "Research access required",
+                        "Sign-in succeeded. Ask your administrator to provision your research account."),
+                        headers, html=True)
+                return reply("403 Forbidden", headers=headers)
             except Exception:
-                return reply("401 Unauthorized", headers=[("Set-Cookie", self._clear_state())])
+                return login_error("401 Unauthorized", headers=[("Set-Cookie", self._clear_state())])
             return reply("303 See Other", headers=[
                 ("Location", self.origin + "/"),
                 ("Set-Cookie", self._clear_state()),

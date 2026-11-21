@@ -78,6 +78,21 @@ class IsolatedStagingReadinessTests(unittest.TestCase):
             finally:
                 isolated_auth0_wsgi._app = previous
 
+    def test_login_outage_shows_recovery_link_without_issuing_session(self):
+        from deployment import isolated_auth0_wsgi as service
+        captured = {}
+        def start(status, headers):
+            captured.update(status=status, headers=dict(headers))
+        with patch.object(service, "_app", None), patch.dict("os.environ", {}, clear=True):
+            body = b"".join(service.application({
+                "REQUEST_METHOD": "GET", "PATH_INFO": "/auth/login", "HTTP_ACCEPT": "text/html",
+            }, start))
+        self.assertEqual(captured["status"], "503 Service Unavailable")
+        self.assertIn("text/html", captured["headers"]["Content-Type"])
+        self.assertNotIn("Set-Cookie", captured["headers"])
+        self.assertIn(b"Sign-in temporarily unavailable", body)
+        self.assertIn(b'href="/auth/login"', body)
+
     def test_bff_health_is_research_only(self):
         class NoReader:
             pass

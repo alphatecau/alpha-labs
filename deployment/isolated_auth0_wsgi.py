@@ -8,6 +8,7 @@ import os
 import threading
 from urllib.parse import urlsplit
 
+from deployment.research_dashboard import access_message
 from deployment.account_role_research_reader import AccountRoleResearchReader
 from deployment.isolated_auth0_role_audit import audit_runtime_roles
 from deployment.tenant_credential_broker import TenantCredentialBroker
@@ -97,8 +98,17 @@ def application(environ, start_response):
                     _app = build_isolated_app()
                 except Exception:
                     body = b'{"error":"research_auth_unavailable"}'
+                    content_type = "application/json"
+                    if (environ.get("REQUEST_METHOD") == "GET"
+                            and environ.get("PATH_INFO") in ("/", "/dashboard", "/auth/login", "/auth/callback")
+                            and "text/html" in environ.get("HTTP_ACCEPT", "")):
+                        body = access_message("Sign-in temporarily unavailable",
+                                              "Your research account could not be opened. Please try again later.")
+                        content_type = "text/html; charset=utf-8"
                     start_response("503 Service Unavailable", [
-                        ("Content-Type", "application/json"), ("Content-Length", str(len(body))),
-                        ("Cache-Control", "no-store"), ("X-Content-Type-Options", "nosniff")])
+                        ("Content-Type", content_type), ("Content-Length", str(len(body))),
+                        ("Cache-Control", "no-store"), ("Referrer-Policy", "no-referrer"),
+                        ("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'"),
+                        ("X-Content-Type-Options", "nosniff")])
                     return [body]
     return _app(environ, start_response)

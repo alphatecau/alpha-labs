@@ -50,6 +50,10 @@ class Auth0PKCEFlow:
         return self.issuer + "authorize?" + urlencode(params)
 
 
+class ResearchAccountNotProvisioned(PermissionError):
+    """The provider verified the identity but research access is absent."""
+
+
 class Auth0CallbackController:
     def __init__(self, *, flow, exchange_code, token_verifier, sessions,
                  authorise_principal):
@@ -78,6 +82,6 @@ class Auth0CallbackController:
             raise PermissionError("missing ID token")
         principal = self.token_verifier.verify(tokens["id_token"], expected_nonce=nonce)
         if self.authorise_principal(principal) is not True:
-            raise PermissionError("unprovisioned identity")
+            raise ResearchAccountNotProvisioned("unprovisioned identity")
         sid = self.sessions.create(principal.subject, principal.issuer)
         return "__Host-alpha_session=" + sid + "; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=1800"

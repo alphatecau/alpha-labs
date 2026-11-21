@@ -266,6 +266,17 @@ class IntegratedAuth0BFFTests(unittest.TestCase):
         finally:
             self.app.reader.list_runs = original
 
+    def test_verified_unprovisioned_user_gets_no_session(self):
+        self.active.clear()
+        first = self.request("/auth/login")
+        state = parse_qs(urlsplit(dict(first["headers"])["Location"]).query)["state"][0]
+        response = self.request("/auth/callback", query="code=code&state=" + state,
+                                cookie=self.cookie(first, "__Host-alpha_oauth_state"), accept="text/html")
+        self.assertEqual(response["status"], 403)
+        self.assertIn(b"Research access required", response["body"])
+        self.assertFalse(any(k == "Set-Cookie" and v.startswith("__Host-alpha_session=")
+                             for k, v in response["headers"]))
+
     def test_callback_token_exchange_failure_no_session(self):
         first = self.request("/auth/login")
         url = next(v for k, v in first["headers"] if k == "Location")

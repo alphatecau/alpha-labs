@@ -63,7 +63,7 @@ class TenantCredentialBroker:
         # No dynamic SQL, no superuser fallback, no caller-provided DSN.
         with self._connect(host=credentials["host"], port=credentials["port"],
                            dbname=credentials["dbname"], user=credentials["user"],
-                           password=credentials["password"], sslmode="verify-full",
+                           password=credentials["password"], sslmode="verify-full", sslrootcert="system",
                            connect_timeout=5) as connection:
             # Keep identity, policy checks and reads on the same transaction and
             # physical connection, including with a transaction-mode pooler.

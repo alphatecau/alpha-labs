@@ -7,6 +7,7 @@ No implicit environment or database fallback.
 import hashlib
 import hmac
 import json
+import logging
 import re
 import secrets
 from http.cookies import SimpleCookie
@@ -124,25 +125,32 @@ class StagingResearchBFF:
                 if page:
                     return reply("303 See Other", headers=[("Location", "/auth/login")])
                 return reply("401 Unauthorized")
+            stage = "session_lookup"
             try:
                 owner = self.sessions.resolve_owner(sid)
                 if not isinstance(owner, str) or not re.fullmatch(r"oidc_[a-f0-9]{64}", owner):
                     raise PermissionError("unverified account")
                 # A valid session is not proof that account access is still active.
                 # No tenant credential lookup or data query may precede this check.
+                stage = "ownership_lookup"
                 if self.authorize_owner(owner) is not True:
                     raise PermissionError("account not authorised")
+                stage = "research_read"
                 if page:
                     return reply("200 OK", research_dashboard.dashboard(self.reader.list_runs(owner)), html=True)
                 data = self.reader.list_runs(owner) if path.endswith("/runs") else self.reader.summary(owner)
                 body = json.dumps({"status": "verified_source", "data": data}, allow_nan=False).encode()
                 return reply("200 OK", body, [("Content-Type", "application/json")])
             except PermissionError:
+                logging.getLogger(__name__).warning("research_access_denied stage=%s", stage)
                 if page:
                     return reply("403 Forbidden", research_dashboard.access_message(
                         "Access unavailable", "Sign in with a provisioned research account."), html=True)
                 return reply("403 Forbidden")
-            except Exception:
+            except Exception as exc:
+                # Database exception messages can contain connection details. Log only categories.
+                logging.getLogger(__name__).error("research_unavailable stage=%s type=%s sqlstate=%s",
+                    stage, type(exc).__name__, getattr(exc, "sqlstate", None))
                 if page:
                     return reply("503 Service Unavailable", research_dashboard.access_message(
                         "Research temporarily unavailable", "Your account data could not be verified."), html=True)

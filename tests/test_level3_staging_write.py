@@ -42,7 +42,7 @@ class TestStagingWrite(unittest.TestCase):
         with mock.patch.object(os, "link", create=True):
             # Force the Android code path even on CPython builds with os.link.
             with mock.patch("tools.level3_staging.controlled_write.hasattr",
-                            side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key)):
+                            side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key), create=True):
                 apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
         self.assertEqual((self.root / self.path).read_text(), "hello")
         self.assertFalse(self.approval.exists())
@@ -55,7 +55,7 @@ class TestStagingWrite(unittest.TestCase):
         consumed = Path(str(self.approval) + ".consumed")
         consumed.write_text("prior")
         with mock.patch("tools.level3_staging.controlled_write.hasattr",
-                        side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key)):
+                        side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key), create=True):
             with self.assertRaises(Refused):
                 apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
         self.assertEqual(consumed.read_text(), "prior")

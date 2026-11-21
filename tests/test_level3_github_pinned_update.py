@@ -1,6 +1,7 @@
 """Offline tests for pinned GitHub staging updates."""
 import hashlib
 import importlib.util
+import importlib.util
 from pathlib import Path
 import sys
 import tempfile
@@ -8,7 +9,6 @@ import unittest
 
 TOOLS = Path(__file__).resolve().parents[1] / "tools/level3_staging"
 sys.path.insert(0, str(TOOLS))
-import importlib.util
 
 spec = importlib.util.spec_from_file_location("github_pinned_update", TOOLS / "github_pinned_update.py")
 module = importlib.util.module_from_spec(spec)

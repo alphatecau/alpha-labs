@@ -46,3 +46,10 @@ Status: **core create/update acceptance PASSED; security and operational accepta
 ## Repository CI after recovery-report implementation
 
 Commit `d8b87f6b1cbacfe06f6cf6b2fecf67c1c6950cc2`: seven checks completed successfully (Ruff, CodeQL, Gitleaks, Level 3 staging prototype checks, backend CI, Sites tests and offline research tests). These are repository checks, not a substitute for device acceptance.
+
+## Android recovery-report acceptance (operator output, 2026-11-21)
+
+- Downloaded recovery-report utility and tests from commit `ffaa4042016d20d3a38bc51d2d39067b65eefdb6`.
+- `python -m unittest discover -s tests -p 'test_level3_github_*.py' -q`: **23 tests passed** in 0.177 seconds.
+- Recovery report: `status: consistent`, `audit_entries: 1`, `affected_files: []`.
+- Explicit limitations: unrecorded files not checked; operations interrupted before journal append may be missing; same-UID journal tampering possible; no automatic restoration or rollback.

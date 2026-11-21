@@ -15,7 +15,7 @@ from deployment.staging_authenticated_bff import StagingResearchBFF
 
 def compose_auth0_staging(*, issuer, client_id, client_secret, origin, jwks=None,
                           oauth_connect, session_connect, ownership,
-                          reader, account_key="primary"):
+                          reader, account_key="primary", paper_reader=None, market_reader=None, revision=None):
     """Return WSGI app only when all trusted dependencies are explicitly supplied."""
     if oauth_connect is session_connect:
         raise ValueError("separate restricted OAuth and session DB connections required")
@@ -44,5 +44,6 @@ def compose_auth0_staging(*, issuer, client_id, client_secret, origin, jwks=None
         flow=flow, exchange_code=exchanger, token_verifier=verifier,
         sessions=sessions, authorise_principal=authorised)
     return StagingResearchBFF(
-        flow, controller, sessions, reader, origin=origin,
+        flow, controller, sessions, reader, origin=origin, paper_reader=paper_reader,
+        market_reader=market_reader, revision=revision,
         authorize_owner=lambda owner: ownership.require_owner_id(owner, account_key))

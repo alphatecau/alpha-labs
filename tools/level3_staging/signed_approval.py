@@ -52,8 +52,7 @@ def verify(payload, signature_b64, public_key_b64, path, content, *, now=None):
         if len(signature) != 64 or len(public) != 32:
             raise ApprovalDenied("invalid key or signature length")
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
-        from cryptography.exceptions import InvalidSignature
         Ed25519PublicKey.from_public_bytes(public).verify(signature, message)
-    except (ValueError, TypeError, ImportError, InvalidSignature) as exc:
+    except Exception as exc:  # fail closed if crypto dependency is unavailable
         raise ApprovalDenied("signature verification failed") from exc
     return {"nonce": payload["nonce"], "path": path, "sha256": payload["sha256"]}

@@ -96,6 +96,38 @@ class TestStagingWrite(unittest.TestCase):
         self.assertFalse(self.approval.exists())
         self.assertFalse((self.root / self.path).exists())
 
+    def test_approval_swap_during_claim_refused(self):
+        from tools.level3_staging import controlled_write
+        self.approve()
+        original_claim = controlled_write._consume_approval
+
+        def swap_then_claim(source, consumed):
+            source.unlink()
+            source.write_text(json.dumps({"operation": "create", "path": self.path,
+                "sha256": digest("hello"), "expires_at": 1100}))
+            source.chmod(0o600)
+            return original_claim(source, consumed)
+
+        with mock.patch.object(controlled_write, "_consume_approval", side_effect=swap_then_claim):
+            with self.assertRaisesRegex(Refused, "approval changed"):
+                apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+        self.assertFalse((self.root / self.path).exists())
+        self.assertFalse(self.audit.exists())
+
+    def test_approval_mutation_during_claim_refused(self):
+        from tools.level3_staging import controlled_write
+        self.approve()
+        original_claim = controlled_write._consume_approval
+
+        def mutate_then_claim(source, consumed):
+            source.write_text(source.read_text() + " ")
+            return original_claim(source, consumed)
+
+        with mock.patch.object(controlled_write, "_consume_approval", side_effect=mutate_then_claim):
+            with self.assertRaisesRegex(Refused, "approval contents changed"):
+                apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+        self.assertFalse((self.root / self.path).exists())
+
     def test_traversal(self):
         with self.assertRaises(Refused):
             propose(self.root, "docs/level3-staging/../bad.md", "x")

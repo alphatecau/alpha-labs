@@ -35,3 +35,10 @@ Status: **core create/update acceptance PASSED; security and operational accepta
 - SHA-256 `708cc91e9b1a5c00b4180e1bcdb2a8fea629046cb78ecd766531ca623fbf787f` verified by installer.
 - Audit JSONL last entry displayed matching commit, path, SHA-256, `operation: created`, `outcome: completed`, timestamp `1795251199`.
 - This verifies a successful audit entry, **not** crash consistency, tamper resistance, complete historical reconciliation or independent approval custody.
+
+## Android reconciliation acceptance (operator output, 2026-11-21)
+
+- Fetched `github_staging_reconcile.py` and its tests from commit `012b22dc946f8f1d75c2ea03e0c82509c280c1c7`.
+- `python -m unittest discover -s tests -p 'test_level3_github_*.py' -q`: **20 tests passed** in 0.104 seconds.
+- Read-only reconciliation returned `entries: 1`, audited path `docs/level3-staging/audit_acceptance.md`, `status: match`, expected SHA-256 `708cc91e9b1a5c00b4180e1bcdb2a8fea629046cb78ecd766531ca623fbf787f`, `ok: true`.
+- These results do not verify independent approval custody, tamper resistance, automatic crash recovery or direct MCP write exposure.

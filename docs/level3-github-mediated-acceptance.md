@@ -28,3 +28,10 @@ Status: **core create/update acceptance PASSED; security and operational accepta
 3. Independent GitHub review/approval verification (or explicitly maintain the operator-trusted manual mode).
 4. Independent authorisation and key custody before direct MCP write exposure.
 5. Re-run regression and end-to-end acceptance after security changes.
+
+## Real Android audit acceptance (operator output, 2026-11-21)
+
+- Pinned fixture commit `bee29f8d2857a264824d24b6bc10ad61b7ade5e3` created `docs/level3-staging/audit_acceptance.md` after explicit `INSTALL`.
+- SHA-256 `708cc91e9b1a5c00b4180e1bcdb2a8fea629046cb78ecd766531ca623fbf787f` verified by installer.
+- Audit JSONL last entry displayed matching commit, path, SHA-256, `operation: created`, `outcome: completed`, timestamp `1795251199`.
+- This verifies a successful audit entry, **not** crash consistency, tamper resistance, complete historical reconciliation or independent approval custody.

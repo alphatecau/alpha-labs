@@ -97,6 +97,9 @@ class StoppedPaperSnapshotReader:
                 snapshot_read_only(raw, copy)
             else:
                 encoded = self.directory / (binding.sha256 + ".b64")
+                if not encoded.is_file():
+                    # Render secret-file names must begin with a letter.
+                    encoded = self.directory / ("j_" + binding.sha256 + ".b64")
                 with encoded.open("rb") as f:
                     payload = f.read(4 * ((MAX_BYTES + 2) // 3) + 2)
                     if f.read(1):

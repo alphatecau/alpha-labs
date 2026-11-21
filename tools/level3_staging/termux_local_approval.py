@@ -134,12 +134,12 @@ def apply(root, request_id):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("operation", choices=("approve",))
+    parser.add_argument("operation", choices=("approve", "apply"))
     parser.add_argument("request_id")
     parser.add_argument("--root", required=True)
     args = parser.parse_args()
     try:
-        print(json.dumps(approve(args.root, args.request_id)))
+        print(json.dumps(approve(args.root, args.request_id) if args.operation == "approve" else apply(args.root, args.request_id)))
     except (Refused, OSError, ValueError, KeyError) as exc:
         raise SystemExit("Denied: " + type(exc).__name__) from exc
 

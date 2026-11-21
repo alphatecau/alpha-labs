@@ -9,9 +9,9 @@ from deployment.staging_authenticated_bff import StagingResearchBFF
 OWNER = "oidc_" + "a" * 64
 
 
-def request(app, *, cookie="__Host-alpha_session=valid"):
+def request(app, *, cookie="__Host-alpha_session=valid", path="/api/v1/paper/snapshot"):
     response = []
-    body = b"".join(app({"PATH_INFO": "/api/v1/paper/snapshot",
+    body = b"".join(app({"PATH_INFO": path,
                          "REQUEST_METHOD": "GET", "HTTP_COOKIE": cookie},
                         lambda status, headers: response.append((status, headers))))
     return response[0][0], body
@@ -61,6 +61,22 @@ class PaperRelayTests(unittest.TestCase):
         reader.snapshot.side_effect = RuntimeError("journal unavailable")
         status, _ = request(make_app(reader=reader))
         self.assertEqual(status, "503 Service Unavailable")
+
+    def test_identity_diagnostic_requires_valid_session_and_owner(self):
+        reader = Mock()
+        reader.bindings = {OWNER: object()}
+        app = make_app(reader=reader)
+        status, body = request(app, path="/api/v1/paper/identity")
+        self.assertEqual(status, "200 OK")
+        data = json.loads(body)
+        self.assertEqual(data["data"], {"owner": OWNER, "journal_provisioned": True})
+        self.assertEqual(data["trading"], "disabled")
+        self.assertNotIn("cookie", body.decode().lower())
+        self.assertEqual(request(make_app(reader=reader), cookie="",
+                                 path="/api/v1/paper/identity")[0], "401 Unauthorized")
+        self.assertEqual(request(make_app(reader=reader, authorised=False),
+                                 path="/api/v1/paper/identity")[0], "403 Forbidden")
+        self.assertEqual(request(make_app(), path="/api/v1/paper/identity")[0], "200 OK")
 
     def test_post_cannot_execute_orders(self):
         app = make_app(reader=Mock())

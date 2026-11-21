@@ -9,7 +9,7 @@ Status: **core create/update acceptance PASSED; security and operational accepta
 - Creation is exclusive (no overwrite). Updating checks old and new SHA-256, refusing stale changes.
 - Allowed: `docs/level3-staging/[A-Za-z0-9_-]+.md` and `tests/level3-staging/[A-Za-z0-9_-]+.txt`, max 32 KiB.
 - **A commit SHA does not prove GitHub PR approval**. The installer does not query or cryptographically attest to PR approval. A compromised same-UID Android process can potentially tamper with files or approval prompts; no independent security boundary exists.
-- The installer currently has no durable audit log, rollback journal or automatic crash reconciliation.
+- The operator-run installer and updater now append fsynced success records to a local audit journal. This is not tamper-proof, and there is no transactional crash journal or automatic restoration. Read-only reconciliation and recovery reporting are available.
 - No arbitrary shell commands, trading operations, credentials, or production writes are provided.
 
 ## Verified on Android (operator-provided Termux output, 2026-11-21)
@@ -23,8 +23,8 @@ Status: **core create/update acceptance PASSED; security and operational accepta
 
 ## Remaining before operational acceptance
 
-1. Durable append-only audit and reconciliation of interrupted operations.
-2. Documented backup and rollback with independent content-hash verification.
+1. Transactional crash recovery, including detection of operations interrupted before audit append.
+2. Documented backup and rollback with independent content-hash verification; read-only recovery reports are implemented.
 3. Independent GitHub review/approval verification (or explicitly maintain the operator-trusted manual mode).
 4. Independent authorisation and key custody before direct MCP write exposure.
 5. Re-run regression and end-to-end acceptance after security changes.
@@ -42,3 +42,7 @@ Status: **core create/update acceptance PASSED; security and operational accepta
 - `python -m unittest discover -s tests -p 'test_level3_github_*.py' -q`: **20 tests passed** in 0.104 seconds.
 - Read-only reconciliation returned `entries: 1`, audited path `docs/level3-staging/audit_acceptance.md`, `status: match`, expected SHA-256 `708cc91e9b1a5c00b4180e1bcdb2a8fea629046cb78ecd766531ca623fbf787f`, `ok: true`.
 - These results do not verify independent approval custody, tamper resistance, automatic crash recovery or direct MCP write exposure.
+
+## Repository CI after recovery-report implementation
+
+Commit `d8b87f6b1cbacfe06f6cf6b2fecf67c1c6950cc2`: seven checks completed successfully (Ruff, CodeQL, Gitleaks, Level 3 staging prototype checks, backend CI, Sites tests and offline research tests). These are repository checks, not a substitute for device acceptance.

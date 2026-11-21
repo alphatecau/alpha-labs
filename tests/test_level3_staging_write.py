@@ -1,5 +1,6 @@
 """Offline tests for Level 3 prototype; no network or MCP activation."""
 import json
+import concurrent.futures
 import os
 from pathlib import Path
 import tempfile
@@ -60,6 +61,39 @@ class TestStagingWrite(unittest.TestCase):
                 apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
         self.assertEqual(consumed.read_text(), "prior")
         self.assertTrue(self.approval.exists())
+        self.assertFalse((self.root / self.path).exists())
+
+    def test_android_concurrent_consumption_single_winner(self):
+        from tools.level3_staging.controlled_write import _consume_approval
+        self.approve()
+        consumed = Path(str(self.approval) + ".consumed")
+
+        def claim(_):
+            try:
+                _consume_approval(self.approval, consumed)
+                return True
+            except (Refused, FileNotFoundError, OSError):
+                return False
+
+        with mock.patch("tools.level3_staging.controlled_write.hasattr",
+                        side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key), create=True):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+                results = list(pool.map(claim, range(8)))
+        self.assertEqual(sum(results), 1)
+        self.assertTrue(consumed.exists())
+        self.assertFalse(self.approval.exists())
+
+    def test_android_failed_directory_sync_fails_closed(self):
+        from tools.level3_staging.controlled_write import _consume_approval
+        self.approve()
+        consumed = Path(str(self.approval) + ".consumed")
+        with mock.patch("tools.level3_staging.controlled_write.hasattr",
+                        side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key), create=True):
+            with mock.patch("tools.level3_staging.controlled_write.os.fsync", side_effect=OSError("injected fsync failure")):
+                with self.assertRaises(Refused):
+                    _consume_approval(self.approval, consumed)
+        self.assertTrue(consumed.exists())
+        self.assertFalse(self.approval.exists())
         self.assertFalse((self.root / self.path).exists())
 
     def test_traversal(self):

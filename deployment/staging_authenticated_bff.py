@@ -16,7 +16,7 @@ from deployment.account_role_research_reader import AccountRoleResearchReader
 
 
 class StagingResearchBFF:
-    def __init__(self, flow, controller, sessions, reader, *, origin, authorize_owner):
+    def __init__(self, flow, controller, sessions, reader, *, origin, authorize_owner, paper_reader=None):
         parsed = urlsplit(origin)
         if parsed.scheme != "https" or not parsed.hostname or parsed.path or parsed.query or parsed.fragment:
             raise ValueError("exact HTTPS origin required")
@@ -29,6 +29,7 @@ class StagingResearchBFF:
         self.flow, self.controller, self.sessions, self.reader = flow, controller, sessions, reader
         self.authorize_owner = authorize_owner
         self.origin = origin.rstrip("/")
+        self.paper_reader = paper_reader
 
     def __call__(self, env, start_response):
         def reply(status, data=b"", headers=()):
@@ -79,7 +80,7 @@ class StagingResearchBFF:
                     return reply("503 Service Unavailable")
             return reply("204 No Content", headers=[
                 ("Set-Cookie", "__Host-alpha_session=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0")])
-        if path in ("/api/v1/research/runs", "/api/v1/research/summary") and method == "GET":
+        if path in ("/api/v1/research/runs", "/api/v1/research/summary", "/api/v1/paper/snapshot") and method == "GET":
             sid = self._cookie(env, "__Host-alpha_session")
             if not sid:
                 return reply("401 Unauthorized")
@@ -91,8 +92,14 @@ class StagingResearchBFF:
                 # No tenant credential lookup or data query may precede this check.
                 if self.authorize_owner(owner) is not True:
                     raise PermissionError("account not authorised")
-                data = self.reader.list_runs(owner) if path.endswith("/runs") else self.reader.summary(owner)
-                body = json.dumps({"status": "verified_source", "data": data}, allow_nan=False).encode()
+                if path == "/api/v1/paper/snapshot":
+                    # No shared file path, demo data, or implicit public fallback.
+                    if self.paper_reader is None:
+                        return reply("503 Service Unavailable")
+                    data = self.paper_reader.snapshot(owner)
+                else:
+                    data = self.reader.list_runs(owner) if path.endswith("/runs") else self.reader.summary(owner)
+                body = json.dumps({"status": "verified_source", "mode": "paper_only", "trading": "disabled", "data": data}, allow_nan=False).encode()
                 return reply("200 OK", body, [("Content-Type", "application/json")])
             except PermissionError:
                 return reply("403 Forbidden")

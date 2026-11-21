@@ -81,6 +81,15 @@ class SnapshotTests(unittest.TestCase):
         self.assertIsNone(data["aud"])
         self.assertIsNotNone(data["cash_usd"])
 
+    def test_render_prefixed_secret_filename_and_tamper_rejection(self):
+        encoded = self.root / ("j_" + self.binding["sha256"] + ".b64")
+        encoded.write_bytes(base64.b64encode(self.file.read_bytes()))
+        self.file.unlink()
+        self.assertEqual(self.reader().snapshot(OWNER)["events"], 1)
+        encoded.write_bytes(base64.b64encode(b"not the expected journal"))
+        with self.assertRaises(ValueError):
+            self.reader().snapshot(OWNER)
+
     def test_currency_dates_move_independently_of_usd_pnl(self):
         buy = {"symbol": "BTC-USD", "side": "BUY", "quantity": "2", "price": "100", "fee": "2",
                "filled_at": "2026-11-10T10:00:00Z"}

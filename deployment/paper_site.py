@@ -8,8 +8,6 @@ from threading import Lock
 from time import monotonic
 from urllib.parse import parse_qs
 
-from alpha_lab.research.coinbase_paper_book import PRODUCTS
-from alpha_lab.research.paper_market_feed import PaperMarketFeed
 
 PAPER_SITE = "https://alpha-labs-intelligence.alpha-tec-au86.chatgpt.site"
 
@@ -55,6 +53,7 @@ class RelayBudget:
 class MarketBooks:
     """Reuse the simulator's exchange validation and 429 backoff without a trading runtime."""
     def __init__(self, feed=None):
+        from alpha_lab.research.paper_market_feed import PaperMarketFeed
         self.feed = feed or PaperMarketFeed()
         self.poll_lock = Lock()
         self.next_poll = 0
@@ -63,7 +62,7 @@ class MarketBooks:
         if self.poll_lock.acquire(blocking=False):
             try:
                 if monotonic() >= self.next_poll:
-                    with ThreadPoolExecutor(max_workers=len(PRODUCTS)) as pool:
+                    with ThreadPoolExecutor(max_workers=len(self.feed.product_retry_at)) as pool:
                         self.feed.poll(pool)
                     self.next_poll = monotonic() + 5
             finally:

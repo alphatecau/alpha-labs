@@ -131,7 +131,7 @@ class StagingResearchBFF:
                 return reply("303 See Other", headers=headers)
             return reply("204 No Content", headers=headers)
         page = path in ("/", "/dashboard")
-        paper = path in ("/api/v1/paper/snapshot", "/api/v1/paper/markets", "/api/v1/paper/research")
+        paper = path in ("/api/v1/paper/snapshot", "/api/v1/paper/markets", "/api/v1/paper/research", "/api/v1/paper/identity")
         if (page or paper or path in ("/api/v1/research/runs", "/api/v1/research/summary")) and method == "GET":
             sid = self._cookie(env, "__Host-alpha_session")
             if not sid:
@@ -156,7 +156,11 @@ class StagingResearchBFF:
                         index = page_number(env.get("QUERY_STRING", ""), path.endswith("/snapshot"))
                     except ValueError:
                         return reply("400 Bad Request")
-                    if path.endswith("/snapshot"):
+                    if path.endswith("/identity"):
+                        # Owner-only provisioning diagnostic; never returns credentials or session data.
+                        data = {"owner": owner, "journal_provisioned": bool(
+                            self.paper_reader is not None and owner in self.paper_reader.bindings)}
+                    elif path.endswith("/snapshot"):
                         if self.paper_reader is None:
                             return reply("503 Service Unavailable")
                         data = self.paper_reader.snapshot(owner, page=index) if index else self.paper_reader.snapshot(owner)

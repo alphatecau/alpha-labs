@@ -1,11 +1,13 @@
 """Offline tests for restricted Termux Level 3 staging."""
 import json
+import io
+import contextlib
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from tools.level3_staging.termux_local_approval import Refused, propose, approve, apply
+from tools.level3_staging.termux_local_approval import Refused, propose, approve, apply, main
 from tools.level3_staging.termux_local_mcp import dispatch
 
 
@@ -28,6 +30,25 @@ class LocalStagingTests(unittest.TestCase):
         self.assertEqual((self.root / receipt["path"]).read_text(), "approved content")
         with self.assertRaises(Refused):
             apply(self.root, pending["request_id"])
+
+    def test_cli_apply_requires_prior_approval(self):
+        pending = propose(self.root, "docs/level3-staging/cli.md", "cli content")
+        args = ["level3", "apply", pending["request_id"], "--root", str(self.root)]
+        with patch("sys.argv", args), contextlib.redirect_stdout(io.StringIO()):
+            with self.assertRaises(SystemExit) as denied:
+                main()
+        self.assertIn("Denied", str(denied.exception))
+        self.assertFalse((self.root / "docs/level3-staging/cli.md").exists())
+        with patch("builtins.input", return_value="APPROVE"):
+            approve(self.root, pending["request_id"])
+        output = io.StringIO()
+        with patch("sys.argv", args), contextlib.redirect_stdout(output):
+            main()
+        self.assertEqual(json.loads(output.getvalue())["status"], "complete")
+        self.assertEqual((self.root / "docs/level3-staging/cli.md").read_text(), "cli content")
+        with patch("sys.argv", args), contextlib.redirect_stdout(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                main()
 
     def test_explicit_denial(self):
         pending = propose(self.root, "tests/level3-staging/probe.txt", "x")

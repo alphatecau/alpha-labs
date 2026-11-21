@@ -1,6 +1,5 @@
 """Level 3 staging-only file creation prototype. NOT safe to expose as a network MCP server."""
 import ctypes
-import errno
 import hashlib
 import json
 import os

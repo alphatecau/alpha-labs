@@ -25,3 +25,14 @@ The adapter waits for MCP JSON-RPC requests on stdin and returns responses on st
 - Verify the reviewer's expected Git SHA, proposal-only tool inventory, allowlisted paths, no writes on proposal, refusal of shell/apply/extra arguments, no secret leakage, and fail-closed oversized/malformed input.
 - Same-UID processes on Termux can interfere with local state; this prototype does not provide independent approval isolation.
 - Never enable live trading or production deployment from this adapter.
+
+## Explicit local write completion (not a remote MCP tool)
+
+After a proposal has been received, inspect the requested path, SHA-256 and full content before typing `APPROVE` locally. Replace `REQUEST_ID` with the returned 32-character hexadecimal ID:
+
+```sh
+python -m tools.level3_staging.termux_local_approval approve REQUEST_ID --root "$PWD"
+python -m tools.level3_staging.termux_local_approval apply REQUEST_ID --root "$PWD"
+```
+
+The apply command requires a previously approved record and creates only a new file in the restricted allowlist. It refuses overwrites and replay. The two commands are intentionally not exposed through the remote MCP tool inventory. The same-UID limitation remains: do not treat this as independent remote-client isolation. Before activating a remote tunnel, separately review transport authentication, identity binding, resource limits and exposure.

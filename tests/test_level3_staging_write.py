@@ -1,9 +1,11 @@
 """Offline tests for Level 3 prototype; no network or MCP activation."""
 import json
+import concurrent.futures
 import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 from tools.level3_staging.controlled_write import Refused, apply, digest, propose
 
 class TestStagingWrite(unittest.TestCase):
@@ -35,6 +37,96 @@ class TestStagingWrite(unittest.TestCase):
         apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
         with self.assertRaises((Refused, FileNotFoundError)):
             apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+
+    def test_android_atomic_create_and_replay(self):
+        self.approve()
+        with mock.patch.object(os, "link", create=True):
+            # Force the Android code path even on CPython builds with os.link.
+            with mock.patch("tools.level3_staging.controlled_write.hasattr",
+                            side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key), create=True):
+                apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+        self.assertEqual((self.root / self.path).read_text(), "hello")
+        self.assertFalse(self.approval.exists())
+        self.assertTrue(Path(str(self.approval) + ".consumed").exists())
+        with self.assertRaises((Refused, FileNotFoundError)):
+            apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+
+    def test_android_atomic_no_replace(self):
+        self.approve()
+        consumed = Path(str(self.approval) + ".consumed")
+        consumed.write_text("prior")
+        with mock.patch("tools.level3_staging.controlled_write.hasattr",
+                        side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key), create=True):
+            with self.assertRaises(Refused):
+                apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+        self.assertEqual(consumed.read_text(), "prior")
+        self.assertTrue(self.approval.exists())
+        self.assertFalse((self.root / self.path).exists())
+
+    def test_android_concurrent_consumption_single_winner(self):
+        from tools.level3_staging.controlled_write import _consume_approval
+        self.approve()
+        consumed = Path(str(self.approval) + ".consumed")
+
+        def claim(_):
+            try:
+                _consume_approval(self.approval, consumed)
+                return True
+            except (Refused, FileNotFoundError, OSError):
+                return False
+
+        with mock.patch("tools.level3_staging.controlled_write.hasattr",
+                        side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key), create=True):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+                results = list(pool.map(claim, range(8)))
+        self.assertEqual(sum(results), 1)
+        self.assertTrue(consumed.exists())
+        self.assertFalse(self.approval.exists())
+
+    def test_android_failed_directory_sync_fails_closed(self):
+        from tools.level3_staging.controlled_write import _consume_approval
+        self.approve()
+        consumed = Path(str(self.approval) + ".consumed")
+        with mock.patch("tools.level3_staging.controlled_write.hasattr",
+                        side_effect=lambda obj, key: False if obj is os and key == "link" else hasattr(obj, key), create=True):
+            with mock.patch("tools.level3_staging.controlled_write.os.fsync", side_effect=OSError("injected fsync failure")):
+                with self.assertRaises(Refused):
+                    _consume_approval(self.approval, consumed)
+        self.assertTrue(consumed.exists())
+        self.assertFalse(self.approval.exists())
+        self.assertFalse((self.root / self.path).exists())
+
+    def test_approval_swap_during_claim_refused(self):
+        from tools.level3_staging import controlled_write
+        self.approve()
+        original_claim = controlled_write._consume_approval
+
+        def swap_then_claim(source, consumed):
+            source.unlink()
+            source.write_text(json.dumps({"operation": "create", "path": self.path,
+                "sha256": digest("hello"), "expires_at": 1100}))
+            source.chmod(0o600)
+            return original_claim(source, consumed)
+
+        with mock.patch.object(controlled_write, "_consume_approval", side_effect=swap_then_claim):
+            with self.assertRaisesRegex(Refused, "approval changed"):
+                apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+        self.assertFalse((self.root / self.path).exists())
+        self.assertFalse(self.audit.exists())
+
+    def test_approval_mutation_during_claim_refused(self):
+        from tools.level3_staging import controlled_write
+        self.approve()
+        original_claim = controlled_write._consume_approval
+
+        def mutate_then_claim(source, consumed):
+            source.write_text(source.read_text() + " ")
+            return original_claim(source, consumed)
+
+        with mock.patch.object(controlled_write, "_consume_approval", side_effect=mutate_then_claim):
+            with self.assertRaisesRegex(Refused, "approval contents changed"):
+                apply(self.root, self.path, "hello", self.approval, self.audit, now=1000)
+        self.assertFalse((self.root / self.path).exists())
 
     def test_traversal(self):
         with self.assertRaises(Refused):
